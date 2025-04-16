@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 家谱网站（Family Tree）
 
-## Getting Started
+[English Version (README.en.md)](./README.en.md)
 
-First, run the development server:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 项目简介
+本项目是基于 Next.js 14 + TypeScript + pnpm + Shadcn UI 构建的家谱可视化制作与展示平台，专为家谱初学者、家族历史爱好者等用户打造，支持家谱生成、模板展示、内容科普和 SEO 优化。
+
+## 主要功能
+- 首页：项目介绍与导航
+- 家谱知识科普：家谱基础知识、常见问题
+- 家谱模板展示：多种模板图片/表格，支持下载
+- 家谱生成器：输入成员信息，生成树状结构
+- 移动端适配与响应式设计
+- 后续将支持拖拽式编辑、导出（PNG/PDF/JSON）、AI 辅助等高级功能
+
+## 技术栈
+- 包管理：pnpm
+- 前端框架：Next.js 14
+- UI 框架：Shadcn UI（基于 Tailwind CSS）
+- 语言：TypeScript
+- 可视化：Mermaid.js（计划中）
+- 其他：html2canvas、jsPDF（导出功能，计划中）
+
+## 如何启动与开发
+1. 安装依赖：
+   ```bash
+   pnpm install
+   ```
+2. 启动开发服务器：
+   ```bash
+   pnpm dev
+   ```
+3. 访问 [http://localhost:3000](http://localhost:3000) 查看效果。
+
+## 目录结构
+```
+family-tree/
+├── app/                # Next.js 14 App Router 目录
+├── components/         # 组件库（Shadcn UI）
+├── public/             # 静态资源
+├── src/lib/            # 工具库与通用方法
+├── docs/               # 需求文档与开发计划
+├── README.md           # 项目说明
+├── package.json        # 项目依赖
+├── tailwind.config.js  # Tailwind 配置
+└── ...
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 未来计划
+- 拖拽式家谱编辑器
+- 家谱数据本地/云端存储与导入导出
+- 家谱可视化渲染（Mermaid.js/SVG）
+- AI 辅助家谱分析与自动补全
+- 多用户协作编辑
+- 多语言支持与后台内容管理
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 参考文档
+- [family-tree-dev-plan.md](./docs/family-tree-dev-plan.md)
+- [Next.js 官方文档](https://nextjs.org/)
+- [Shadcn UI 官方文档](https://ui.shadcn.com/)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+如有建议或需求，欢迎 issue 反馈！
