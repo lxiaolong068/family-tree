@@ -1,33 +1,22 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import React from 'react';
+import Link from 'next/link';
+import { Button } from "@/components/ui/button"
 
-export default function Home() {
+const HomePage = () => {
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-blue-50 p-6">
-      <h1 className="text-4xl font-bold mb-4 text-blue-800">Family Tree Website</h1>
-      <p className="text-lg text-gray-700 max-w-xl text-center mb-8">
-        Build, visualize, and share your family history. Create beautiful family trees with ease, explore templates, and learn about genealogy.
+    <div className="container mx-auto py-10">
+      <h1 className="text-3xl font-bold mb-4">家谱网站</h1>
+      <p className="text-gray-700 mb-4">
+        欢迎来到家谱网站，一个免费、易用的家谱制作工具。我们致力于帮助您轻松创建、展示和分享您的家族历史。
       </p>
-      <div className="flex flex-col sm:flex-row gap-4 mb-12 w-full justify-center items-center">
-        <Link href="/generator" className="w-full sm:w-auto">
-          <Button className="min-w-[180px] px-6 py-3 text-base font-semibold whitespace-nowrap">
-            Family Tree Generator
-          </Button>
-        </Link>
-        <Link href="/templates" className="w-full sm:w-auto">
-          <Button variant="outline" className="min-w-[140px] px-6 py-3 text-base font-semibold whitespace-nowrap">
-            Templates
-          </Button>
-        </Link>
-        <Link href="/knowledge" className="w-full sm:w-auto">
-          <Button variant="ghost" className="min-w-[180px] px-6 py-3 text-base font-semibold whitespace-nowrap">
-            Genealogy Knowledge
-          </Button>
-        </Link>
-      </div>
-      <footer className="text-gray-400 text-sm mt-12">
-        &copy; {new Date().getFullYear()} Family Tree Project. Powered by Next.js & Shadcn UI.
-      </footer>
-    </main>
+      <p className="text-gray-700 mb-4">
+        在这里，您可以找到家谱知识科普、丰富的家谱模板，以及简单易用的家谱生成器。
+      </p>
+      <Link href="/generator">
+        <Button>开始制作家谱</Button>
+      </Link>
+    </div>
   );
-}
+};
+
+export default HomePage;

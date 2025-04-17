@@ -1,68 +1,63 @@
 "use client";
-import React, { useState } from "react";
+
+import React, { useState } from 'react';
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-/**
- * Family member node type
- */
-export interface FamilyMember {
-  id: string; // unique identifier
-  name: string; // member name
-  gender?: "male" | "female";
-  parentId?: string | null; // parent node id
-  children?: FamilyMember[];
+interface Member {
+  name: string;
+  relation: string;
 }
 
-/**
- * Family Tree Generator Page (Drag-and-drop editor prototype)
- * Supports adding members, (future) drag-and-drop relationship editing, and visualization preview (Mermaid.js planned)
- */
-const initialData: FamilyMember[] = [
-  { id: "1", name: "Ancestor", gender: "male", parentId: null, children: [] },
-];
+const GeneratorPage = () => {
+  const [members, setMembers] = useState<Member[]>([{ name: '', relation: '' }]);
 
-export default function FamilyTreeGenerator() {
-  const [members, setMembers] = useState<FamilyMember[]>(initialData);
-
-  // Add new member (simple version, can be extended to form input)
   const handleAddMember = () => {
-    const name = prompt("Enter the new member's name:");
-    if (!name) return;
-    setMembers((prev) => [
-      ...prev,
-      { id: Date.now().toString(), name, parentId: null, children: [] },
-    ]);
+    setMembers([...members, { name: '', relation: '' }]);
   };
 
-  // Placeholder for drag-and-drop and relationship editing (to be implemented with dnd-kit or react-dnd)
-  // TODO: Implement drag-and-drop to adjust parent-child relationships
+  const handleInputChange = (index: number, field: keyof Member, value: string) => {
+    const newMembers = [...members];
+    newMembers[index][field] = value;
+    setMembers(newMembers);
+  };
 
   return (
-    <div className="p-6 max-w-3xl mx-auto min-h-screen flex flex-col items-center justify-start">
-      <h1 className="text-3xl font-bold mb-4 text-blue-800">Family Tree Generator (Drag-and-drop Prototype)</h1>
-      <p className="mb-6 text-gray-700 text-center max-w-xl">
-        Add family members, edit relationships (drag-and-drop coming soon), and visualize your family tree.<br />
-        This is an early prototype. More features and better UI are on the way!
+    <div className="container mx-auto py-10">
+      <h1 className="text-3xl font-bold mb-4">家谱生成器</h1>
+      <p className="text-gray-700 mb-4">
+        输入家族成员信息，生成您的专属家谱。
       </p>
-      <Button onClick={handleAddMember} className="mb-6 px-6 py-2">
-        Add New Member
+      {members.map((member, index) => (
+        <div key={index} className="flex items-center mb-4 space-x-2">
+          <Input
+            type="text"
+            placeholder="姓名"
+            value={member.name}
+            onChange={(e) => handleInputChange(index, 'name', e.target.value)}
+            className="flex-1"
+          />
+          <Input
+            type="text"
+            placeholder="关系 (例如：父亲, 母亲, 儿子, 女儿)"
+            value={member.relation}
+            onChange={(e) => handleInputChange(index, 'relation', e.target.value)}
+            className="flex-1"
+          />
+          {/* 考虑添加删除按钮 */}
+        </div>
+      ))}
+      <Button onClick={handleAddMember}>
+        添加成员
       </Button>
-      <ul className="space-y-2 w-full mb-8">
-        {members.map((member) => (
-          <li
-            key={member.id}
-            className="border rounded p-3 flex items-center justify-between bg-white shadow-sm"
-          >
-            <span className="font-medium text-gray-800">{member.name}</span>
-            {/* Placeholder for drag handle and actions */}
-            <span className="text-xs text-gray-400">ID: {member.id}</span>
-          </li>
-        ))}
-      </ul>
-      {/* Placeholder: Mermaid.js visualization area */}
-      <div className="mt-8 p-4 bg-gray-50 rounded border text-gray-500 w-full text-center">
-        <span>(Drag-and-drop editing, tree visualization, import/export, and more coming soon!)</span>
+      <div className="mt-4">
+        {/* 家谱树状结构展示 */}
+        <p className="text-gray-700">
+          家谱结构将在后续版本中实现。
+        </p>
       </div>
     </div>
   );
-}
+};
+
+export default GeneratorPage;
