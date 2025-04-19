@@ -6,9 +6,9 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 const navItems = [
-  { href: "/knowledge", label: "家谱知识" },
-  { href: "/templates", label: "家谱模板" },
-  { href: "/generator", label: "家谱生成器" },
+  { href: "/knowledge", label: "Knowledge" },
+  { href: "/templates", label: "Templates" },
+  { href: "/generator", label: "Generator" },
 ];
 
 const Navbar = () => {
@@ -18,7 +18,7 @@ const Navbar = () => {
     <nav className="bg-gray-100 py-4 border-b"> {/* 添加底部边框 */}
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors">
-          家谱网站
+          Family Tree
         </Link>
         <ul className="flex space-x-6"> {/* 增加链接间距 */}
           {navItems.map((item) => (

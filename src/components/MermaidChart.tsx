@@ -11,8 +11,8 @@ interface MermaidChartProps {
 const MermaidChart: React.FC<MermaidChartProps> = ({ chartDefinition, className }) => {
   const chartRef = useRef<HTMLDivElement>(null);
 
+  // Initialize mermaid only once
   useEffect(() => {
-    // 初始化mermaid配置
     mermaid.initialize({
       startOnLoad: true,
       theme: 'default',
@@ -24,38 +24,40 @@ const MermaidChart: React.FC<MermaidChartProps> = ({ chartDefinition, className 
       },
       logLevel: 'error'
     });
+  }, []);
 
-    // 渲染图表
-    if (chartRef.current) {
-      try {
-        // 清除之前的内容
-        chartRef.current.innerHTML = '';
+  // Render chart when definition changes
+  useEffect(() => {
+    if (!chartDefinition || !chartRef.current) return;
 
-        // 使用唯一ID避免冲突
-        const uniqueId = `mermaid-chart-${Math.random().toString(36).substring(2, 9)}`;
+    try {
+      // Clear previous content
+      chartRef.current.innerHTML = '';
 
-        mermaid.render(uniqueId, chartDefinition).then(({ svg }) => {
-          if (chartRef.current) {
-            chartRef.current.innerHTML = svg;
-          }
-        }).catch((error) => {
-          console.error('Mermaid chart rendering failed:', error);
-          if (chartRef.current) {
-            chartRef.current.innerHTML = `<div class="text-red-500">图表渲染失败: ${error instanceof Error ? error.message : String(error)}</div>`;
-          }
-        });
-      } catch (error) {
+      // Use unique ID to avoid conflicts
+      const uniqueId = `mermaid-chart-${Math.random().toString(36).substring(2, 9)}`;
+
+      mermaid.render(uniqueId, chartDefinition).then(({ svg }) => {
+        if (chartRef.current) {
+          chartRef.current.innerHTML = svg;
+        }
+      }).catch((error) => {
         console.error('Mermaid chart rendering failed:', error);
         if (chartRef.current) {
-          chartRef.current.innerHTML = `<div class="text-red-500">图表渲染失败: ${error instanceof Error ? error.message : String(error)}</div>`;
+          chartRef.current.innerHTML = `<div class="text-red-500">Chart rendering failed: ${error instanceof Error ? error.message : String(error)}</div>`;
         }
+      });
+    } catch (error) {
+      console.error('Mermaid chart rendering failed:', error);
+      if (chartRef.current) {
+        chartRef.current.innerHTML = `<div class="text-red-500">Chart rendering failed: ${error instanceof Error ? error.message : String(error)}</div>`;
       }
     }
   }, [chartDefinition]);
 
   return (
     <div ref={chartRef} className={className}>
-      {/* Mermaid图表将在这里渲染 */}
+      {/* Mermaid chart will be rendered here */}
     </div>
   );
 };

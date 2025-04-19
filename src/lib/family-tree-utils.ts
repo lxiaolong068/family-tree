@@ -1,11 +1,14 @@
 import { Member, FamilyTree, FamilyTreeChartType } from '@/types/family-tree';
+import { db } from '@/db';
+import { familyTrees, members } from '@/db/schema';
+import { eq } from 'drizzle-orm';
 
 /**
- * 生成Mermaid.js图表定义
- * @param members 家谱成员数组
- * @param chartType 图表类型
- * @param rootId 根节点ID（可选）
- * @returns Mermaid.js图表定义字符串
+ * Generate Mermaid.js chart definition
+ * @param members Family tree member array
+ * @param chartType Chart type
+ * @param rootId Root node ID (optional)
+ * @returns Mermaid.js chart definition string
  */
 export function generateMermaidChart(
   members: Member[],
@@ -13,40 +16,40 @@ export function generateMermaidChart(
   rootId?: string
 ): string {
   if (!members.length) {
-    return 'graph TD\n  EmptyNode["暂无家谱数据"]';
+    return 'graph TD\n  EmptyNode["No family tree data yet"]';
   }
 
-  // 查找根节点
+  // Find root node
   let root: Member | undefined;
   if (rootId) {
     root = members.find(m => m.id === rootId);
   } else {
-    // 如果没有指定根节点，则查找没有父节点的成员作为根节点
+    // If no root node is specified, find a member without a parent node as the root node
     root = members.find(m => !m.parentId);
   }
 
-  // 如果没有找到根节点，则使用第一个成员作为根节点
+  // If no root node is found, use the first member as the root node
   if (!root && members.length > 0) {
     root = members[0];
   }
 
-  // 如果仍然没有根节点，则返回空图表
+  // If there is still no root node, return an empty chart
   if (!root) {
-    return 'graph TD\n  EmptyNode["暂无家谱数据"]';
+    return 'graph TD\n  EmptyNode["No family tree data yet"]';
   }
 
-  // 开始构建图表定义
+  // Start building chart definition
   let chartDef = 'flowchart TD\n';
 
-  // 添加节点定义
+  // Add node definitions
   members.forEach(member => {
-    // 使用形状而不是类来区分性别
+    // Use shapes instead of classes to distinguish gender
     const shape = member.gender === 'male' ? '([' : '((';
     const endShape = member.gender === 'male' ? '])' : '))';
     chartDef += `  ${member.id}${shape}${member.name}${endShape}\n`;
   });
 
-  // 添加连接定义
+  // Add connection definitions
   members.forEach(member => {
     if (member.parentId) {
       const parent = members.find(m => m.id === member.parentId);
@@ -168,4 +171,218 @@ export function loadFamilyTreeFromLocalStorage(key: string = 'familyTree'): Fami
     }
   }
   return createNewFamilyTree();
+}
+
+/**
+ * 保存家谱到Neon数据库
+ * @param familyTree 家谱对象
+ * @param userId 用户ID（可选）
+ * @returns 保存的家谱ID
+ */
+export async function saveFamilyTreeToDatabase(familyTree: FamilyTree, userId?: string): Promise<number | null> {
+  // 如果数据库连接不可用，则返回null
+  if (!db) {
+    console.warn('数据库连接不可用，无法保存家谱');
+    return null;
+  }
+
+  try {
+    console.log('开始保存家谱到数据库:', {
+      membersCount: familyTree.members.length,
+      name: familyTree.name,
+      rootId: familyTree.rootId,
+      userId: userId
+    });
+
+    // Save or update family tree
+    let familyTreeId: number;
+
+    // Check if there is already a family tree ID in the URL
+    let existingId: number | null = null;
+    if (typeof window !== 'undefined') {
+      const urlParams = new URLSearchParams(window.location.search);
+      const idParam = urlParams.get('id');
+      if (idParam) {
+        existingId = parseInt(idParam);
+        console.log('Retrieved family tree ID from URL parameter:', existingId);
+      }
+    }
+
+    if (existingId) {
+      // If there is an ID in the URL, use it directly to update
+      familyTreeId = existingId;
+      console.log('Updating existing family tree:', familyTreeId);
+
+      try {
+        await db.update(familyTrees)
+          .set({
+            rootId: familyTree.rootId,
+            updatedAt: new Date(),
+          })
+          .where(eq(familyTrees.id, familyTreeId));
+
+        console.log('Family tree table updated successfully');
+      } catch (updateError) {
+        console.error('Failed to update family tree table:', updateError);
+        throw updateError;
+      }
+
+      try {
+        // Delete old member records
+        await db.delete(members).where(eq(members.familyTreeId, familyTreeId));
+        console.log('Old members deleted successfully');
+      } catch (deleteError) {
+        console.error('Failed to delete old members:', deleteError);
+        throw deleteError;
+      }
+    } else {
+      // Check if this family tree already exists (by name and user ID)
+      try {
+        const existingFamilyTrees = await db.select().from(familyTrees)
+          .where(eq(familyTrees.name, familyTree.name || 'Unnamed Family Tree'));
+
+        console.log('Found existing family trees:', existingFamilyTrees.length);
+
+        if (existingFamilyTrees.length > 0) {
+          // Update existing family tree
+          familyTreeId = existingFamilyTrees[0].id;
+          console.log('Updating existing family tree:', familyTreeId);
+
+          await db.update(familyTrees)
+            .set({
+              rootId: familyTree.rootId,
+              updatedAt: new Date(),
+            })
+            .where(eq(familyTrees.id, familyTreeId));
+
+          // Delete old member records
+          await db.delete(members).where(eq(members.familyTreeId, familyTreeId));
+        } else {
+          // Create new family tree
+          console.log('Creating new family tree');
+
+          const result = await db.insert(familyTrees).values({
+            name: familyTree.name || 'Unnamed Family Tree',
+            rootId: familyTree.rootId,
+            userId: userId,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          }).returning({ id: familyTrees.id });
+
+          console.log('New family tree created successfully:', result);
+          familyTreeId = result[0].id;
+        }
+      } catch (queryError) {
+        console.error('Failed to query or create family tree:', queryError);
+        throw queryError;
+      }
+    }
+
+    // Save members
+    console.log('Starting to save members, count:', familyTree.members.length);
+
+    try {
+      for (const member of familyTree.members) {
+        await db.insert(members).values({
+          id: member.id,
+          name: member.name,
+          relation: member.relation,
+          parentId: member.parentId,
+          birthDate: member.birthDate,
+          deathDate: member.deathDate,
+          gender: member.gender,
+          description: member.description,
+          familyTreeId: familyTreeId.toString(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+      }
+      console.log('All members saved successfully');
+    } catch (memberError) {
+      console.error('Failed to save members:', memberError);
+      throw memberError;
+    }
+
+    console.log('Family tree saved successfully, ID:', familyTreeId);
+    return familyTreeId;
+  } catch (error) {
+    console.error('Failed to save family tree to database:', error);
+    throw error; // Throw the error instead of returning null, so the caller can see the specific error
+  }
+}
+
+/**
+ * Load family tree from database
+ * @param familyTreeId Family tree ID
+ * @returns Family tree object, or null if it doesn't exist
+ */
+export async function loadFamilyTreeFromDatabase(familyTreeId: number): Promise<FamilyTree | null> {
+  // If database connection is unavailable, return null
+  if (!db) {
+    console.warn('Database connection unavailable, cannot load family tree');
+    return null;
+  }
+
+  try {
+    // Get family tree information
+    const familyTreeData = await db.select().from(familyTrees)
+      .where(eq(familyTrees.id, familyTreeId));
+
+    if (familyTreeData.length === 0) {
+      return null;
+    }
+
+    // Get family tree members
+    const membersData = await db.select().from(members)
+      .where(eq(members.familyTreeId, familyTreeId));
+
+    // Build family tree object
+    const familyTree: FamilyTree = {
+      members: membersData.map(m => ({
+        id: m.id,
+        name: m.name,
+        relation: m.relation,
+        parentId: m.parentId || undefined,
+        birthDate: m.birthDate || undefined,
+        deathDate: m.deathDate || undefined,
+        gender: m.gender as 'male' | 'female' | 'other' | undefined,
+        description: m.description || undefined,
+      })),
+      name: familyTreeData[0].name || undefined,
+      rootId: familyTreeData[0].rootId || undefined,
+      createdAt: familyTreeData[0].createdAt?.toISOString() || new Date().toISOString(),
+      updatedAt: familyTreeData[0].updatedAt?.toISOString() || new Date().toISOString(),
+    };
+
+    return familyTree;
+  } catch (error) {
+    console.error('Failed to load family tree from database:', error);
+    return null;
+  }
+}
+
+/**
+ * Get all family trees for a user
+ * @param userId User ID
+ * @returns List of family trees
+ */
+export async function getUserFamilyTrees(userId: string): Promise<{ id: number, name: string }[]> {
+  // If database connection is unavailable, return empty array
+  if (!db) {
+    console.warn('Database connection unavailable, cannot get user family trees');
+    return [];
+  }
+
+  try {
+    const result = await db.select({
+      id: familyTrees.id,
+      name: familyTrees.name,
+    }).from(familyTrees)
+      .where(eq(familyTrees.userId, userId));
+
+    return result;
+  } catch (error) {
+    console.error('Failed to get user family trees:', error);
+    return [];
+  }
 }

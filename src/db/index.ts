@@ -1,0 +1,49 @@
+import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/neon-http';
+import * as schema from './schema';
+
+// Check if environment variables exist
+// Note: This file only runs on the server side, not on the client side
+const dbUrl = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
+
+// Check database URL on server side
+if (typeof window === 'undefined') {
+  if (!dbUrl) {
+    console.warn('NEON_DATABASE_URL environment variable is not set, database functionality will be unavailable');
+  } else {
+    console.log('Database URL configured, length:', dbUrl.length);
+    // For security, only show parts of the URL
+    const maskedUrl = dbUrl.substring(0, 20) + '...' + dbUrl.substring(dbUrl.length - 20);
+    console.log('Database URL fragment:', maskedUrl);
+  }
+}
+
+// Create database connection
+let sql = null;
+let db = null;
+
+// Only initialize database connection on server side
+if (typeof window === 'undefined') {
+  try {
+    if (dbUrl) {
+      sql = neon(dbUrl);
+      db = drizzle(sql, { schema });
+      console.log('Database connection initialized successfully');
+    }
+  } catch (error) {
+    console.error('Failed to initialize database connection:', error);
+  }
+}
+
+// Export drizzle instance
+export { db };
+
+// Export a function to check if database is available
+export function isDatabaseConfigured() {
+  // On client side, check using public environment variable
+  if (typeof window !== 'undefined') {
+    return process.env.NEXT_PUBLIC_HAS_DATABASE === 'true';
+  }
+  // On server side, directly check database URL
+  return !!dbUrl;
+}

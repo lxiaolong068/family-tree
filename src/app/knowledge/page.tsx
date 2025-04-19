@@ -9,36 +9,36 @@ import {
 const KnowledgePage = () => {
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-4">家谱知识科普</h1>
+      <h1 className="text-3xl font-bold mb-4">Family Tree Knowledge</h1>
       <p className="text-gray-700 mb-4">
-        家谱，又称族谱、宗谱等，是记录家族世系和重要人物事迹的书籍。
+        A family tree, also known as a genealogical chart, is a document that records family lineage and important events of family members.
       </p>
-      <h2 className="text-2xl font-bold mb-2">如何制作家谱</h2>
+      <h2 className="text-2xl font-bold mb-2">How to Create a Family Tree</h2>
       <ol className="list-decimal list-inside text-gray-700 mb-4">
-        <li>收集家族成员信息</li>
-        <li>确定家谱的格式和内容</li>
-        <li>编写家谱</li>
-        <li>校对和完善家谱</li>
-        <li>印刷和保存家谱</li>
+        <li>Collect family member information</li>
+        <li>Determine the format and content of the family tree</li>
+        <li>Write the family tree</li>
+        <li>Proofread and improve the family tree</li>
+        <li>Print and preserve the family tree</li>
       </ol>
-      <h2 className="text-2xl font-bold mb-2">常见问题（FAQ）</h2>
+      <h2 className="text-2xl font-bold mb-2">Frequently Asked Questions (FAQ)</h2>
       <Accordion type="single" collapsible className="w-full">
         <AccordionItem value="item-1">
-          <AccordionTrigger>家谱应该包含哪些内容？</AccordionTrigger>
+          <AccordionTrigger>What should a family tree include?</AccordionTrigger>
           <AccordionContent>
-            通常包括：谱序、凡例、世系图、家谱正文（成员信息）、家规家训、传记、艺文著述等。
+            Typically includes: preface, legend, genealogical chart, main content (member information), family rules, biographies, and literary works.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-2">
-          <AccordionTrigger>如何查找家族成员信息？</AccordionTrigger>
+          <AccordionTrigger>How to find family member information?</AccordionTrigger>
           <AccordionContent>
-            可以通过询问长辈、查阅旧物（信件、照片）、户籍档案、地方志、图书馆、网络资源等途径。
+            You can ask elders, check old items (letters, photos), household registration archives, local chronicles, libraries, online resources, etc.
           </AccordionContent>
         </AccordionItem>
         <AccordionItem value="item-3">
-          <AccordionTrigger>家谱的保存方式有哪些？</AccordionTrigger>
+          <AccordionTrigger>What are the ways to preserve a family tree?</AccordionTrigger>
           <AccordionContent>
-            纸质印刷、电子文档（Word、PDF）、专门的家谱软件、在线家谱平台等。注意防潮、防火、防虫。
+            Paper printing, electronic documents (Word, PDF), specialized family tree software, online family tree platforms, etc. Pay attention to moisture, fire, and insect prevention.
           </AccordionContent>
         </AccordionItem>
       </Accordion>

@@ -13,8 +13,11 @@ import {
   createNewFamilyTree,
   addMemberToFamilyTree,
   saveFamilyTreeToLocalStorage,
-  loadFamilyTreeFromLocalStorage
+  loadFamilyTreeFromLocalStorage,
+  saveFamilyTreeToDatabase,
+  loadFamilyTreeFromDatabase
 } from '@/lib/family-tree-utils';
+import { isDatabaseConfigured } from '@/db';
 
 const GeneratorPage = () => {
   // 家谱数据状态
@@ -32,12 +35,46 @@ const GeneratorPage = () => {
 
   // 加载保存的家谱数据
   useEffect(() => {
-    const savedFamilyTree = loadFamilyTreeFromLocalStorage();
-    if (savedFamilyTree && savedFamilyTree.members.length > 0) {
-      setFamilyTree(savedFamilyTree);
-      setShowChart(true);
-      updateChartDefinition(savedFamilyTree.members);
-    }
+    // 首先尝试从数据库加载（如果有家谱ID在URL中）
+    const loadFromDatabase = async () => {
+      // 从 URL 参数中获取家谱ID
+      const urlParams = new URLSearchParams(window.location.search);
+      const familyTreeId = urlParams.get('id');
+
+      if (familyTreeId) {
+        try {
+          const dbFamilyTree = await loadFamilyTreeFromDatabase(parseInt(familyTreeId));
+          if (dbFamilyTree) {
+            console.log('从数据库加载家谱成功:', dbFamilyTree);
+            setFamilyTree(dbFamilyTree);
+            setShowChart(true);
+            updateChartDefinition(dbFamilyTree.members);
+            return true; // 标记已从数据库加载成功
+          }
+        } catch (error) {
+          console.error('从数据库加载家谱失败:', error);
+        }
+      }
+      return false; // 标记未从数据库加载成功
+    };
+
+    // 如果数据库加载失败，则尝试从本地存储加载
+    const loadData = async () => {
+      const loadedFromDb = await loadFromDatabase();
+
+      // 如果没有从数据库加载成功，则尝试从本地存储加载
+      if (!loadedFromDb) {
+        const savedFamilyTree = loadFamilyTreeFromLocalStorage();
+        if (savedFamilyTree && savedFamilyTree.members.length > 0) {
+          console.log('从本地存储加载家谱成功:', savedFamilyTree);
+          setFamilyTree(savedFamilyTree);
+          setShowChart(true);
+          updateChartDefinition(savedFamilyTree.members);
+        }
+      }
+    };
+
+    loadData();
   }, []);
 
   // 更新图表定义
@@ -68,11 +105,20 @@ const GeneratorPage = () => {
     updateChartDefinition(updatedFamilyTree.members);
     setShowChart(true);
 
-    // 保存到本地存储
-    saveFamilyTreeToLocalStorage(updatedFamilyTree);
+    // Check if there is a family tree ID in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const familyTreeId = urlParams.get('id');
+
+    if (familyTreeId) {
+      // If there is an ID parameter, save to database
+      saveFamilyTreeToDatabase(updatedFamilyTree);
+    } else {
+      // If there is no ID parameter, save to local storage
+      saveFamilyTreeToLocalStorage(updatedFamilyTree);
+    }
   };
 
-  // 删除成员
+  // Delete member
   const handleDeleteMember = (id: string) => {
     const updatedMembers = familyTree.members.filter(member => member.id !== id);
     const updatedFamilyTree = {
@@ -82,56 +128,165 @@ const GeneratorPage = () => {
     };
     setFamilyTree(updatedFamilyTree);
     updateChartDefinition(updatedMembers);
-    saveFamilyTreeToLocalStorage(updatedFamilyTree);
+
+    // Check if there is a family tree ID in the URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const familyTreeId = urlParams.get('id');
+
+    if (familyTreeId) {
+      // If there is an ID parameter, save to database
+      saveFamilyTreeToDatabase(updatedFamilyTree);
+    } else {
+      // If there is no ID parameter, save to local storage
+      saveFamilyTreeToLocalStorage(updatedFamilyTree);
+    }
   };
 
-  // 生成家谱图
+  // Generate family tree chart
   const handleGenerateChart = () => {
     updateChartDefinition(familyTree.members);
     setShowChart(true);
   };
 
-  // 清空家谱
+  // Clear family tree
   const handleClearFamilyTree = () => {
-    if (confirm('确定要清空家谱数据吗？此操作不可恢复。')) {
+    if (confirm('Are you sure you want to clear the family tree data? This operation cannot be undone.')) {
       const newFamilyTree = createNewFamilyTree();
       setFamilyTree(newFamilyTree);
       setChartDefinition('');
       setShowChart(false);
-      saveFamilyTreeToLocalStorage(newFamilyTree);
+
+      // Clear local storage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('familyTree');
+      }
+
+      // If there is a family tree ID in the URL, also save to database
+      const urlParams = new URLSearchParams(window.location.search);
+      const familyTreeId = urlParams.get('id');
+      if (familyTreeId) {
+        saveFamilyTreeToDatabase(newFamilyTree);
+      } else {
+        // If there is no ID parameter, remove all parameters from the URL
+        window.history.pushState({}, '', window.location.pathname);
+      }
+    }
+  };
+
+  // Save to database
+  const handleSaveToDatabase = async () => {
+    try {
+      console.log('Starting to save family tree to database...');
+      console.log('Database configuration status:', isDatabaseConfigured());
+
+      // Check if database is configured
+      if (!isDatabaseConfigured()) {
+        alert('Database not configured, please check environment variable settings.');
+        return;
+      }
+
+      // Check if family tree is empty
+      if (familyTree.members.length === 0) {
+        alert('Family tree is empty, please add members first.');
+        return;
+      }
+
+      // First test database connection
+      try {
+        console.log('Testing database connection...');
+        const testResponse = await fetch('/api/db-test');
+        const testResult = await testResponse.json();
+        console.log('Database connection test result:', testResult);
+
+        if (!testResult.success) {
+          alert('Database connection test failed: ' + (testResult.message || testResult.error));
+          return;
+        }
+      } catch (testError) {
+        console.error('Database connection test failed:', testError);
+      }
+
+      // Use API route to save family tree
+      try {
+        console.log('Trying to save family tree via API...');
+        const response = await fetch('/api/save-family-tree', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ familyTree }),
+        });
+
+        const result = await response.json();
+        console.log('Save result:', result);
+
+        if (result.success && result.familyTreeId) {
+          // Update URL to include family tree ID
+          const url = new URL(window.location.href);
+          url.searchParams.set('id', result.familyTreeId.toString());
+          window.history.pushState({}, '', url.toString());
+
+          // Clear local storage, because now we use the database
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('familyTree');
+          }
+
+          alert('Family tree has been successfully saved to the cloud!\n\nYou can access this family tree using the following link:\n' + url.toString());
+        } else {
+          // Display error message
+          let errorMessage = 'Save failed\n';
+          if (result.error) {
+            errorMessage += '\nError: ' + result.error;
+          }
+          if (result.message) {
+            errorMessage += '\nMessage: ' + result.message;
+          }
+          if (result.code) {
+            errorMessage += '\nCode: ' + result.code;
+          }
+
+          alert(errorMessage);
+        }
+      } catch (apiError: any) {
+        console.error('API call error:', apiError);
+        alert('Save failed: ' + (apiError.message || 'Unknown error') + '\n\nPlease check the console for details.');
+      }
+    } catch (error: any) {
+      console.error('Failed to save to database:', error);
+      alert('Save failed: ' + (error.message || 'Unknown error') + '\n\nPlease check the console for details.');
     }
   };
 
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-4">家谱生成器</h1>
+      <h1 className="text-3xl font-bold mb-4">Family Tree Generator</h1>
       <p className="text-gray-700 mb-4">
-        输入家族成员信息，生成您的专属家谱。
+        Enter family member information to generate your personalized family tree.
       </p>
 
-      {/* 添加成员表单 */}
+      {/* Add member form */}
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>添加家族成员</CardTitle>
+          <CardTitle>Add Family Member</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium mb-1">姓名</label>
+              <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
               <Input
                 id="name"
                 type="text"
-                placeholder="请输入姓名"
+                placeholder="Enter name"
                 value={currentMember.name}
                 onChange={(e) => handleInputChange('name', e.target.value)}
               />
             </div>
             <div>
-              <label htmlFor="relation" className="block text-sm font-medium mb-1">关系</label>
+              <label htmlFor="relation" className="block text-sm font-medium mb-1">Relationship</label>
               <Input
                 id="relation"
                 type="text"
-                placeholder="例如：父亲, 母亲, 儿子, 女儿"
+                placeholder="e.g., father, mother, son, daughter"
                 value={currentMember.relation}
                 onChange={(e) => handleInputChange('relation', e.target.value)}
               />
@@ -139,20 +294,20 @@ const GeneratorPage = () => {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label htmlFor="gender" className="block text-sm font-medium mb-1">性别</label>
+              <label htmlFor="gender" className="block text-sm font-medium mb-1">Gender</label>
               <select
                 id="gender"
                 className="w-full h-9 rounded-md border border-input px-3 py-1 text-base shadow-xs outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                 value={currentMember.gender}
                 onChange={(e) => handleInputChange('gender', e.target.value as 'male' | 'female' | 'other')}
               >
-                <option value="male">男</option>
-                <option value="female">女</option>
-                <option value="other">其他</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
               </select>
             </div>
             <div>
-              <label htmlFor="birthDate" className="block text-sm font-medium mb-1">出生日期 (可选)</label>
+              <label htmlFor="birthDate" className="block text-sm font-medium mb-1">Birth Date (Optional)</label>
               <Input
                 id="birthDate"
                 type="date"
@@ -163,27 +318,28 @@ const GeneratorPage = () => {
           </div>
         </CardContent>
         <CardFooter>
-          <Button onClick={handleAddMember} className="mr-2">添加成员</Button>
-          <Button variant="outline" onClick={handleGenerateChart}>生成家谱图</Button>
+          <Button onClick={handleAddMember} className="mr-2">Add Member</Button>
+          <Button variant="outline" onClick={handleGenerateChart} className="mr-2">Generate Chart</Button>
+          <Button variant="secondary" onClick={handleSaveToDatabase}>Save to Cloud</Button>
         </CardFooter>
       </Card>
 
-      {/* 成员列表 */}
+      {/* Member list */}
       {familyTree.members.length > 0 && (
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>家族成员列表</CardTitle>
+            <CardTitle>Family Member List</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="border-b">
-                    <th className="text-left py-2 px-4">姓名</th>
-                    <th className="text-left py-2 px-4">关系</th>
-                    <th className="text-left py-2 px-4">性别</th>
-                    <th className="text-left py-2 px-4">出生日期</th>
-                    <th className="text-left py-2 px-4">操作</th>
+                    <th className="text-left py-2 px-4">Name</th>
+                    <th className="text-left py-2 px-4">Relationship</th>
+                    <th className="text-left py-2 px-4">Gender</th>
+                    <th className="text-left py-2 px-4">Birth Date</th>
+                    <th className="text-left py-2 px-4">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -192,7 +348,7 @@ const GeneratorPage = () => {
                       <td className="py-2 px-4">{member.name}</td>
                       <td className="py-2 px-4">{member.relation}</td>
                       <td className="py-2 px-4">
-                        {member.gender === 'male' ? '男' : member.gender === 'female' ? '女' : '其他'}
+                        {member.gender === 'male' ? 'Male' : member.gender === 'female' ? 'Female' : 'Other'}
                       </td>
                       <td className="py-2 px-4">{member.birthDate || '-'}</td>
                       <td className="py-2 px-4">
@@ -201,7 +357,7 @@ const GeneratorPage = () => {
                           size="sm"
                           onClick={() => handleDeleteMember(member.id)}
                         >
-                          删除
+                          Delete
                         </Button>
                       </td>
                     </tr>
@@ -211,18 +367,18 @@ const GeneratorPage = () => {
             </div>
             {familyTree.members.length > 0 && (
               <div className="mt-4 text-right">
-                <Button variant="destructive" onClick={handleClearFamilyTree}>清空家谱</Button>
+                <Button variant="destructive" onClick={handleClearFamilyTree}>Clear Family Tree</Button>
               </div>
             )}
           </CardContent>
         </Card>
       )}
 
-      {/* 家谱图 */}
+      {/* Family tree chart */}
       {showChart && chartDefinition && (
         <Card>
           <CardHeader>
-            <CardTitle>家谱图</CardTitle>
+            <CardTitle>Family Tree Chart</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
@@ -231,7 +387,7 @@ const GeneratorPage = () => {
           </CardContent>
           <CardFooter>
             <p className="text-sm text-gray-500">
-              提示：家谱图会根据成员关系自动生成。如果关系不明确，可能无法正确显示所有连接。
+              Tip: The family tree chart is automatically generated based on member relationships. If relationships are unclear, not all connections may display correctly.
             </p>
           </CardFooter>
         </Card>

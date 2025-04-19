@@ -9,19 +9,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-// 模板数据 - 实际应用中图片和文件应放在 public 目录下
+// Template data - images and files should be placed in the public directory in actual application
 const templatesData = [
-  { id: 1, title: "经典世系图", imgSrc: "/template1.jpg", downloadUrl: "/template1.docx", alt: "经典世系图模板" },
-  { id: 2, title: "现代简约风", imgSrc: "/template2.jpg", downloadUrl: "/template2.xlsx", alt: "现代简约风模板" },
-  { id: 3, title: "图文并茂版", imgSrc: "/template3.jpg", downloadUrl: "/template3.pdf", alt: "图文并茂版模板" },
+  { id: 1, title: "Classic Genealogy Chart", imgSrc: "/template1.jpg", downloadUrl: "/template1.docx", alt: "Classic genealogy chart template" },
+  { id: 2, title: "Modern Minimalist Style", imgSrc: "/template2.jpg", downloadUrl: "/template2.xlsx", alt: "Modern minimalist style template" },
+  { id: 3, title: "Illustrated Version", imgSrc: "/template3.jpg", downloadUrl: "/template3.pdf", alt: "Illustrated version template" },
 ];
 
 const TemplatesPage = () => {
   return (
     <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-4">家谱模板展示</h1>
+      <h1 className="text-3xl font-bold mb-4">Family Tree Templates</h1>
       <p className="text-gray-700 mb-4">
-        我们为您准备了多种家谱模板，您可以根据自己的需求选择合适的模板进行下载和使用。
+        We have prepared various family tree templates for you. You can choose the appropriate template for download and use according to your needs.
       </p>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {templatesData.map((template) => (
@@ -37,9 +37,10 @@ const TemplatesPage = () => {
                  <Image
                    src={template.imgSrc}
                    alt={template.alt}
-                   layout="fill" // 或者 width={400} height={300}
-                   objectFit="cover" // 保持图片比例并覆盖容器
-                   className="rounded-md" // 可选：添加圆角
+                   fill
+                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                   style={{ objectFit: "cover" }}
+                   className="rounded-md"
                  />
               </div>
             </CardContent>
@@ -47,10 +48,10 @@ const TemplatesPage = () => {
               {/* download 属性提示浏览器下载文件 */}
               <a
                 href={template.downloadUrl}
-                download // 添加 download 属性
+                download // Add download attribute
                 className="text-blue-500 hover:underline"
               >
-                下载模板
+                Download Template
               </a>
             </CardFooter>
           </Card>
