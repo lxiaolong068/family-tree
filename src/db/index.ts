@@ -11,10 +11,8 @@ if (typeof window === 'undefined') {
   if (!dbUrl) {
     console.warn('NEON_DATABASE_URL environment variable is not set, database functionality will be unavailable');
   } else {
-    console.log('Database URL configured, length:', dbUrl.length);
-    // For security, only show parts of the URL
-    const maskedUrl = dbUrl.substring(0, 20) + '...' + dbUrl.substring(dbUrl.length - 20);
-    console.log('Database URL fragment:', maskedUrl);
+    console.log('Database URL configured and available');
+    // For security, don't show any part of the URL in logs
   }
 }
 
@@ -44,6 +42,6 @@ export function isDatabaseConfigured() {
   if (typeof window !== 'undefined') {
     return process.env.NEXT_PUBLIC_HAS_DATABASE === 'true';
   }
-  // On server side, directly check database URL
-  return !!dbUrl;
+  // On server side, directly check database URL and connection
+  return !!dbUrl && !!db;
 }

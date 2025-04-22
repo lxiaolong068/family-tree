@@ -45,28 +45,62 @@ const GeneratorPage = () => {
         try {
           const dbFamilyTree = await loadFamilyTreeFromDatabase(parseInt(familyTreeId));
           if (dbFamilyTree) {
-            console.log('从数据库加载家谱成功:', dbFamilyTree);
+            console.log('Successfully loaded family tree from database:', dbFamilyTree);
             setFamilyTree(dbFamilyTree);
             setShowChart(true);
             updateChartDefinition(dbFamilyTree.members);
             return true; // 标记已从数据库加载成功
           }
         } catch (error) {
-          console.error('从数据库加载家谱失败:', error);
+          console.error('Failed to load family tree from database:', error);
         }
       }
       return false; // 标记未从数据库加载成功
     };
 
-    // 如果数据库加载失败，则尝试从本地存储加载
+    // 尝试加载数据，优先使用数据库
     const loadData = async () => {
-      const loadedFromDb = await loadFromDatabase();
+      // 检查数据库是否配置
+      const isDbConfigured = isDatabaseConfigured();
 
-      // 如果没有从数据库加载成功，则尝试从本地存储加载
-      if (!loadedFromDb) {
+      if (isDbConfigured) {
+        // 尝试从数据库加载
+        const loadedFromDb = await loadFromDatabase();
+
+        // 如果没有从数据库加载成功，则尝试从本地存储加载
+        if (!loadedFromDb) {
+          const savedFamilyTree = loadFamilyTreeFromLocalStorage();
+          if (savedFamilyTree && savedFamilyTree.members.length > 0) {
+            console.log('Loaded family tree from local storage backup:', savedFamilyTree);
+            setFamilyTree(savedFamilyTree);
+            setShowChart(true);
+            updateChartDefinition(savedFamilyTree.members);
+
+            // 如果数据库可用，尝试将本地数据保存到数据库
+            if (savedFamilyTree.members.length > 0) {
+              console.log('Attempting to migrate local storage data to database...');
+              try {
+                const familyTreeId = await saveFamilyTreeToDatabase(savedFamilyTree);
+                if (familyTreeId) {
+                  console.log('Successfully migrated local data to database, ID:', familyTreeId);
+                  // 更新URL以包含家谱ID
+                  const url = new URL(window.location.href);
+                  url.searchParams.set('id', familyTreeId.toString());
+                  window.history.pushState({}, '', url.toString());
+                  // 清除本地存储
+                  localStorage.removeItem('familyTree');
+                }
+              } catch (error) {
+                console.error('Failed to migrate local data to database:', error);
+              }
+            }
+          }
+        }
+      } else {
+        // 数据库未配置，从本地存储加载
         const savedFamilyTree = loadFamilyTreeFromLocalStorage();
         if (savedFamilyTree && savedFamilyTree.members.length > 0) {
-          console.log('从本地存储加载家谱成功:', savedFamilyTree);
+          console.log('Database not configured, loading from local storage:', savedFamilyTree);
           setFamilyTree(savedFamilyTree);
           setShowChart(true);
           updateChartDefinition(savedFamilyTree.members);
@@ -95,7 +129,7 @@ const GeneratorPage = () => {
   // 添加成员
   const handleAddMember = () => {
     if (!currentMember.name || !currentMember.relation) {
-      alert('请输入成员姓名和关系');
+      alert('Please enter member name and relationship');
       return;
     }
 
@@ -105,15 +139,29 @@ const GeneratorPage = () => {
     updateChartDefinition(updatedFamilyTree.members);
     setShowChart(true);
 
-    // Check if there is a family tree ID in the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const familyTreeId = urlParams.get('id');
-
-    if (familyTreeId) {
-      // If there is an ID parameter, save to database
-      saveFamilyTreeToDatabase(updatedFamilyTree);
+    // 优先保存到数据库
+    if (isDatabaseConfigured()) {
+      // 尝试保存到数据库
+      saveFamilyTreeToDatabase(updatedFamilyTree)
+        .then(familyTreeId => {
+          if (familyTreeId) {
+            // 更新URL以包含家谱ID
+            const url = new URL(window.location.href);
+            url.searchParams.set('id', familyTreeId.toString());
+            window.history.pushState({}, '', url.toString());
+            console.log('Family tree saved to database, ID:', familyTreeId);
+          } else {
+            // 数据库保存失败，使用本地存储作为备份
+            console.log('Database save failed, using local storage as backup');
+          }
+        })
+        .catch(error => {
+          console.error('Failed to save to database:', error);
+          // 数据库保存失败，使用本地存储作为备份
+          saveFamilyTreeToLocalStorage(updatedFamilyTree);
+        });
     } else {
-      // If there is no ID parameter, save to local storage
+      // 数据库未配置，使用本地存储
       saveFamilyTreeToLocalStorage(updatedFamilyTree);
     }
   };
@@ -129,15 +177,29 @@ const GeneratorPage = () => {
     setFamilyTree(updatedFamilyTree);
     updateChartDefinition(updatedMembers);
 
-    // Check if there is a family tree ID in the URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const familyTreeId = urlParams.get('id');
-
-    if (familyTreeId) {
-      // If there is an ID parameter, save to database
-      saveFamilyTreeToDatabase(updatedFamilyTree);
+    // 优先保存到数据库
+    if (isDatabaseConfigured()) {
+      // 尝试保存到数据库
+      saveFamilyTreeToDatabase(updatedFamilyTree)
+        .then(familyTreeId => {
+          if (familyTreeId) {
+            // 更新URL以包含家谱ID
+            const url = new URL(window.location.href);
+            url.searchParams.set('id', familyTreeId.toString());
+            window.history.pushState({}, '', url.toString());
+            console.log('Updated family tree saved to database, ID:', familyTreeId);
+          } else {
+            // 数据库保存失败，使用本地存储作为备份
+            console.log('Database update failed, using local storage as backup');
+          }
+        })
+        .catch(error => {
+          console.error('Failed to update in database:', error);
+          // 数据库保存失败，使用本地存储作为备份
+          saveFamilyTreeToLocalStorage(updatedFamilyTree);
+        });
     } else {
-      // If there is no ID parameter, save to local storage
+      // 数据库未配置，使用本地存储
       saveFamilyTreeToLocalStorage(updatedFamilyTree);
     }
   };
@@ -161,13 +223,21 @@ const GeneratorPage = () => {
         localStorage.removeItem('familyTree');
       }
 
-      // If there is a family tree ID in the URL, also save to database
+      // 检查是否有家谱ID在URL中
       const urlParams = new URLSearchParams(window.location.search);
       const familyTreeId = urlParams.get('id');
-      if (familyTreeId) {
-        saveFamilyTreeToDatabase(newFamilyTree);
+
+      if (familyTreeId && isDatabaseConfigured()) {
+        // 如果有ID参数且数据库已配置，则保存空家谱到数据库
+        saveFamilyTreeToDatabase(newFamilyTree)
+          .then(() => {
+            console.log('Cleared family tree in database');
+          })
+          .catch(error => {
+            console.error('Failed to clear family tree in database:', error);
+          });
       } else {
-        // If there is no ID parameter, remove all parameters from the URL
+        // 如果没有ID参数，则从URL中移除所有参数
         window.history.pushState({}, '', window.location.pathname);
       }
     }
@@ -181,7 +251,9 @@ const GeneratorPage = () => {
 
       // Check if database is configured
       if (!isDatabaseConfigured()) {
-        alert('Database not configured, please check environment variable settings.');
+        alert('Database not configured. Please check environment variable settings. Your data will be saved locally as a backup.');
+        // Save to local storage as backup
+        saveFamilyTreeToLocalStorage(familyTree);
         return;
       }
 
@@ -199,11 +271,17 @@ const GeneratorPage = () => {
         console.log('Database connection test result:', testResult);
 
         if (!testResult.success) {
-          alert('Database connection test failed: ' + (testResult.message || testResult.error));
+          alert('Database connection test failed: ' + (testResult.message || testResult.error) + '\n\nYour data will be saved locally as a backup.');
+          // Save to local storage as backup
+          saveFamilyTreeToLocalStorage(familyTree);
           return;
         }
       } catch (testError) {
         console.error('Database connection test failed:', testError);
+        alert('Database connection test failed. Your data will be saved locally as a backup.');
+        // Save to local storage as backup
+        saveFamilyTreeToLocalStorage(familyTree);
+        return;
       }
 
       // Use API route to save family tree
@@ -244,16 +322,23 @@ const GeneratorPage = () => {
           if (result.code) {
             errorMessage += '\nCode: ' + result.code;
           }
+          errorMessage += '\n\nYour data will be saved locally as a backup.';
 
           alert(errorMessage);
+          // Save to local storage as backup
+          saveFamilyTreeToLocalStorage(familyTree);
         }
       } catch (apiError: any) {
         console.error('API call error:', apiError);
-        alert('Save failed: ' + (apiError.message || 'Unknown error') + '\n\nPlease check the console for details.');
+        alert('Save failed: ' + (apiError.message || 'Unknown error') + '\n\nYour data will be saved locally as a backup.');
+        // Save to local storage as backup
+        saveFamilyTreeToLocalStorage(familyTree);
       }
     } catch (error: any) {
       console.error('Failed to save to database:', error);
-      alert('Save failed: ' + (error.message || 'Unknown error') + '\n\nPlease check the console for details.');
+      alert('Save failed: ' + (error.message || 'Unknown error') + '\n\nYour data will be saved locally as a backup.');
+      // Save to local storage as backup
+      saveFamilyTreeToLocalStorage(familyTree);
     }
   };
 
@@ -320,7 +405,7 @@ const GeneratorPage = () => {
         <CardFooter>
           <Button onClick={handleAddMember} className="mr-2">Add Member</Button>
           <Button variant="outline" onClick={handleGenerateChart} className="mr-2">Generate Chart</Button>
-          <Button variant="secondary" onClick={handleSaveToDatabase}>Save to Cloud</Button>
+          <Button variant="secondary" onClick={handleSaveToDatabase}>Save to Database</Button>
         </CardFooter>
       </Card>
 

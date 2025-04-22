@@ -144,18 +144,19 @@ export function addMemberToFamilyTree(familyTree: FamilyTree, member: Partial<Me
 }
 
 /**
- * 保存家谱到本地存储
+ * 保存家谱到本地存储（仅作为数据库不可用时的备份）
  * @param familyTree 家谱对象
  * @param key 存储键名
  */
 export function saveFamilyTreeToLocalStorage(familyTree: FamilyTree, key: string = 'familyTree'): void {
   if (typeof window !== 'undefined') {
     localStorage.setItem(key, JSON.stringify(familyTree));
+    console.log('Family tree saved to local storage as backup');
   }
 }
 
 /**
- * 从本地存储加载家谱
+ * 从本地存储加载家谱（仅作为数据库不可用时的备份）
  * @param key 存储键名
  * @returns 家谱对象，如果不存在则返回新的家谱
  */
@@ -164,9 +165,10 @@ export function loadFamilyTreeFromLocalStorage(key: string = 'familyTree'): Fami
     const storedData = localStorage.getItem(key);
     if (storedData) {
       try {
+        console.log('Loading family tree from local storage backup');
         return JSON.parse(storedData) as FamilyTree;
       } catch (error) {
-        console.error('Failed to parse family tree data:', error);
+        console.error('Failed to parse family tree data from local storage:', error);
       }
     }
   }
@@ -174,7 +176,7 @@ export function loadFamilyTreeFromLocalStorage(key: string = 'familyTree'): Fami
 }
 
 /**
- * 保存家谱到Neon数据库
+ * 保存家谱到Neon数据库（主要存储方式）
  * @param familyTree 家谱对象
  * @param userId 用户ID（可选）
  * @returns 保存的家谱ID
@@ -182,12 +184,14 @@ export function loadFamilyTreeFromLocalStorage(key: string = 'familyTree'): Fami
 export async function saveFamilyTreeToDatabase(familyTree: FamilyTree, userId?: string): Promise<number | null> {
   // 如果数据库连接不可用，则返回null
   if (!db) {
-    console.warn('数据库连接不可用，无法保存家谱');
+    console.warn('Database connection unavailable, cannot save family tree');
+    // Save to local storage as backup
+    saveFamilyTreeToLocalStorage(familyTree);
     return null;
   }
 
   try {
-    console.log('开始保存家谱到数据库:', {
+    console.log('Starting to save family tree to database:', {
       membersCount: familyTree.members.length,
       name: familyTree.name,
       rootId: familyTree.rootId,
@@ -312,15 +316,15 @@ export async function saveFamilyTreeToDatabase(familyTree: FamilyTree, userId?: 
 }
 
 /**
- * Load family tree from database
+ * Load family tree from database (primary storage method)
  * @param familyTreeId Family tree ID
  * @returns Family tree object, or null if it doesn't exist
  */
 export async function loadFamilyTreeFromDatabase(familyTreeId: number): Promise<FamilyTree | null> {
-  // If database connection is unavailable, return null
+  // If database connection is unavailable, try to load from local storage
   if (!db) {
-    console.warn('Database connection unavailable, cannot load family tree');
-    return null;
+    console.warn('Database connection unavailable, trying to load from local storage');
+    return loadFamilyTreeFromLocalStorage();
   }
 
   try {
