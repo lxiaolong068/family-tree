@@ -328,17 +328,26 @@ export async function loadFamilyTreeFromDatabase(familyTreeId: number): Promise<
   }
 
   try {
+    console.log('Loading family tree from database, ID:', familyTreeId);
+
     // Get family tree information
     const familyTreeData = await db.select().from(familyTrees)
       .where(eq(familyTrees.id, familyTreeId));
 
+    console.log('Family tree data retrieved:', familyTreeData);
+
     if (familyTreeData.length === 0) {
+      console.warn('No family tree found with ID:', familyTreeId);
       return null;
     }
 
     // Get family tree members
+    // 确保familyTreeId作为字符串进行比较，因为在数据库中可能存储为字符串
+    console.log('Querying members with familyTreeId:', familyTreeId.toString());
     const membersData = await db.select().from(members)
-      .where(eq(members.familyTreeId, familyTreeId));
+      .where(eq(members.familyTreeId, familyTreeId.toString()));
+
+    console.log('Members data retrieved:', membersData);
 
     // Build family tree object
     const familyTree: FamilyTree = {
@@ -358,6 +367,7 @@ export async function loadFamilyTreeFromDatabase(familyTreeId: number): Promise<
       updatedAt: familyTreeData[0].updatedAt?.toISOString() || new Date().toISOString(),
     };
 
+    console.log('Built family tree object with members count:', familyTree.members.length);
     return familyTree;
   } catch (error) {
     console.error('Failed to load family tree from database:', error);

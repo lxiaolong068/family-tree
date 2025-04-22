@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Member, FamilyTree } from '@/types/family-tree';
 import MermaidChart from '@/components/MermaidChart';
+import { SuccessDialog } from '@/components/ui/success-dialog';
 import {
   generateMermaidChart,
   generateUniqueId,
@@ -20,6 +21,10 @@ import {
 import { isDatabaseConfigured } from '@/db';
 
 const GeneratorPage = () => {
+  // 关闭成功对话框
+  const handleCloseSuccessDialog = () => {
+    setSuccessDialogOpen(false);
+  };
   // 家谱数据状态
   const [familyTree, setFamilyTree] = useState<FamilyTree>(createNewFamilyTree());
   // 当前编辑的成员
@@ -28,6 +33,14 @@ const GeneratorPage = () => {
     relation: '',
     gender: 'male'
   });
+  // 成功对话框状态
+  const [successDialogOpen, setSuccessDialogOpen] = useState<boolean>(false);
+  const [successDialogData, setSuccessDialogData] = useState<{
+    title: string;
+    description?: string;
+    familyTreeId?: number | string;
+    familyTreeUrl?: string;
+  }>({ title: '' });
   // Mermaid图表定义
   const [chartDefinition, setChartDefinition] = useState<string>('');
   // 是否显示家谱图
@@ -40,16 +53,23 @@ const GeneratorPage = () => {
       // 从 URL 参数中获取家谱ID
       const urlParams = new URLSearchParams(window.location.search);
       const familyTreeId = urlParams.get('id');
+      console.log('URL parameters:', urlParams.toString());
+      console.log('Family tree ID from URL:', familyTreeId);
 
       if (familyTreeId) {
         try {
+          console.log('Attempting to load family tree with ID:', familyTreeId);
           const dbFamilyTree = await loadFamilyTreeFromDatabase(parseInt(familyTreeId));
+          console.log('Database response for family tree:', dbFamilyTree);
+
           if (dbFamilyTree) {
-            console.log('Successfully loaded family tree from database:', dbFamilyTree);
+            console.log('Successfully loaded family tree from database with members count:', dbFamilyTree.members.length);
             setFamilyTree(dbFamilyTree);
             setShowChart(true);
             updateChartDefinition(dbFamilyTree.members);
             return true; // 标记已从数据库加载成功
+          } else {
+            console.warn('No family tree data returned from database for ID:', familyTreeId);
           }
         } catch (error) {
           console.error('Failed to load family tree from database:', error);
@@ -113,8 +133,10 @@ const GeneratorPage = () => {
 
   // 更新图表定义
   const updateChartDefinition = (members: Member[]) => {
+    console.log('Updating chart definition with members count:', members.length);
     const updatedMembers = buildFamilyRelations(members);
     const chartDef = generateMermaidChart(updatedMembers);
+    console.log('Generated chart definition:', chartDef.substring(0, 100) + '...');
     setChartDefinition(chartDef);
   };
 
@@ -309,7 +331,14 @@ const GeneratorPage = () => {
             localStorage.removeItem('familyTree');
           }
 
-          alert('Family tree has been successfully saved to the cloud!\n\nYou can access this family tree using the following link:\n' + url.toString());
+          // 显示成功对话框
+          setSuccessDialogData({
+            title: 'Family tree saved successfully!',
+            description: 'Your family tree has been saved to the database and can be accessed anytime using the link below.',
+            familyTreeId: result.familyTreeId,
+            familyTreeUrl: url.toString()
+          });
+          setSuccessDialogOpen(true);
         } else {
           // Display error message
           let errorMessage = 'Save failed\n';
@@ -460,23 +489,36 @@ const GeneratorPage = () => {
       )}
 
       {/* Family tree chart */}
-      {showChart && chartDefinition && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Family Tree Chart</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
+      <Card>
+        <CardHeader>
+          <CardTitle>Family Tree Chart</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            {chartDefinition ? (
               <MermaidChart chartDefinition={chartDefinition} className="min-h-[300px]" />
-            </div>
-          </CardContent>
-          <CardFooter>
-            <p className="text-sm text-gray-500">
-              Tip: The family tree chart is automatically generated based on member relationships. If relationships are unclear, not all connections may display correctly.
-            </p>
-          </CardFooter>
-        </Card>
-      )}
+            ) : (
+              <div className="flex items-center justify-center min-h-[300px] bg-gray-50 rounded-md">
+                <p className="text-gray-500">No family tree data yet</p>
+              </div>
+            )}
+          </div>
+        </CardContent>
+        <CardFooter>
+          <p className="text-sm text-gray-500">
+            Tip: The family tree chart is automatically generated based on member relationships. If relationships are unclear, not all connections may display correctly.
+          </p>
+        </CardFooter>
+      </Card>
+      {/* Success Dialog */}
+      <SuccessDialog
+        isOpen={successDialogOpen}
+        onClose={handleCloseSuccessDialog}
+        title={successDialogData.title}
+        description={successDialogData.description}
+        familyTreeId={successDialogData.familyTreeId}
+        familyTreeUrl={successDialogData.familyTreeUrl}
+      />
     </div>
   );
 };
