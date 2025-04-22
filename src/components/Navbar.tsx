@@ -1,9 +1,13 @@
-"use client"; // 需要 usePathname hook
+"use client";
 
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from '@/contexts/AuthContext';
+import LoginDialog from './LoginDialog';
 
 const navItems = [
   { href: "/knowledge", label: "Knowledge" },
@@ -13,29 +17,52 @@ const navItems = [
 
 const Navbar = () => {
   const pathname = usePathname();
+  const { user, isAuthenticated, logout } = useAuth();
+  const [showLoginDialog, setShowLoginDialog] = React.useState(false);
 
   return (
-    <nav className="bg-gray-100 py-4 border-b"> {/* 添加底部边框 */}
+    <nav className="bg-gray-100 py-4 border-b">
       <div className="container mx-auto flex justify-between items-center">
         <Link href="/" className="text-2xl font-bold text-gray-800 hover:text-blue-600 transition-colors">
           Family Tree
         </Link>
-        <ul className="flex space-x-6"> {/* 增加链接间距 */}
-          {navItems.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className={cn(
-                  "text-gray-600 hover:text-blue-600 transition-colors",
-                  pathname === item.href && "text-blue-600 font-semibold" // 活动链接高亮
-                )}
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <div className="flex items-center">
+          <ul className="flex space-x-6 mr-6">
+            {navItems.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "text-gray-600 hover:text-blue-600 transition-colors",
+                    pathname === item.href && "text-blue-600 font-semibold"
+                  )}
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+
+          {isAuthenticated ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-700">{user?.name}</span>
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={user?.profileImage} alt={user?.name} />
+                <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <Button variant="ghost" size="sm" onClick={() => logout()}>
+                Logout
+              </Button>
+            </div>
+          ) : (
+            <Button onClick={() => setShowLoginDialog(true)}>
+              Login
+            </Button>
+          )}
+        </div>
       </div>
+
+      <LoginDialog open={showLoginDialog} onClose={() => setShowLoginDialog(false)} />
     </nav>
   );
 };

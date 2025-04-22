@@ -3,12 +3,44 @@ import { db, isDatabaseConfigured } from '@/db';
 import { familyTrees, members } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { FamilyTree } from '@/types/family-tree';
+import { verify } from 'jsonwebtoken';
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse request body
+    // 验证用户认证
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Authentication required', requireAuth: true },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.substring(7);
+
+    // 验证令牌
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      return NextResponse.json(
+        { error: 'JWT secret not configured' },
+        { status: 500 }
+      );
+    }
+
+    let userId: string;
+    try {
+      const decoded = verify(token, jwtSecret) as { userId: string };
+      userId = decoded.userId;
+    } catch (error) {
+      return NextResponse.json(
+        { error: 'Invalid authentication token', requireAuth: true },
+        { status: 401 }
+      );
+    }
+
+    // 解析请求体
     const body = await request.json();
-    const { familyTree, userId } = body;
+    const { familyTree } = body;
 
     // Check database configuration
     const isConfigured = isDatabaseConfigured();

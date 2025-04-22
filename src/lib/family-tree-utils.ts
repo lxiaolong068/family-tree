@@ -178,140 +178,46 @@ export function loadFamilyTreeFromLocalStorage(key: string = 'familyTree'): Fami
 /**
  * 保存家谱到Neon数据库（主要存储方式）
  * @param familyTree 家谱对象
- * @param userId 用户ID（可选）
  * @returns 保存的家谱ID
  */
-export async function saveFamilyTreeToDatabase(familyTree: FamilyTree, userId?: string): Promise<number | null> {
-  // 如果数据库连接不可用，则返回null
-  if (!db) {
-    console.warn('Database connection unavailable, cannot save family tree');
-    // Save to local storage as backup
-    saveFamilyTreeToLocalStorage(familyTree);
-    return null;
-  }
+export async function saveFamilyTreeToDatabase(familyTree: FamilyTree): Promise<number | null> {
+  // 获取认证令牌
+  const authToken = localStorage.getItem('authToken');
+  console.log('Auth token available:', authToken ? 'yes' : 'no');
 
   try {
     console.log('Starting to save family tree to database:', {
       membersCount: familyTree.members.length,
       name: familyTree.name,
       rootId: familyTree.rootId,
-      userId: userId
     });
 
-    // Save or update family tree
-    let familyTreeId: number;
+    // 调用API保存家谱
+    const response = await fetch('/api/save-family-tree', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(authToken ? { 'Authorization': `Bearer ${authToken}` } : {})
+      },
+      body: JSON.stringify({ familyTree })
+    });
 
-    // Check if there is already a family tree ID in the URL
-    let existingId: number | null = null;
-    if (typeof window !== 'undefined') {
-      const urlParams = new URLSearchParams(window.location.search);
-      const idParam = urlParams.get('id');
-      if (idParam) {
-        existingId = parseInt(idParam);
-        console.log('Retrieved family tree ID from URL parameter:', existingId);
-      }
+    const data = await response.json();
+
+    // 检查是否需要认证
+    if (response.status === 401 && data.requireAuth) {
+      // 返回特殊错误，表示需要认证
+      throw new Error('AUTH_REQUIRED');
     }
 
-    if (existingId) {
-      // If there is an ID in the URL, use it directly to update
-      familyTreeId = existingId;
-      console.log('Updating existing family tree:', familyTreeId);
-
-      try {
-        await db.update(familyTrees)
-          .set({
-            rootId: familyTree.rootId,
-            updatedAt: new Date(),
-          })
-          .where(eq(familyTrees.id, familyTreeId));
-
-        console.log('Family tree table updated successfully');
-      } catch (updateError) {
-        console.error('Failed to update family tree table:', updateError);
-        throw updateError;
-      }
-
-      try {
-        // Delete old member records
-        await db.delete(members).where(eq(members.familyTreeId, familyTreeId));
-        console.log('Old members deleted successfully');
-      } catch (deleteError) {
-        console.error('Failed to delete old members:', deleteError);
-        throw deleteError;
-      }
-    } else {
-      // Check if this family tree already exists (by name and user ID)
-      try {
-        const existingFamilyTrees = await db.select().from(familyTrees)
-          .where(eq(familyTrees.name, familyTree.name || 'Unnamed Family Tree'));
-
-        console.log('Found existing family trees:', existingFamilyTrees.length);
-
-        if (existingFamilyTrees.length > 0) {
-          // Update existing family tree
-          familyTreeId = existingFamilyTrees[0].id;
-          console.log('Updating existing family tree:', familyTreeId);
-
-          await db.update(familyTrees)
-            .set({
-              rootId: familyTree.rootId,
-              updatedAt: new Date(),
-            })
-            .where(eq(familyTrees.id, familyTreeId));
-
-          // Delete old member records
-          await db.delete(members).where(eq(members.familyTreeId, familyTreeId));
-        } else {
-          // Create new family tree
-          console.log('Creating new family tree');
-
-          const result = await db.insert(familyTrees).values({
-            name: familyTree.name || 'Unnamed Family Tree',
-            rootId: familyTree.rootId,
-            userId: userId,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          }).returning({ id: familyTrees.id });
-
-          console.log('New family tree created successfully:', result);
-          familyTreeId = result[0].id;
-        }
-      } catch (queryError) {
-        console.error('Failed to query or create family tree:', queryError);
-        throw queryError;
-      }
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to save family tree');
     }
 
-    // Save members
-    console.log('Starting to save members, count:', familyTree.members.length);
-
-    try {
-      for (const member of familyTree.members) {
-        await db.insert(members).values({
-          id: member.id,
-          name: member.name,
-          relation: member.relation,
-          parentId: member.parentId,
-          birthDate: member.birthDate,
-          deathDate: member.deathDate,
-          gender: member.gender,
-          description: member.description,
-          familyTreeId: familyTreeId.toString(),
-          createdAt: new Date(),
-          updatedAt: new Date(),
-        });
-      }
-      console.log('All members saved successfully');
-    } catch (memberError) {
-      console.error('Failed to save members:', memberError);
-      throw memberError;
-    }
-
-    console.log('Family tree saved successfully, ID:', familyTreeId);
-    return familyTreeId;
+    return data.familyTreeId;
   } catch (error) {
     console.error('Failed to save family tree to database:', error);
-    throw error; // Throw the error instead of returning null, so the caller can see the specific error
+    throw error; // 抛出错误，让调用者处理
   }
 }
 

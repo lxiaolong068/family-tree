@@ -19,12 +19,20 @@ import {
   loadFamilyTreeFromDatabase
 } from '@/lib/family-tree-utils';
 import { isDatabaseConfigured } from '@/db';
+import { useAuth } from '@/contexts/AuthContext';
+import SaveLoginPrompt from '@/components/SaveLoginPrompt';
+import LoginDialog from '@/components/LoginDialog';
 
 const GeneratorPage = () => {
   // 关闭成功对话框
   const handleCloseSuccessDialog = () => {
     setSuccessDialogOpen(false);
   };
+  // 认证状态
+  const { isAuthenticated } = useAuth();
+  const [showLoginPrompt, setShowLoginPrompt] = useState(false);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
+
   // 家谱数据状态
   const [familyTree, setFamilyTree] = useState<FamilyTree>(createNewFamilyTree());
   // 当前编辑的成员
@@ -179,6 +187,13 @@ const GeneratorPage = () => {
         })
         .catch(error => {
           console.error('Failed to save to database:', error);
+
+          // 检查是否需要认证
+          if (error.message === 'AUTH_REQUIRED') {
+            setShowLoginPrompt(true);
+            return;
+          }
+
           // 数据库保存失败，使用本地存储作为备份
           saveFamilyTreeToLocalStorage(updatedFamilyTree);
         });
@@ -217,6 +232,13 @@ const GeneratorPage = () => {
         })
         .catch(error => {
           console.error('Failed to update in database:', error);
+
+          // 检查是否需要认证
+          if (error.message === 'AUTH_REQUIRED') {
+            setShowLoginPrompt(true);
+            return;
+          }
+
           // 数据库保存失败，使用本地存储作为备份
           saveFamilyTreeToLocalStorage(updatedFamilyTree);
         });
@@ -257,6 +279,12 @@ const GeneratorPage = () => {
           })
           .catch(error => {
             console.error('Failed to clear family tree in database:', error);
+
+            // 检查是否需要认证
+            if (error.message === 'AUTH_REQUIRED') {
+              setShowLoginPrompt(true);
+              return;
+            }
           });
       } else {
         // 如果没有ID参数，则从URL中移除所有参数
@@ -267,6 +295,19 @@ const GeneratorPage = () => {
 
   // Save to database
   const handleSaveToDatabase = async () => {
+    // 检查用户是否已登录
+    if (!isAuthenticated) {
+      // 如果未登录，显示登录提示
+      setShowLoginPrompt(true);
+      return;
+    }
+
+    // 用户已登录，直接保存
+    saveToDatabase();
+  };
+
+  // 实际保存到数据库的函数
+  const saveToDatabase = async () => {
     try {
       console.log('Starting to save family tree to database...');
       console.log('Database configuration status:', isDatabaseConfigured());
@@ -306,27 +347,17 @@ const GeneratorPage = () => {
         return;
       }
 
-      // Use API route to save family tree
       try {
-        console.log('Trying to save family tree via API...');
-        const response = await fetch('/api/save-family-tree', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ familyTree }),
-        });
+        // 尝试保存到数据库
+        const familyTreeId = await saveFamilyTreeToDatabase(familyTree);
 
-        const result = await response.json();
-        console.log('Save result:', result);
-
-        if (result.success && result.familyTreeId) {
-          // Update URL to include family tree ID
+        if (familyTreeId) {
+          // 更新URL以包含家谱ID
           const url = new URL(window.location.href);
-          url.searchParams.set('id', result.familyTreeId.toString());
+          url.searchParams.set('id', familyTreeId.toString());
           window.history.pushState({}, '', url.toString());
 
-          // Clear local storage, because now we use the database
+          // 清除本地存储
           if (typeof window !== 'undefined') {
             localStorage.removeItem('familyTree');
           }
@@ -335,31 +366,22 @@ const GeneratorPage = () => {
           setSuccessDialogData({
             title: 'Family tree saved successfully!',
             description: 'Your family tree has been saved to the database and can be accessed anytime using the link below.',
-            familyTreeId: result.familyTreeId,
+            familyTreeId: familyTreeId,
             familyTreeUrl: url.toString()
           });
           setSuccessDialogOpen(true);
-        } else {
-          // Display error message
-          let errorMessage = 'Save failed\n';
-          if (result.error) {
-            errorMessage += '\nError: ' + result.error;
-          }
-          if (result.message) {
-            errorMessage += '\nMessage: ' + result.message;
-          }
-          if (result.code) {
-            errorMessage += '\nCode: ' + result.code;
-          }
-          errorMessage += '\n\nYour data will be saved locally as a backup.';
-
-          alert(errorMessage);
-          // Save to local storage as backup
-          saveFamilyTreeToLocalStorage(familyTree);
         }
-      } catch (apiError: any) {
-        console.error('API call error:', apiError);
-        alert('Save failed: ' + (apiError.message || 'Unknown error') + '\n\nYour data will be saved locally as a backup.');
+      } catch (error: any) {
+        console.error('Failed to save to database:', error);
+
+        // 检查是否需要认证
+        if (error.message === 'AUTH_REQUIRED') {
+          setShowLoginPrompt(true);
+          return;
+        }
+
+        // 其他错误
+        alert('Save failed: ' + (error.message || 'Unknown error') + '\n\nYour data will be saved locally as a backup.');
         // Save to local storage as backup
         saveFamilyTreeToLocalStorage(familyTree);
       }
@@ -518,6 +540,22 @@ const GeneratorPage = () => {
         description={successDialogData.description}
         familyTreeId={successDialogData.familyTreeId}
         familyTreeUrl={successDialogData.familyTreeUrl}
+      />
+
+      {/* 登录提示对话框 */}
+      <SaveLoginPrompt
+        open={showLoginPrompt}
+        onClose={() => setShowLoginPrompt(false)}
+        onLogin={() => {
+          setShowLoginPrompt(false);
+          setShowLoginDialog(true);
+        }}
+      />
+
+      {/* 登录对话框 */}
+      <LoginDialog
+        open={showLoginDialog}
+        onClose={() => setShowLoginDialog(false)}
       />
     </div>
   );

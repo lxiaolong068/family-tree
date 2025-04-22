@@ -27,10 +27,12 @@ export const members = pgTable('members', {
   updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// 用户表（可选，如果需要用户认证）
+// 用户表
 export const users = pgTable('users', {
   id: text('id').primaryKey(),
   email: text('email').unique().notNull(),
   name: text('name'),
+  googleId: text('google_id').unique(), // Google 认证ID
+  profileImage: text('profile_image'), // 用户头像链接
   createdAt: timestamp('created_at').defaultNow(),
 });
