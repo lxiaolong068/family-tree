@@ -12,7 +12,7 @@ interface FamilyTreeItem {
 }
 
 interface FamilyTreeListProps {
-  userId: string;
+  userId?: string | undefined;
 }
 
 export default function FamilyTreeList({ userId }: FamilyTreeListProps) {
