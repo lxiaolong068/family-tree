@@ -149,9 +149,16 @@ export function addMemberToFamilyTree(familyTree: FamilyTree, member: Partial<Me
  * @param key 存储键名
  */
 export function saveFamilyTreeToLocalStorage(familyTree: FamilyTree, key: string = 'familyTree'): void {
-  if (typeof window !== 'undefined') {
+  // 确保只在客户端环境中使用localStorage
+  if (typeof window === 'undefined') {
+    console.warn('无法在服务器端使用localStorage');
+    return;
+  }
+  
+  try {
     localStorage.setItem(key, JSON.stringify(familyTree));
-    console.log('Family tree saved to local storage as backup');
+  } catch (error: unknown) {
+    console.error('保存家谱到本地存储失败:', error instanceof Error ? error.message : String(error));
   }
 }
 
@@ -161,17 +168,22 @@ export function saveFamilyTreeToLocalStorage(familyTree: FamilyTree, key: string
  * @returns 家谱对象，如果不存在则返回新的家谱
  */
 export function loadFamilyTreeFromLocalStorage(key: string = 'familyTree'): FamilyTree {
-  if (typeof window !== 'undefined') {
+  // 确保只在客户端环境中使用localStorage
+  if (typeof window === 'undefined') {
+    console.warn('无法在服务器端使用localStorage');
+    return createNewFamilyTree();
+  }
+  
+  try {
     const storedData = localStorage.getItem(key);
     if (storedData) {
-      try {
-        console.log('Loading family tree from local storage backup');
-        return JSON.parse(storedData) as FamilyTree;
-      } catch (error) {
-        console.error('Failed to parse family tree data from local storage:', error);
-      }
+      return JSON.parse(storedData) as FamilyTree;
     }
+  } catch (error: unknown) {
+    console.error('从本地存储加载家谱失败:', error instanceof Error ? error.message : String(error));
   }
+  
+  // 如果没有找到或解析失败，返回一个新的家谱
   return createNewFamilyTree();
 }
 
@@ -227,9 +239,9 @@ export async function saveFamilyTreeToDatabase(familyTree: FamilyTree): Promise<
  * @returns Family tree object, or null if it doesn't exist
  */
 export async function loadFamilyTreeFromDatabase(familyTreeId: number): Promise<FamilyTree | null> {
-  // If database connection is unavailable, try to load from local storage
+  // 如果数据库连接不可用，尝试从本地存储加载
   if (!db) {
-    console.warn('Database connection unavailable, trying to load from local storage');
+    console.warn('数据库连接不可用，尝试从本地存储加载');
     return loadFamilyTreeFromLocalStorage();
   }
 
@@ -247,11 +259,11 @@ export async function loadFamilyTreeFromDatabase(familyTreeId: number): Promise<
       return null;
     }
 
-    // Get family tree members
-    // 确保familyTreeId作为字符串进行比较，因为在数据库中可能存储为字符串
-    console.log('Querying members with familyTreeId:', familyTreeId.toString());
+    // 获取家谱成员
+    // 直接使用数字ID，与数据库模式匹配
+    console.log('使用ID查询家谱成员:', familyTreeId);
     const membersData = await db.select().from(members)
-      .where(eq(members.familyTreeId, familyTreeId.toString()));
+      .where(eq(members.familyTreeId, familyTreeId));
 
     console.log('Members data retrieved:', membersData);
 
@@ -275,8 +287,8 @@ export async function loadFamilyTreeFromDatabase(familyTreeId: number): Promise<
 
     console.log('Built family tree object with members count:', familyTree.members.length);
     return familyTree;
-  } catch (error) {
-    console.error('Failed to load family tree from database:', error);
+  } catch (error: unknown) {
+    console.error('从数据库加载家谱失败:', error instanceof Error ? error.message : String(error));
     return null;
   }
 }
@@ -286,7 +298,7 @@ export async function loadFamilyTreeFromDatabase(familyTreeId: number): Promise<
  * @param userId User ID
  * @returns List of family trees
  */
-export async function getUserFamilyTrees(userId: string): Promise<{ id: number, name: string }[]> {
+export async function getUserFamilyTrees(userId: string): Promise<{ id: number, name: string | null }[]> {
   // If database connection is unavailable, return empty array
   if (!db) {
     console.warn('Database connection unavailable, cannot get user family trees');
@@ -299,10 +311,14 @@ export async function getUserFamilyTrees(userId: string): Promise<{ id: number, 
       name: familyTrees.name,
     }).from(familyTrees)
       .where(eq(familyTrees.userId, userId));
-
-    return result;
-  } catch (error) {
-    console.error('Failed to get user family trees:', error);
+      
+    // 确保结果中的name字段不为null，如果为null则提供默认值
+    return result.map(item => ({
+      id: item.id,
+      name: item.name || `家谱 #${item.id}` // 提供默认名称
+    }));
+  } catch (error: unknown) {
+    console.error('获取用户家谱列表失败:', error instanceof Error ? error.message : String(error));
     return [];
   }
 }

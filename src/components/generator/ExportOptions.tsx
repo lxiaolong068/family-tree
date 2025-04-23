@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { handleClientError } from '@/lib/error-handler';
 
 interface ExportOptionsProps {
   familyTreeName: string;
@@ -24,42 +25,37 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
   chartRef,
   disabled = false
 }) => {
+  // 导出状态管理
+  const [isExporting, setIsExporting] = useState(false);
+  const loadingRef = useRef<HTMLDivElement>(null);
+  
   // 导出为PNG图片
   const exportAsPNG = async () => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || isExporting) return;
     
     try {
-      // 显示加载状态
-      const chartElement = chartRef.current;
-      chartElement.classList.add('relative');
-      const loadingDiv = document.createElement('div');
-      loadingDiv.className = 'absolute inset-0 bg-black/20 flex items-center justify-center z-10';
-      loadingDiv.innerHTML = '<div class="text-white font-bold">Exporting...</div>';
-      chartElement.appendChild(loadingDiv);
-      
-      // 等待DOM更新
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // 设置导出状态
+      setIsExporting(true);
       
       // 使用html2canvas生成图片
+      const chartElement = chartRef.current;
       const canvas = await html2canvas(chartElement, {
         scale: 2, // 提高分辨率
         backgroundColor: '#ffffff',
         logging: false,
         removeContainer: true,
-        // 确保可见性
+        // 改进克隆函数，使用更安全的选择器
         onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.querySelector('div[ref="chartRef"]') as HTMLElement;
-          if (clonedElement) {
-            clonedElement.classList.remove('overflow-x-auto');
-            clonedElement.style.overflow = 'visible';
-          }
+          // 按照类名或元素结构查找，而不是使用ref属性
+          const chartContainers = clonedDoc.querySelectorAll('.overflow-x-auto');
+          chartContainers.forEach(container => {
+            if (container instanceof HTMLElement) {
+              container.style.overflow = 'visible';
+            }
+          });
           return Promise.resolve();
         }
       });
-      
-      // 移除加载状态显示
-      chartElement.removeChild(loadingDiv);
-      chartElement.classList.remove('relative');
       
       // 转换为数据URL并下载
       const imgData = canvas.toDataURL('image/png');
@@ -67,49 +63,44 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
       link.href = imgData;
       link.download = `${familyTreeName || 'family-tree'}.png`;
       link.click();
-    } catch (error) {
-      console.error('Export as PNG failed:', error);
-      alert('Failed to export as PNG. Please try again.');
+    } catch (error: unknown) {
+      console.error('导出PNG失败:', error);
+      alert(handleClientError(error));
+    } finally {
+      // 恢复状态
+      setIsExporting(false);
     }
   };
   
   // 导出为PDF
   const exportAsPDF = async () => {
-    if (!chartRef.current) return;
+    if (!chartRef.current || isExporting) return;
     
     try {
-      // 显示加载状态
-      const chartElement = chartRef.current;
-      chartElement.classList.add('relative');
-      const loadingDiv = document.createElement('div');
-      loadingDiv.className = 'absolute inset-0 bg-black/20 flex items-center justify-center z-10';
-      loadingDiv.innerHTML = '<div class="text-white font-bold">Exporting...</div>';
-      chartElement.appendChild(loadingDiv);
-      
-      // 等待DOM更新
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // 设置导出状态
+      setIsExporting(true);
       
       // 使用html2canvas生成图片
+      const chartElement = chartRef.current;
       const canvas = await html2canvas(chartElement, {
         scale: 2,
         backgroundColor: '#ffffff',
         logging: false,
         removeContainer: true,
-        // 确保可见性
+        // 改进克隆函数，使用更安全的选择器
         onclone: (clonedDoc) => {
-          const clonedElement = clonedDoc.querySelector('div[ref="chartRef"]') as HTMLElement;
-          if (clonedElement) {
-            clonedElement.classList.remove('overflow-x-auto');
-            clonedElement.style.overflow = 'visible';
-          }
+          // 按照类名或元素结构查找，而不是使用ref属性
+          const chartContainers = clonedDoc.querySelectorAll('.overflow-x-auto');
+          chartContainers.forEach(container => {
+            if (container instanceof HTMLElement) {
+              container.style.overflow = 'visible';
+            }
+          });
           return Promise.resolve();
         }
       });
       
-      // 移除加载状态显示
-      chartElement.removeChild(loadingDiv);
-      chartElement.classList.remove('relative');
-      
+      // 获取图片数据
       const imgData = canvas.toDataURL('image/png');
       
       // 创建PDF文档
@@ -127,9 +118,12 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
       
       // 下载PDF
       pdf.save(`${familyTreeName || 'family-tree'}.pdf`);
-    } catch (error) {
-      console.error('Export as PDF failed:', error);
-      alert('Failed to export as PDF. Please try again.');
+    } catch (error: unknown) {
+      console.error('导出PDF失败:', error);
+      alert(handleClientError(error));
+    } finally {
+      // 恢复状态
+      setIsExporting(false);
     }
   };
 
@@ -143,11 +137,11 @@ const ExportOptions: React.FC<ExportOptionsProps> = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button 
-                disabled={disabled} 
+                disabled={disabled || isExporting} 
                 className="flex items-center"
               >
                 <Download className="mr-2 h-4 w-4" />
-                Export
+                {isExporting ? '导出中...' : '导出'}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">

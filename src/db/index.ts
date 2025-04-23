@@ -5,7 +5,7 @@ import * as schema from './schema';
 
 // Check if environment variables exist
 // Note: This file only runs on the server side, not on the client side
-const dbUrl = process.env.DATABASE_URL || process.env.NEON_DATABASE_URL;
+const dbUrl = process.env.NEON_DATABASE_URL;
 
 // Check database URL on server side
 if (typeof window === 'undefined') {
@@ -29,8 +29,9 @@ if (typeof window === 'undefined') {
       db = drizzle(sql, { schema });
       console.log('Database connection initialized successfully');
     }
-  } catch (error) {
-    console.error('Failed to initialize database connection:', error);
+  } catch (error: unknown) {
+    console.error('Failed to initialize database connection:', 
+      error instanceof Error ? error.message : String(error));
   }
 }
 

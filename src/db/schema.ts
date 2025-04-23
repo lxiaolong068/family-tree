@@ -20,9 +20,9 @@ export const members = pgTable('members', {
   deathDate: text('death_date'),
   gender: text('gender'), // 'male', 'female', 'other'
   description: text('description'),
-  // 注意：在SQL定义中，family_tree_id是INTEGER类型，但在代码中我们将其作为字符串处理
-  // 这是因为在保存时我们将数字ID转换为字符串
-  familyTreeId: text('family_tree_id').notNull(), // 外键关联到家谱表
+  // 修改为integer类型，与familyTrees表的id字段类型保持一致
+  // 这样可以避免类型转换问题和潜在的错误
+  familyTreeId: serial('family_tree_id').notNull(), // 外键关联到家谱表
   createdAt: timestamp('created_at').defaultNow(),
   updatedAt: timestamp('updated_at').defaultNow(),
 });

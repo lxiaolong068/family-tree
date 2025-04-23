@@ -4,6 +4,7 @@ import { familyTrees, members } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { FamilyTree } from '@/types/family-tree';
 import { verify } from 'jsonwebtoken';
+import { handleApiError } from '@/lib/error-handler';
 
 export async function POST(request: NextRequest) {
   try {
@@ -31,9 +32,13 @@ export async function POST(request: NextRequest) {
     try {
       const decoded = verify(token, jwtSecret) as { userId: string };
       userId = decoded.userId;
-    } catch (error) {
+    } catch (error: unknown) {
       return NextResponse.json(
-        { error: 'Invalid authentication token', requireAuth: true },
+        { 
+          error: '无效的认证令牌', 
+          requireAuth: true,
+          message: error instanceof Error ? error.message : '令牌验证失败'
+        },
         { status: 401 }
       );
     }
@@ -42,14 +47,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { familyTree } = body;
 
-    // Check database configuration
+    // 检查数据库配置状态
     const isConfigured = isDatabaseConfigured();
-    console.log('Database configuration status:', isConfigured);
-    console.log('Environment variable status:', {
-      NEON_DATABASE_URL: !!process.env.NEON_DATABASE_URL,
-      NEXT_PUBLIC_HAS_DATABASE: process.env.NEXT_PUBLIC_HAS_DATABASE,
-      DATABASE_URL: !!process.env.DATABASE_URL
-    });
+    console.log('数据库配置状态:', isConfigured);
 
     // Check database connection
     if (!db) {
@@ -83,34 +83,30 @@ export async function POST(request: NextRequest) {
     let familyTreeId: number;
 
     try {
-      // Create new family tree
-      console.log('Creating new family tree');
+      // 创建新家谱
+      console.log('正在创建新家谱');
 
       const result = await db.insert(familyTrees).values({
-        name: familyTree.name || 'Unnamed Family Tree',
+        name: familyTree.name || '未命名家谱',
         rootId: familyTree.rootId,
         userId: userId,
         createdAt: new Date(),
         updatedAt: new Date(),
       }).returning({ id: familyTrees.id });
 
-      console.log('New family tree created successfully:', result);
+      console.log('新家谱创建成功:', result);
       familyTreeId = result[0].id;
-    } catch (createError: any) {
+    } catch (createError: unknown) {
+      // 使用错误处理工具处理错误
       return NextResponse.json(
-        {
-          error: 'Failed to create family tree',
-          message: createError.message,
-          code: createError.code,
-          stack: createError.stack
-        },
+        handleApiError(createError),
         { status: 500 }
       );
     }
 
-    // Save members
+    // 保存成员
     try {
-      console.log('Starting to save members, count:', familyTree.members.length);
+      console.log('开始保存家谱成员，数量:', familyTree.members.length);
 
       for (const member of familyTree.members) {
         await db.insert(members).values({
@@ -122,34 +118,27 @@ export async function POST(request: NextRequest) {
           deathDate: member.deathDate,
           gender: member.gender,
           description: member.description,
-          familyTreeId: familyTreeId.toString(),
+          // 使用数字类型的ID，与数据库模式匹配
+          familyTreeId: familyTreeId,
           createdAt: new Date(),
           updatedAt: new Date(),
         });
       }
-      console.log('All members saved successfully');
-    } catch (memberError: any) {
+      console.log('所有成员保存成功');
+    } catch (memberError: unknown) {
+      // 使用错误处理工具处理错误
       return NextResponse.json(
-        {
-          error: 'Failed to save members',
-          message: memberError.message,
-          code: memberError.code,
-          stack: memberError.stack,
-          member: memberError.member
-        },
+        handleApiError(memberError),
         { status: 500 }
       );
     }
 
-    console.log('Family tree saved successfully, ID:', familyTreeId);
+    console.log('家谱保存成功，ID:', familyTreeId);
     return NextResponse.json({ success: true, familyTreeId });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    // 使用错误处理工具处理错误，不暴露敏感信息
     return NextResponse.json(
-      {
-        error: 'Server error',
-        message: error.message,
-        stack: error.stack
-      },
+      handleApiError(error),
       { status: 500 }
     );
   }
