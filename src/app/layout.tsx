@@ -22,8 +22,8 @@ export const metadata: Metadata = {
   openGraph: {
     title: "How to Make a Family Tree | Professional Online Family Tree Maker",
     description: "Learn how to make a beautiful family tree with our free online tool. Step-by-step guide, templates & easy visualization.",
-    url: "https://your-domain.com",
-    siteName: "Family Tree Maker",
+    url: "https://www.family-tree.cc",
+    siteName: "Family Tree Maker | How to Make a Family Tree",
     locale: "en_US",
     type: "website",
   },

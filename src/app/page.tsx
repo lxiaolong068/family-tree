@@ -103,6 +103,7 @@ const HomePage = () => {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
         "@context": "https://schema.org",
         "@type": "HowTo",
+        "@id": "https://www.family-tree.cc/#howto",
         "name": "How to Make a Family Tree",
         "description": "Complete guide to creating a family tree with step-by-step instructions and free tools",
         "step": [

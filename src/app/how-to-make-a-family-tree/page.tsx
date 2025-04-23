@@ -255,31 +255,31 @@ export default function HowToMakeFamilyTreePage() {
             "@type": "HowToStep",
             "name": "Gather Family Information",
             "text": "Collect names, dates, and relationships of family members",
-            "url": "https://your-domain.com/how-to-make-a-family-tree#step1"
+            "url": "https://www.family-tree.cc/how-to-make-a-family-tree#step1"
           },
           {
             "@type": "HowToStep",
             "name": "Choose a Family Tree Format",
             "text": "Decide on ancestor chart, descendant chart, or another format",
-            "url": "https://your-domain.com/how-to-make-a-family-tree#step2"
+            "url": "https://www.family-tree.cc/how-to-make-a-family-tree#step2"
           },
           {
             "@type": "HowToStep",
             "name": "Organize Your Information",
             "text": "Sort by generation and establish relationships",
-            "url": "https://your-domain.com/how-to-make-a-family-tree#step3"
+            "url": "https://www.family-tree.cc/how-to-make-a-family-tree#step3"
           },
           {
             "@type": "HowToStep",
             "name": "Create Your Family Tree",
             "text": "Use our online tool to build your visual family tree",
-            "url": "https://your-domain.com/how-to-make-a-family-tree#step4"
+            "url": "https://www.family-tree.cc/how-to-make-a-family-tree#step4"
           },
           {
             "@type": "HowToStep",
             "name": "Save and Share",
             "text": "Export, print, or digitally share your family tree",
-            "url": "https://your-domain.com/how-to-make-a-family-tree#step5"
+            "url": "https://www.family-tree.cc/how-to-make-a-family-tree#step5"
           }
         ],
         "tool": [
@@ -341,13 +341,13 @@ export default function HowToMakeFamilyTreePage() {
             "@type": "ListItem",
             "position": 1,
             "name": "Home",
-            "item": "https://your-domain.com/"
+            "item": "https://www.family-tree.cc/"
           },
           {
             "@type": "ListItem",
             "position": 2,
             "name": "How to Make a Family Tree",
-            "item": "https://your-domain.com/how-to-make-a-family-tree"
+            "item": "https://www.family-tree.cc/how-to-make-a-family-tree"
           }
         ]
       })}}></script>

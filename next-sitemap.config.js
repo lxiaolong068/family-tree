@@ -1,11 +1,11 @@
 /** @type {import('next-sitemap').IConfig} */
 module.exports = {
-  siteUrl: process.env.SITE_URL || 'https://your-domain.com',
+  siteUrl: process.env.SITE_URL || 'https://www.family-tree.cc',
   generateRobotsTxt: true,
   generateIndexSitemap: true,
   robotsTxtOptions: {
     additionalSitemaps: [
-      'https://your-domain.com/server-sitemap.xml',
+      'https://www.family-tree.cc/server-sitemap.xml',
     ],
     policies: [
       {
