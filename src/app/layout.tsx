@@ -16,8 +16,22 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Family Tree Website",
-  description: "Free and easy-to-use family tree creation tool",
+  title: "How to Make a Family Tree | Professional Online Family Tree Maker",
+  description: "Learn how to make a beautiful family tree with our free online tool. Step-by-step guide, templates & easy visualization. Start preserving your family history today!",
+  keywords: "how to make a family tree, family tree maker, family tree templates, ancestry chart, genealogy tool",
+  openGraph: {
+    title: "How to Make a Family Tree | Professional Online Family Tree Maker",
+    description: "Learn how to make a beautiful family tree with our free online tool. Step-by-step guide, templates & easy visualization.",
+    url: "https://your-domain.com",
+    siteName: "Family Tree Maker",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "How to Make a Family Tree | Professional Online Family Tree Maker",
+    description: "Learn how to make a beautiful family tree with our free online tool. Step-by-step guide & templates.",
+  },
 };
 
 export default function RootLayout({

@@ -20,6 +20,15 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Configure compression
   compress: true,
+  // Configure i18n
+  i18n: {
+    locales: ['en-US'],
+    defaultLocale: 'en-US',
+  },
+  // Optimize for search engines
+  swcMinify: true,
+  // Use trailing slashes for SEO benefits
+  trailingSlash: true,
 };
 
 export default nextConfig;
