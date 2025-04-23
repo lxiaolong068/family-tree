@@ -19,7 +19,8 @@
 - **数据存储**：本地存储（LocalStorage）为主，使用 Neon 作为云数据库进行数据持久化 🟩【已完成】
 - **可选工具**：Mermaid.js（家谱图可视化）🟩【已完成】、html2canvas（导出图片）🟩【已完成】、jsPDF（导出 PDF）🟩【已完成】
 - **内容管理**：MDX/Markdown 支持，便于内容型页面维护 🟥【待开发】
-- **部署**：主要使用 Vercel 部署，优化自动化构建及发布流程 🟥【待开发】
+- **部署**：主要使用 Vercel 部署，优化自动化构建及发布流程 🟧【进行中】
+- **域名配置**：已配置域名 www.family-tree.cc，支持 HTTPS 访问 🟩【已完成】
 
 ---
 
@@ -51,7 +52,7 @@ graph TD
 - 家谱图可视化：集成 Mermaid.js 渲染 🟩【已完成】
 - 家谱数据本地保存/导入导出（JSON） 🟩【已完成】
 - 模板多样化：支持多种家谱结构（祖先图、后代图） 🟩【已完成】
-- SEO 优化：结构化数据、meta 标签、长尾关键词覆盖 🟧【进行中】
+- SEO 优化：结构化数据、meta 标签、长尾关键词覆盖 🟩【已完成】
 
 #### Mermaid 结构图
 ```mermaid
@@ -215,10 +216,13 @@ graph TD
 - 实现"Save to Database"时的登录提醒功能
 
 ### 进行中功能
-- SEO 优化和结构化数据标注
 - 用户家谱数据的权限控制
 
 ### 最近完成功能
+- 完成SEO优化和结构化数据标注，针对"how to make a family tree"关键词
+- 创建专门的"How to Make a Family Tree"详细指南页面
+- 配置网站域名(www.family-tree.cc)和相关环境变量
+- 设置自动生成sitemap.xml和robots.txt文件
 - 添加用户个人资料页面，显示用户信息和家谱列表
 - 更新导航栏，添加个人资料页面入口
 - 创建useFamilyTree、useFamilyTreeMembers、useFamilyTreeStorage等自定义hooks，抽离数据处理逻辑
@@ -233,7 +237,8 @@ graph TD
 - 集成html2canvas和jsPDF库实现高质量图表导出
 
 ### 下一阶段计划
-- 添加用户个人资料页面
+- 配置Firebase授权域名，将www.family-tree.cc添加为合法域名
+- 完成Vercel部署配置，设置环境变量
 - 实现家谱生成器的可视化拖拽功能 🟥【待开发】
 - 实现家谱图导出为图片/PDF功能 🟩【已完成】
 - 完善家谱生成器的复杂关系设置功能（如配偶、兄弟姐妹等） 🟥【待开发】
