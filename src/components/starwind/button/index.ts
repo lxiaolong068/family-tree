@@ -1,4 +1,4 @@
-import Button from "./Button.astro";
+import Button from "./Button";
 
 export { Button };
 
