@@ -4,15 +4,15 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion"
+} from "@/components/ui/accordion";
+import PageLayout from "@/components/PageLayout";
 
 const KnowledgePage = () => {
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-4">Family Tree Knowledge</h1>
-      <p className="text-gray-700 mb-4">
-        A family tree, also known as a genealogical chart, is a document that records family lineage and important events of family members.
-      </p>
+    <PageLayout
+      title="Family Tree Knowledge"
+      description="A family tree, also known as a genealogical chart, is a document that records family lineage and important events of family members."
+    >
       <h2 className="text-2xl font-bold mb-2">How to Create a Family Tree</h2>
       <ol className="list-decimal list-inside text-gray-700 mb-4">
         <li>Collect family member information</li>
@@ -42,7 +42,7 @@ const KnowledgePage = () => {
           </AccordionContent>
         </AccordionItem>
       </Accordion>
-    </div>
+    </PageLayout>
   );
 };
 

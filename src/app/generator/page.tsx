@@ -9,10 +9,8 @@ import MemberList from '@/components/generator/MemberList';
 import FamilyTreeChart from '@/components/generator/FamilyTreeChart';
 import {
   generateMermaidChart,
-  generateUniqueId,
   buildFamilyRelations,
   createNewFamilyTree,
-  addMemberToFamilyTree,
   saveFamilyTreeToLocalStorage,
   loadFamilyTreeFromLocalStorage,
   saveFamilyTreeToDatabase,
@@ -23,6 +21,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import SaveLoginPrompt from '@/components/SaveLoginPrompt';
 import LoginDialog from '@/components/LoginDialog';
 import ExportOptions from '@/components/generator/ExportOptions';
+import { useFamilyTreeMembers } from '@/hooks/useFamilyTreeMembers';
 
 const GeneratorPage = () => {
   // 认证状态
@@ -32,12 +31,6 @@ const GeneratorPage = () => {
 
   // 家谱数据状态
   const [familyTree, setFamilyTree] = useState<FamilyTree>(createNewFamilyTree());
-  // 当前编辑的成员
-  const [currentMember, setCurrentMember] = useState<Partial<Member>>({
-    name: '',
-    relation: '',
-    gender: 'male'
-  });
   // 成功对话框状态
   const [successDialogOpen, setSuccessDialogOpen] = useState<boolean>(false);
   const [successDialogData, setSuccessDialogData] = useState<{
@@ -155,55 +148,38 @@ const GeneratorPage = () => {
     }
   };
 
-  // 处理输入变化
-  const handleInputChange = (field: keyof Member, value: string) => {
-    setCurrentMember(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
+  // 使用自定义钩子管理成员操作
+  const {
+    currentMember,
+    handleInputChange,
+    addMember,
+    deleteMember
+  } = useFamilyTreeMembers(familyTree, (updatedFamilyTree) => {
+    setFamilyTree(updatedFamilyTree);
+    // 保存到本地存储（作为备份）
+    saveFamilyTreeToLocalStorage(updatedFamilyTree);
+    // 更新图表
+    if (updatedFamilyTree.members.length > 0) {
+      updateChartDefinition(updatedFamilyTree.members);
+      setShowChart(true);
+    } else {
+      setChartDefinition('');
+      setShowChart(false);
+    }
+  });
+  
   // 添加成员
   const handleAddMember = () => {
     try {
-      // 验证表单
-      if (!currentMember.name || !currentMember.relation) {
+      const result = addMember();
+      if (!result.success && result.error) {
         // 显示错误对话框
         setErrorDialogData({
           title: "Validation Error",
-          description: "Both name and relationship are required fields."
+          description: result.error
         });
         setErrorDialogOpen(true);
-        return;
       }
-
-      // 创建新成员
-      const newMember: Member = {
-        id: generateUniqueId(),
-        name: currentMember.name!,
-        relation: currentMember.relation!,
-        gender: currentMember.gender || 'male',
-        birthDate: currentMember.birthDate || '',
-      };
-
-      // 更新家谱
-      const updatedFamilyTree = addMemberToFamilyTree(familyTree, newMember);
-      setFamilyTree(updatedFamilyTree);
-
-      // 保存到本地存储（作为备份）
-      saveFamilyTreeToLocalStorage(updatedFamilyTree);
-
-      // 清空表单
-      setCurrentMember({
-        name: '',
-        relation: '',
-        gender: 'male',
-        birthDate: '',
-      });
-
-      // 更新图表
-      updateChartDefinition(updatedFamilyTree.members);
-      setShowChart(true);
     } catch (error) {
       console.error('Error adding family member:', error);
       // 显示错误对话框
@@ -232,24 +208,15 @@ const GeneratorPage = () => {
             label: "Delete",
             onClick: () => {
               // 执行删除
-              const updatedMembers = familyTree.members.filter(member => member.id !== id);
-              const updatedFamilyTree = {
-                ...familyTree,
-                members: updatedMembers
-              };
-              
-              setFamilyTree(updatedFamilyTree);
-              
-              // 更新图表
-              if (updatedMembers.length > 0) {
-                updateChartDefinition(updatedMembers);
-              } else {
-                setChartDefinition('');
-                setShowChart(false);
+              const result = deleteMember(id);
+              if (!result.success && result.error) {
+                // 显示错误对话框
+                setErrorDialogData({
+                  title: "Error Deleting Member",
+                  description: result.error
+                });
+                setErrorDialogOpen(true);
               }
-              
-              // 保存到本地存储
-              saveFamilyTreeToLocalStorage(updatedFamilyTree);
             },
             variant: "destructive"
           }
@@ -299,14 +266,6 @@ const GeneratorPage = () => {
                 setChartDefinition('');
                 setShowChart(false);
                 saveFamilyTreeToLocalStorage(newFamilyTree);
-                
-                // 重置表单
-                setCurrentMember({
-                  name: '',
-                  relation: '',
-                  gender: 'male',
-                  birthDate: '',
-                });
                 
                 // 清除URL参数（如果有ID）
                 if (window.location.search.includes('id=')) {

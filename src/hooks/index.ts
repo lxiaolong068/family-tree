@@ -2,3 +2,4 @@
 export * from './useFamilyTree';
 export * from './useFamilyTreeMembers';
 export * from './useFamilyTreeStorage';
+export * from './useErrorHandling';

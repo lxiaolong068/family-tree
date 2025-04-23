@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import PageLayout from "@/components/PageLayout";
 
 // Template data - images and files should be placed in the public directory in actual application
 const templatesData = [
@@ -18,11 +19,10 @@ const templatesData = [
 
 const TemplatesPage = () => {
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-4">Family Tree Templates</h1>
-      <p className="text-gray-700 mb-4">
-        We have prepared various family tree templates for you. You can choose the appropriate template for download and use according to your needs.
-      </p>
+    <PageLayout
+      title="Family Tree Templates"
+      description="We have prepared various family tree templates for you. You can choose the appropriate template for download and use according to your needs."
+    >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {templatesData.map((template) => (
           <Card key={template.id}>
@@ -57,7 +57,7 @@ const TemplatesPage = () => {
           </Card>
         ))}
       </div>
-    </div>
+    </PageLayout>
   );
 };
 
