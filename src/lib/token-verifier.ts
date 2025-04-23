@@ -17,6 +17,12 @@ const getKey = (header: jwt.JwtHeader, callback: jwt.SigningKeyCallback) => {
       return;
     }
     
+    // 添加空值检查，确保key不为undefined
+    if (!key) {
+      callback(new Error('无法获取签名密钥'));
+      return;
+    }
+    
     const signingKey = key.getPublicKey();
     callback(null, signingKey);
   });
