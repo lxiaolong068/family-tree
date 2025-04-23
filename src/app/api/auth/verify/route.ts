@@ -29,6 +29,14 @@ export async function GET(request: NextRequest) {
     const decoded = verify(token, jwtSecret) as { userId: string };
     
     // 获取用户信息
+    // 检查数据库连接
+    if (!db) {
+      return NextResponse.json(
+        { error: '数据库连接不可用' },
+        { status: 500 }
+      );
+    }
+    
     const userData = await db.select().from(users).where(eq(users.id, decoded.userId));
     
     if (userData.length === 0) {
@@ -46,10 +54,12 @@ export async function GET(request: NextRequest) {
         profileImage: userData[0].profileImage,
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Token verification error:', error);
+    // 类型断言处理
+    const errorMessage = error instanceof Error ? error.message : '未知令牌验证错误';
     return NextResponse.json(
-      { error: 'Invalid token', message: error.message },
+      { error: 'Invalid token', message: errorMessage },
       { status: 401 }
     );
   }
