@@ -152,7 +152,7 @@ graph TD
 
 ### 4. 代码结构优化
 - 将家谱生成器页面拆分为更小的组件 🟩【已完成】
-- 将数据处理逻辑抽离到自定义 hooks 🟧【进行中】
+- 将数据处理逻辑抽离到自定义 hooks 🟩【已完成】
 - 使用 Context API 管理状态 🟩【已完成】
 
 ### 5. 安全性增强
@@ -197,9 +197,9 @@ graph TD
 ### 进行中功能
 - SEO 优化和结构化数据标注
 - 用户家谱数据的权限控制
-- 将数据处理逻辑抽离到自定义 hooks
 
 ### 最近完成功能
+- 创建useFamilyTree、useFamilyTreeMembers、useFamilyTreeStorage等自定义hooks，抽离数据处理逻辑
 - 重构家谱生成器页面，拆分为MemberForm、MemberList和FamilyTreeChart组件
 - 创建ErrorDialog组件，替换alert提示为更友好的错误提示UI
 - 改进错误处理机制，添加详细错误提示和自定义操作
