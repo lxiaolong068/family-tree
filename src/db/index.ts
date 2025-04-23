@@ -1,5 +1,6 @@
-import { neon } from '@neondatabase/serverless';
+import { neon, NeonQueryFunction } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';
+import { NeonHttpDatabase } from 'drizzle-orm/neon-http';
 import * as schema from './schema';
 
 // Check if environment variables exist
@@ -17,8 +18,8 @@ if (typeof window === 'undefined') {
 }
 
 // Create database connection
-let sql = null;
-let db = null;
+let sql: NeonQueryFunction<any, any> | null = null;
+let db: NeonHttpDatabase<typeof schema> | null = null;
 
 // Only initialize database connection on server side
 if (typeof window === 'undefined') {
@@ -37,7 +38,7 @@ if (typeof window === 'undefined') {
 export { db };
 
 // Export a function to check if database is available
-export function isDatabaseConfigured() {
+export function isDatabaseConfigured(): boolean {
   // On client side, check using public environment variable
   if (typeof window !== 'undefined') {
     return process.env.NEXT_PUBLIC_HAS_DATABASE === 'true';
