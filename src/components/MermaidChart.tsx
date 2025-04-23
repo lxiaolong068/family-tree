@@ -3,6 +3,12 @@
 import React, { useEffect, useRef } from 'react';
 import mermaid from 'mermaid';
 
+// 为mermaid.render方法的返回值定义接口
+interface MermaidRenderResult {
+  svg: string;
+  bindFunctions?: (element: Element) => void;
+}
+
 interface MermaidChartProps {
   chartDefinition: string;
   className?: string;
@@ -37,17 +43,17 @@ const MermaidChart: React.FC<MermaidChartProps> = ({ chartDefinition, className 
       // Use unique ID to avoid conflicts
       const uniqueId = `mermaid-chart-${Math.random().toString(36).substring(2, 9)}`;
 
-      mermaid.render(uniqueId, chartDefinition).then(({ svg }) => {
+      mermaid.render(uniqueId, chartDefinition).then(({ svg }: MermaidRenderResult) => {
         if (chartRef.current) {
           chartRef.current.innerHTML = svg;
         }
-      }).catch((error) => {
+      }).catch((error: unknown) => {
         console.error('Mermaid chart rendering failed:', error);
         if (chartRef.current) {
           chartRef.current.innerHTML = `<div class="text-red-500">Chart rendering failed: ${error instanceof Error ? error.message : String(error)}</div>`;
         }
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error('Mermaid chart rendering failed:', error);
       if (chartRef.current) {
         chartRef.current.innerHTML = `<div class="text-red-500">Chart rendering failed: ${error instanceof Error ? error.message : String(error)}</div>`;
