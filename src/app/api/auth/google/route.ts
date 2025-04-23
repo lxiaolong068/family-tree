@@ -22,8 +22,10 @@ export async function POST(request: NextRequest) {
       console.log('Token verified successfully');
     } catch (error) {
       console.error('Token verification error:', error);
+      // 类型断言处理 - 转换为标准Error对象或提供默认信息
+      const errorMessage = error instanceof Error ? error.message : '未知验证错误';
       return NextResponse.json(
-        { error: 'Invalid token', message: error.message },
+        { error: 'Invalid token', message: errorMessage },
         { status: 400 }
       );
     }
@@ -37,6 +39,14 @@ export async function POST(request: NextRequest) {
 
     // 查找或创建用户
     const { email, name, picture, sub: googleId } = payload;
+
+    // 检查数据库连接
+    if (!db) {
+      return NextResponse.json(
+        { error: 'Database connection not available' },
+        { status: 500 }
+      );
+    }
 
     // 查找现有用户
     const existingUsers = await db.select().from(users).where(eq(users.email, email));
@@ -82,6 +92,13 @@ export async function POST(request: NextRequest) {
     );
 
     // 获取用户信息
+    if (!db) {
+      return NextResponse.json(
+        { error: 'Database connection not available' },
+        { status: 500 }
+      );
+    }
+    
     const userData = await db.select().from(users).where(eq(users.id, userId));
 
     return NextResponse.json({
@@ -93,10 +110,12 @@ export async function POST(request: NextRequest) {
         profileImage: userData[0].profileImage,
       }
     });
-  } catch (error: any) {
+  } catch (error) {
     console.error('Google auth error:', error);
+    // 类型断言处理
+    const errorMessage = error instanceof Error ? error.message : '未知身份验证错误';
     return NextResponse.json(
-      { error: 'Authentication failed', message: error.message },
+      { error: 'Authentication failed', message: errorMessage },
       { status: 500 }
     );
   }
