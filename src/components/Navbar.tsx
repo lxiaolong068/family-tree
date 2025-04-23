@@ -45,11 +45,15 @@ const Navbar = () => {
 
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
-              <span className="text-sm text-gray-700">{user?.name}</span>
-              <Avatar className="h-8 w-8">
-                <AvatarImage src={user?.profileImage} alt={user?.name} />
-                <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
-              </Avatar>
+              <Link href="/profile">
+                <div className="flex items-center gap-2 hover:text-blue-600 transition-colors">
+                  <span className="text-sm text-gray-700">{user?.name}</span>
+                  <Avatar className="h-8 w-8 cursor-pointer">
+                    <AvatarImage src={user?.profileImage} alt={user?.name} />
+                    <AvatarFallback>{user?.name?.charAt(0)}</AvatarFallback>
+                  </Avatar>
+                </div>
+              </Link>
               <Button variant="ghost" size="sm" onClick={() => logout()}>
                 Logout
               </Button>
