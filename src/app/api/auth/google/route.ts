@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
       console.log('Token verified successfully');
     } catch (error) {
       console.error('Token verification error:', error);
+      // TypeScript类型错误修复: 处理unknown类型的error对象
       // 类型断言处理 - 转换为标准Error对象或提供默认信息
       const errorMessage = error instanceof Error ? error.message : '未知验证错误';
       return NextResponse.json(
