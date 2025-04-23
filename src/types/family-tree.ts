@@ -21,3 +21,10 @@ export interface FamilyTree {
 
 // 家谱图表类型
 export type FamilyTreeChartType = 'ancestry' | 'descendants' | 'full';
+
+// 保存家谱后的返回结果
+export interface SaveFamilyTreeResult {
+  id: number;
+  isUpdate?: boolean;
+  success?: boolean;
+}

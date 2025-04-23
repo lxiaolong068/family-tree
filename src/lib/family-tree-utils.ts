@@ -1,4 +1,4 @@
-import { Member, FamilyTree, FamilyTreeChartType } from '@/types/family-tree';
+import { Member, FamilyTree, FamilyTreeChartType, SaveFamilyTreeResult } from '@/types/family-tree';
 import { db } from '@/db';
 import { familyTrees, members } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -178,9 +178,9 @@ export function loadFamilyTreeFromLocalStorage(key: string = 'familyTree'): Fami
 /**
  * 保存家谱到Neon数据库（主要存储方式）
  * @param familyTree 家谱对象
- * @returns 保存的家谱ID
+ * @returns 保存的家谱结果
  */
-export async function saveFamilyTreeToDatabase(familyTree: FamilyTree): Promise<number | null> {
+export async function saveFamilyTreeToDatabase(familyTree: FamilyTree): Promise<SaveFamilyTreeResult | null> {
   // 获取认证令牌
   const authToken = localStorage.getItem('authToken');
   console.log('Auth token available:', authToken ? 'yes' : 'no');

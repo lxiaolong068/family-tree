@@ -1,0 +1,50 @@
+CLASSIC GENEALOGY CHART
+=======================
+
+INSTRUCTIONS FOR USE
+-------------------
+
+This Classic Genealogy Chart template is designed to help you document your family history in a traditional, hierarchical format. Follow these steps to create your family tree:
+
+1. GETTING STARTED
+   - Start with the oldest known ancestor at the top
+   - Work downward through generations
+   - Use consistent formatting for dates (e.g., YYYY-MM-DD or MM/DD/YYYY)
+
+2. RECORDING INFORMATION
+   - Full name (including maiden names for women with "née" designation)
+   - Birth and death dates
+   - Locations (birthplace, places lived, burial location)
+   - Occupations and notable achievements
+   - Marriage dates and spouse information
+
+3. SYMBOLS & FORMATTING
+   - Use solid lines to connect parents to children
+   - Use dotted lines to show adoptions
+   - Males are typically represented with squares/rectangles
+   - Females are typically represented with circles/ovals
+   - Unknown gender can be represented with diamonds
+
+4. ADDITIONAL TIPS
+   - Include sources for your information
+   - Add photographs where available
+   - Note any uncertainties with question marks
+   - Consider color-coding different family branches
+
+This template can be expanded to include as many generations as needed. For very large family trees, consider creating separate sheets for different branches and connecting them with reference numbers.
+
+For more detailed instructions and tips on researching your family history, visit our website's Knowledge section.
+
+EXAMPLE DATA
+-----------
+John Smith (1925-2010) m. Elizabeth Taylor (1928-2015)
+  └── Robert Smith (1950-) m. Sarah Johnson (1952-)
+       ├── Michael Smith (1975-) m. Laura Williams (1976-)
+       │    └── Emma Smith (2005-)
+       ├── Jennifer Smith (1978-) m. Thomas Brown (1977-)
+       │    ├── Oliver Brown (2008-)
+       │    └── Sophie Brown (2010-)
+       └── David Smith (1980-) m. Jessica Davis (1982-)
+            └── James Smith (2012-)
+
+Note: This text file is provided as a guide for using the DOCX template. Please refer to the actual Word document for the editable template.

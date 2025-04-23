@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Illustrated Family Tree Template</title>
+    <style>
+        body {
+            font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+            line-height: 1.6;
+            margin: 40px;
+            color: #333;
+            background-color: #fef5e7;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M30,20 Q50,5 70,20 T90,50 T70,80 T30,80 T10,50 T30,20" fill="none" stroke="%23d4a762" stroke-width="0.5" opacity="0.3" /></svg>');
+            background-size: 300px;
+        }
+        h1 {
+            text-align: center;
+            color: #5d4037;
+            margin-bottom: 30px;
+            font-family: "Lucida Calligraphy", cursive;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #8d6e63;
+            margin-top: 30px;
+            font-family: "Bookman Old Style", serif;
+            border-bottom: 2px solid #d7ccc8;
+            padding-bottom: 10px;
+        }
+        .instructions {
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border: 1px solid #d7ccc8;
+        }
+        .family-tree {
+            margin: 40px auto;
+            max-width: 800px;
+            position: relative;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><defs><filter id="blur"><feGaussianBlur stdDeviation="4" /></filter></defs><g filter="url(%23blur)"><path d="M400,50 Q250,150 200,300 T50,550" fill="none" stroke="%23a1887f" stroke-width="15" opacity="0.3"/><path d="M400,50 Q550,150 600,300 T750,550" fill="none" stroke="%23a1887f" stroke-width="15" opacity="0.3"/><path d="M400,50 Q400,250 400,550" fill="none" stroke="%23a1887f" stroke-width="10" opacity="0.3"/></g></svg>');
+            background-repeat: no-repeat;
+            padding: 30px;
+            border: 20px solid transparent;
+            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect x="0" y="0" width="100" height="100" fill="none" stroke="%238d6e63" stroke-width="5" rx="10" ry="10"/><path d="M0,0 L20,20 M80,80 L100,100 M0,100 L20,80 M80,20 L100,0" stroke="%238d6e63" stroke-width="3"/></svg>') 30 stretch;
+        }
+        .generation {
+            margin-bottom: 50px;
+            position: relative;
+            text-align: center;
+        }
+        .ancestor {
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        .parents {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 150px;
+        }
+        .children {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 200px;
+        }
+        .family-member {
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            width: 180px;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+            border: 2px solid #8d6e63;
+            text-align: center;
+        }
+        .family-member.male {
+            background-color: rgba(225, 240, 255, 0.9);
+        }
+        .family-member.female {
+            background-color: rgba(255, 235, 238, 0.9);
+        }
+        .photo-placeholder {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 15px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #8d6e63;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #757575;
+        }
+        .name {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #5d4037;
+        }
+        .dates {
+            font-style: italic;
+            font-size: 14px;
+            color: #795548;
+            margin-bottom: 5px;
+        }
+        .details {
+            font-size: 14px;
+            color: #6d4c41;
+        }
+        .footer {
+            margin-top: 50px;
+            text-align: center;
+            font-size: 14px;
+            color: #8d6e63;
+            font-style: italic;
+        }
+        .note {
+            background-color: rgba(251, 235, 219, 0.9);
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 8px;
+            border-left: 4px solid #d7ccc8;
+        }
+    </style>
+</head>
+<body>
+    <h1>Illustrated Family Tree</h1>
+    
+    <div class="instructions">
+        <h2>Instructions for Use</h2>
+        <p>This decorative Illustrated Family Tree template combines artistic elements with practical genealogy. Follow these steps to create your beautiful family tree:</p>
+        <ol>
+            <li>Add photographs in the circular frames provided (or keep the placeholders)</li>
+            <li>Complete personal information in an elegant, consistent style</li>
+            <li>Maintain the decorative elements that connect family members</li>
+            <li>Consider adding personal touches like family crests or mottos</li>
+            <li>Print on high-quality paper for display or framing</li>
+        </ol>
+    </div>
+    
+    <div class="family-tree">
+        <div class="generation">
+            <div class="ancestor">
+                <div class="family-member male">
+                    <div class="photo-placeholder">Photo</div>
+                    <div class="name">Richard Clark</div>
+                    <div class="dates">1935-2018</div>
+                    <div class="details">Military, Yorkshire</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="generation">
+            <div class="parents">
+                <div class="family-member male">
+                    <div class="photo-placeholder">Photo</div>
+                    <div class="name">Thomas Clark</div>
+                    <div class="dates">1960-</div>
+                    <div class="details">Professor, Oxford</div>
+                </div>
+                <div class="family-member female">
+                    <div class="photo-placeholder">Photo</div>
+                    <div class="name">Mary Davis</div>
+                    <div class="dates">1962-</div>
+                    <div class="details">Artist, Cambridge</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="generation">
+            <div class="children">
+                <div class="family-member male">
+                    <div class="photo-placeholder">Photo</div>
+                    <div class="name">Peter Clark</div>
+                    <div class="dates">1985-</div>
+                    <div class="details">Doctor, London</div>
+                </div>
+                <div class="family-member female">
+                    <div class="photo-placeholder">Photo</div>
+                    <div class="name">Emily Clark</div>
+                    <div class="dates">1990-</div>
+                    <div class="details">Lawyer, Edinburgh</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="note">
+        <strong>Note:</strong> This is an HTML version of the template. For a richer visual experience with high-quality decorative elements, please download the PDF version from our website.
+    </div>
+    
+    <div class="footer">
+        <p>Family Tree Website - Illustrated Template</p>
+        <p>© 2025 Family Tree Project. All rights reserved.</p>
+    </div>
+</body>
+</html>

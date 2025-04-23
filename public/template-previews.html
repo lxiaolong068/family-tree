@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Tree Templates Preview</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .template-container {
+            margin-bottom: 80px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            page-break-after: always;
+        }
+        h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .instructions {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f1f9ff;
+            border-left: 4px solid #3498db;
+        }
+        /* 经典家谱样式 */
+        .classic-tree {
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            position: relative;
+            text-align: center;
+        }
+        .classic-node {
+            display: inline-block;
+            border: 2px solid #333;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 5px;
+            background-color: #fff;
+            position: relative;
+            min-width: 120px;
+        }
+        .classic-node.male {
+            background-color: #d4e6f1;
+        }
+        .classic-node.female {
+            background-color: #f5b7b1;
+        }
+        .classic-level {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            position: relative;
+        }
+        .classic-line {
+            position: absolute;
+            border-left: 2px solid #333;
+            height: 40px;
+            bottom: -40px;
+            left: 50%;
+        }
+        .classic-h-line {
+            position: absolute;
+            height: 2px;
+            background-color: #333;
+            bottom: -20px;
+        }
+        .classic-level-1 .classic-node {
+            border-color: #8e44ad;
+        }
+        .classic-level-2 .classic-node {
+            border-color: #2980b9;
+        }
+        .classic-level-3 .classic-node {
+            border-color: #27ae60;
+        }
+        .classic-spouse {
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+        .classic-spouse::before {
+            content: "";
+            position: absolute;
+            top: 50%;
+            left: calc(50% - 60px - 10px);
+            width: 70px;
+            height: 2px;
+            background-color: #333;
+        }
+
+        /* 现代简约风格 */
+        .modern-tree {
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            position: relative;
+            background-color: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        .modern-node {
+            border: none;
+            padding: 15px;
+            margin: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            background-color: white;
+            min-width: 150px;
+            position: relative;
+        }
+        .modern-node.male {
+            border-left: 5px solid #4a69bd;
+        }
+        .modern-node.female {
+            border-left: 5px solid #e84393;
+        }
+        .modern-level {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+        .modern-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2d3436;
+        }
+        .modern-date {
+            font-size: 12px;
+            color: #636e72;
+        }
+        .modern-details {
+            margin-top: 5px;
+            font-size: 12px;
+            color: #636e72;
+        }
+        .modern-connection {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -25px;
+            height: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .modern-connection::before {
+            content: "";
+            width: 2px;
+            height: 25px;
+            background-color: #b2bec3;
+        }
+        .modern-horizontal {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: -25px;
+            display: flex;
+            justify-content: center;
+        }
+        .modern-horizontal::before {
+            content: "";
+            width: 60%;
+            height: 2px;
+            background-color: #b2bec3;
+        }
+
+        /* 插图版本 */
+        .illustrated-tree {
+            width: 800px;
+            height: 600px;
+            margin: 0 auto;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600"><defs><filter id="blur"><feGaussianBlur stdDeviation="4" /></filter></defs><g filter="url(%23blur)"><path d="M400,50 Q250,150 200,300 T50,550" fill="none" stroke="#27ae60" stroke-width="15" opacity="0.3"/><path d="M400,50 Q550,150 600,300 T750,550" fill="none" stroke="#27ae60" stroke-width="15" opacity="0.3"/><path d="M400,50 Q400,250 400,550" fill="none" stroke="#27ae60" stroke-width="10" opacity="0.3"/></g></svg>');
+            background-repeat: no-repeat;
+            position: relative;
+            padding: 20px;
+            border: 20px solid transparent;
+            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><rect x="0" y="0" width="100" height="100" fill="none" stroke="#8e44ad" stroke-width="5" rx="10" ry="10"/><path d="M0,0 L20,20 M80,80 L100,100 M0,100 L20,80 M80,20 L100,0" stroke="#8e44ad" stroke-width="3"/></svg>') 30 stretch;
+            font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+        }
+        .illustrated-node {
+            border: 2px solid #8e44ad;
+            background-color: rgba(255,255,255,0.85);
+            border-radius: 5px;
+            padding: 15px;
+            position: absolute;
+            width: 150px;
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.2);
+        }
+        .illustrated-node.male {
+            background-color: rgba(213, 233, 255, 0.85);
+        }
+        .illustrated-node.female {
+            background-color: rgba(255, 235, 238, 0.85);
+        }
+        .illustrated-photo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 10px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid #8e44ad;
+            background-color: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            color: #666;
+        }
+        .illustrated-name {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .illustrated-dates {
+            text-align: center;
+            font-style: italic;
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .illustrated-info {
+            text-align: center;
+            font-size: 11px;
+            color: #333;
+        }
+        .download-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .download-btn:hover {
+            background-color: #2980b9;
+        }
+        .screenshot-tip {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #ffe8d6;
+            border-left: 4px solid #f4a261;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Family Tree Templates Preview</h1>
+        <p class="screenshot-tip">Tip: You can take screenshots of each template and save them as template1.jpg, template2.jpg, and template3.jpg for website preview.</p>
+        
+        <!-- 经典家谱图表 -->
+        <div class="template-container">
+            <h2>1. Classic Genealogy Chart</h2>
+            <div class="instructions">
+                <p>This is a traditional family tree chart style with a clear hierarchical structure to display family relationships. Suitable for showing 3-5 generations of family members. Download the Word document template for a complete editable version.</p>
+            </div>
+            <div class="classic-tree">
+                <!-- 第一代 -->
+                <div class="classic-level classic-level-1">
+                    <div class="classic-node male">
+                        <div>John Smith</div>
+                        <div>1925-2010</div>
+                        <div class="classic-line"></div>
+                    </div>
+                </div>
+                
+                <!-- 第二代 -->
+                <div class="classic-level classic-level-2">
+                    <div class="classic-spouse">
+                        <div class="classic-node male">
+                            <div>Robert Smith</div>
+                            <div>1950-</div>
+                        </div>
+                        <div class="classic-node female">
+                            <div>Sarah Johnson</div>
+                            <div>1952-</div>
+                        </div>
+                        <div class="classic-line"></div>
+                    </div>
+                </div>
+                
+                <!-- 第三代 -->
+                <div class="classic-level classic-level-3">
+                    <div class="classic-node male">
+                        <div>Michael Smith</div>
+                        <div>1975-</div>
+                    </div>
+                    <div class="classic-node female">
+                        <div>Jennifer Smith</div>
+                        <div>1978-</div>
+                    </div>
+                    <div class="classic-node male">
+                        <div>David Smith</div>
+                        <div>1980-</div>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <a href="/public/template1.html" class="download-btn" download="Family_Tree_Classic_Template.html">Download HTML Template</a>
+            </div>
+        </div>
+        
+        <!-- 现代简约风格 -->
+        <div class="template-container">
+            <h2>2. Modern Minimalist Style</h2>
+            <div class="instructions">
+                <p>This is a modern minimalist family tree chart that uses clean design and colors to highlight clear display of family information. Download the Excel template for a spreadsheet version with automatic calculation features.</p>
+            </div>
+            <div class="modern-tree">
+                <!-- 第一代 -->
+                <div class="modern-level">
+                    <div class="modern-node male">
+                        <div class="modern-name">William Brown</div>
+                        <div class="modern-date">1930-2015</div>
+                        <div class="modern-details">London, Artist</div>
+                        <div class="modern-connection"></div>
+                    </div>
+                </div>
+                
+                <!-- 第二代 -->
+                <div class="modern-level">
+                    <div class="modern-node female">
+                        <div class="modern-name">Elizabeth Brown</div>
+                        <div class="modern-date">1955-</div>
+                        <div class="modern-details">Manchester, Teacher</div>
+                        <div class="modern-horizontal"></div>
+                    </div>
+                </div>
+                
+                <!-- 第三代 -->
+                <div class="modern-level">
+                    <div class="modern-node male">
+                        <div class="modern-name">James Wilson</div>
+                        <div class="modern-date">1980-</div>
+                        <div class="modern-details">Manchester, Engineer</div>
+                    </div>
+                    <div class="modern-node female">
+                        <div class="modern-name">Emma Wilson</div>
+                        <div class="modern-date">1985-</div>
+                        <div class="modern-details">London, Doctor</div>
+                    </div>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <a href="/public/template2.html" class="download-btn" download="Family_Tree_Modern_Template.html">Download HTML Template</a>
+            </div>
+        </div>
+        
+        <!-- 插图版本 -->
+        <div class="template-container">
+            <h2>3. Illustrated Version</h2>
+            <div class="instructions">
+                <p>This is a more decorative family tree chart using tree design and decorative borders, suitable for printing and display. Download the PDF template for a high-quality printable version.</p>
+            </div>
+            <div class="illustrated-tree">
+                <!-- 祖父/祖母 -->
+                <div class="illustrated-node male" style="top: 50px; left: 325px;">
+                    <div class="illustrated-photo">Photo</div>
+                    <div class="illustrated-name">Richard Clark</div>
+                    <div class="illustrated-dates">1935-2018</div>
+                    <div class="illustrated-info">Military, Yorkshire</div>
+                </div>
+                
+                <!-- 父亲/母亲 -->
+                <div class="illustrated-node male" style="top: 250px; left: 200px;">
+                    <div class="illustrated-photo">Photo</div>
+                    <div class="illustrated-name">Thomas Clark</div>
+                    <div class="illustrated-dates">1960-</div>
+                    <div class="illustrated-info">Professor, Oxford</div>
+                </div>
+                
+                <div class="illustrated-node female" style="top: 250px; left: 450px;">
+                    <div class="illustrated-photo">Photo</div>
+                    <div class="illustrated-name">Mary Davis</div>
+                    <div class="illustrated-dates">1962-</div>
+                    <div class="illustrated-info">Artist, Cambridge</div>
+                </div>
+                
+                <!-- 子女 -->
+                <div class="illustrated-node male" style="top: 450px; left: 200px;">
+                    <div class="illustrated-photo">Photo</div>
+                    <div class="illustrated-name">Peter Clark</div>
+                    <div class="illustrated-dates">1985-</div>
+                    <div class="illustrated-info">Doctor, London</div>
+                </div>
+                
+                <div class="illustrated-node female" style="top: 450px; left: 450px;">
+                    <div class="illustrated-photo">Photo</div>
+                    <div class="illustrated-name">Emily Clark</div>
+                    <div class="illustrated-dates">1990-</div>
+                    <div class="illustrated-info">Lawyer, Edinburgh</div>
+                </div>
+            </div>
+            <div style="text-align: center;">
+                <a href="/public/template3.html" class="download-btn" download="Family_Tree_Illustrated_Template.html">Download HTML Template</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,51 @@
+MODERN MINIMALIST FAMILY TREE
+============================
+
+INSTRUCTIONS FOR USE
+-------------------
+
+This Modern Minimalist Family Tree template is designed as an Excel spreadsheet with built-in formulas and automatic formatting. Follow these steps to create your sleek, contemporary family tree:
+
+1. DATA ENTRY
+   - Navigate to the "Data Entry" sheet
+   - Fill in information for each family member in the appropriate columns
+   - Do not skip rows or leave empty rows between entries
+   - Use ID numbers exactly as shown in the examples
+
+2. RELATIONSHIP MAPPING
+   - In the "Relationships" sheet, connect family members by their ID numbers
+   - For each person, enter their parents' IDs in the designated columns
+   - For marriages/partnerships, enter the partner's ID
+   - The system will automatically establish sibling relationships
+
+3. CUSTOMIZATION
+   - Adjust colors in the "Settings" sheet
+   - Change date formats if desired
+   - Modify display options for the visualization
+
+4. VISUALIZATION
+   - View the automatically generated family tree in the "Visualization" sheet
+   - Use the filter buttons to focus on specific branches or generations
+   - The legend at the bottom explains symbols and color coding
+
+5. STATISTICAL ANALYSIS
+   - The "Statistics" sheet provides interesting insights about your family:
+     * Age distribution
+     * Geographic distribution
+     * Occupation trends
+     * Marriage/partnership patterns
+
+FEATURES
+--------
+- Automatic age calculation
+- Color-coding by gender or family branch
+- Filtering capabilities
+- Sortable data
+- Statistics and charts
+- Print-ready formatting
+
+This Excel template uses conditional formatting and formulas to maintain visual consistency. Please do not delete rows or columns that appear empty, as they may contain important formulas.
+
+For best results, use Microsoft Excel 2016 or newer. Some features may not be fully compatible with other spreadsheet applications.
+
+Note: This text file is provided as a guide for using the XLSX template. Please refer to the actual Excel file for the interactive template.
