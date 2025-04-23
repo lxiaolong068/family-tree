@@ -5,8 +5,8 @@ Disallow: /api/*
 Disallow: /admin/*
 
 # Host
-Host: https://your-domain.com
+Host: https://www.family-tree.cc
 
 # Sitemaps
-Sitemap: https://your-domain.com/sitemap.xml
-Sitemap: https://your-domain.com/server-sitemap.xml
+Sitemap: https://www.family-tree.cc/sitemap.xml
+Sitemap: https://www.family-tree.cc/server-sitemap.xml

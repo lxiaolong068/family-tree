@@ -45,6 +45,18 @@ module.exports = {
       priority = 0.8;
       changefreq = 'weekly';
     }
+    
+    // Privacy Policy page
+    if (path === '/privacy/') {
+      priority = 0.6;
+      changefreq = 'monthly';
+    }
+    
+    // Terms of Use page
+    if (path === '/terms/') {
+      priority = 0.6;
+      changefreq = 'monthly';
+    }
 
     return {
       loc: path,
