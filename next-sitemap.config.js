@@ -4,9 +4,6 @@ module.exports = {
   generateRobotsTxt: true,
   generateIndexSitemap: true,
   robotsTxtOptions: {
-    additionalSitemaps: [
-      'https://www.family-tree.cc/server-sitemap.xml',
-    ],
     policies: [
       {
         userAgent: '*',

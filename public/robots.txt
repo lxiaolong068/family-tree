@@ -9,4 +9,3 @@ Host: https://www.family-tree.cc
 
 # Sitemaps
 Sitemap: https://www.family-tree.cc/sitemap.xml
-Sitemap: https://www.family-tree.cc/server-sitemap.xml
