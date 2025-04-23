@@ -25,7 +25,8 @@
 - 认证：Firebase Authentication（Google 登录）
 - 令牌验证：jsonwebtoken、jwks-rsa
 - 数据库：Neon PostgreSQL
-- 其他：html2canvas、jsPDF（导出功能，计划中）
+- 测试框架：Jest、React Testing Library
+- 其他：html2canvas、jsPDF（用于导出家谱图为PNG/PDF）
 
 ## 如何启动与开发
 1. 安装依赖：
@@ -70,6 +71,48 @@
 
 4. 访问 [http://localhost:3000](http://localhost:3000) 查看效果。
 
+## 测试
+
+项目使用 Jest 和 React Testing Library 进行单元测试和组件测试。
+
+### 运行测试
+
+```bash
+# 运行所有测试
+pnpm test
+
+# 监视模式运行测试（开发时使用）
+pnpm test:watch
+
+# 生成测试覆盖率报告
+pnpm test:coverage
+
+# 运行端到端测试（Playwright）
+pnpm test:e2e
+```
+
+### 测试结构
+
+```
+family-tree/
+├── src/
+│   ├── lib/__tests__/          # 工具函数单元测试
+│   ├── components/__tests__/    # 组件测试
+│   ├── app/**/__tests__/        # 页面测试
+│   └── types/testing.d.ts       # 测试类型定义
+├── jest.config.js               # Jest 配置
+├── jest.setup.js                # Jest 设置
+└── .github/workflows/test.yml   # CI 测试工作流
+```
+
+### 测试覆盖率
+
+目标测试覆盖率为核心功能达到 75% 以上。当前测试主要集中在以下方面：
+
+- 工具函数和逻辑测试
+- 组件渲染和交互测试
+- 页面路由和认证逻辑测试
+
 ## 目录结构
 ```
 family-tree/
@@ -98,11 +141,13 @@ family-tree/
 - 用户账户与家谱数据关联
 - 安全的令牌验证机制
 - 响应式设计，支持移动端和桌面端
+- 用户个人资料页面
+- 单元测试和组件测试框架
+- 家谱图导出功能（支持PNG和PDF格式）
 
 ## 未来计划
 - 用户个人资料页面
 - 拖拽式家谱编辑器
-- 家谱图导出为图片/PDF功能
 - 完善家谱生成器的复杂关系设置功能（如配偶、兄弟姐妹等）
 - AI 辅助家谱分析与自动补全
 - 多用户协作编辑
@@ -114,6 +159,64 @@ family-tree/
 - [Shadcn UI 官方文档](https://ui.shadcn.com/)
 - [Firebase Authentication 文档](https://firebase.google.com/docs/auth)
 - [JWT 文档](https://jwt.io/)
+- [Vercel 部署文档](https://vercel.com/docs)
+
+## Vercel 部署指南
+
+本项目已配置为可直接部署到 Vercel 平台，以下是部署步骤：
+
+1. **准备工作**
+   - 确保项目已推送到 GitHub 仓库
+   - 注册 [Vercel 账号](https://vercel.com/signup) (可使用 GitHub 账号登录)
+
+2. **导入项目**
+   - 在 Vercel 控制台点击 "New Project"
+   - 选择您的 GitHub 仓库
+   - 选择 "family-tree" 仓库
+
+3. **配置项目**
+   - Framework Preset: 选择 "Next.js"
+   - 在 "Environment Variables" 部分添加以下环境变量：
+     ```
+     # 数据库配置
+     NEON_DATABASE_URL=your_neon_database_url
+     NEXT_PUBLIC_HAS_DATABASE=true
+
+     # Google OAuth
+     GOOGLE_CLIENT_ID=your_google_client_id
+     GOOGLE_CLIENT_SECRET=your_google_client_secret
+     
+     # JWT Secret
+     JWT_SECRET=your_jwt_secret_key
+     
+     # Firebase 配置
+     NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+     NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+     NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
+     NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+     NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+     NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
+     NEXT_PUBLIC_FIREBASE_CLIENT_ID=your_firebase_client_id
+     
+     # Firebase Admin SDK
+     FIREBASE_CLIENT_EMAIL=your_firebase_client_email
+     FIREBASE_PRIVATE_KEY="your_firebase_private_key"
+     ```
+
+4. **部署项目**
+   - 点击 "Deploy"
+   - 等待部署完成
+   - 部署完成后，您将获得一个 `.vercel.app` 的域名
+
+5. **配置自定义域名（可选）**
+   - 在 Vercel 项目仪表板中点击 "Domains"
+   - 添加您自己的域名并按照指南进行 DNS 配置
+
+6. **持续部署**
+   - Vercel 会自动为每个 push 到主分支的提交触发构建
+   - 可在 Vercel 仪表板中查看部署历史和详情
+
+> 注意：Vercel 部署会使用项目根目录下的 `vercel.json` 配置文件进行优化，包括缓存策略和安全头设置。
 
 ---
 

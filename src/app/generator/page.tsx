@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Member, FamilyTree, SaveFamilyTreeResult } from '@/types/family-tree';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import { ErrorDialog } from '@/components/ui/error-dialog';
@@ -22,6 +22,7 @@ import { isDatabaseConfigured } from '@/db';
 import { useAuth } from '@/contexts/AuthContext';
 import SaveLoginPrompt from '@/components/SaveLoginPrompt';
 import LoginDialog from '@/components/LoginDialog';
+import ExportOptions from '@/components/generator/ExportOptions';
 
 const GeneratorPage = () => {
   // 认证状态
@@ -60,6 +61,8 @@ const GeneratorPage = () => {
   const [chartDefinition, setChartDefinition] = useState<string>('');
   // 是否显示家谱图
   const [showChart, setShowChart] = useState<boolean>(false);
+  // 家谱图表引用
+  const chartRef = useRef<HTMLDivElement>(null);
 
   // 对话框控制
   const handleCloseSuccessDialog = () => {
@@ -410,7 +413,14 @@ const GeneratorPage = () => {
         onClearFamilyTree={handleClearFamilyTree}
       />
       
-      <FamilyTreeChart chartDefinition={chartDefinition} />
+      <FamilyTreeChart ref={chartRef} chartDefinition={chartDefinition} />
+      
+      {/* 导出选项 */}
+      <ExportOptions 
+        familyTreeName={familyTree.name || 'family-tree'}
+        chartRef={chartRef}
+        disabled={!chartDefinition || familyTree.members.length === 0}
+      />
       
       {/* 成功对话框 */}
       <SuccessDialog

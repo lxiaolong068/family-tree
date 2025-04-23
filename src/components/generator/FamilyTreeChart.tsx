@@ -1,23 +1,30 @@
 "use client";
 
-import React from 'react';
+import React, { forwardRef, useRef, useImperativeHandle } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import MermaidChart from '@/components/MermaidChart';
 
 interface FamilyTreeChartProps {
   chartDefinition: string;
+  className?: string;
 }
 
-const FamilyTreeChart: React.FC<FamilyTreeChartProps> = ({
-  chartDefinition
-}) => {
+const FamilyTreeChart = forwardRef<HTMLDivElement, FamilyTreeChartProps>(({ 
+  chartDefinition,
+  className
+}, ref) => {
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+  
+  // 使用useImperativeHandle暴露内部的ref给父组件
+  useImperativeHandle(ref, () => chartContainerRef.current as HTMLDivElement);
+  
   return (
-    <Card>
+    <Card className={className}>
       <CardHeader>
         <CardTitle>Family Tree Chart</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto" ref={chartContainerRef}>
           {chartDefinition ? (
             <MermaidChart chartDefinition={chartDefinition} className="min-h-[300px]" />
           ) : (
@@ -34,6 +41,8 @@ const FamilyTreeChart: React.FC<FamilyTreeChartProps> = ({
       </CardFooter>
     </Card>
   );
-};
+});
+
+FamilyTreeChart.displayName = 'FamilyTreeChart';
 
 export default FamilyTreeChart;
