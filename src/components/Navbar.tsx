@@ -13,6 +13,7 @@ const navItems = [
   { href: "/knowledge", label: "Knowledge" },
   { href: "/templates", label: "Templates" },
   { href: "/generator", label: "Generator" },
+  { href: "/drag-editor", label: "Drag Editor" },
 ];
 
 const Navbar = () => {

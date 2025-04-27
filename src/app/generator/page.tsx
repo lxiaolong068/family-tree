@@ -22,6 +22,8 @@ import SaveLoginPrompt from '@/components/SaveLoginPrompt';
 import LoginDialog from '@/components/LoginDialog';
 import ExportOptions from '@/components/generator/ExportOptions';
 import { useFamilyTreeMembers } from '@/hooks/useFamilyTreeMembers';
+import Link from 'next/link';
+import { Button } from "@/components/ui/button";
 
 const GeneratorPage = () => {
   // 认证状态
@@ -167,7 +169,7 @@ const GeneratorPage = () => {
       setShowChart(false);
     }
   });
-  
+
   // 添加成员
   const handleAddMember = () => {
     try {
@@ -266,7 +268,7 @@ const GeneratorPage = () => {
                 setChartDefinition('');
                 setShowChart(false);
                 saveFamilyTreeToLocalStorage(newFamilyTree);
-                
+
                 // 清除URL参数（如果有ID）
                 if (window.location.search.includes('id=')) {
                   window.history.replaceState({}, "", window.location.pathname);
@@ -317,17 +319,17 @@ const GeneratorPage = () => {
 
       // 保存到数据库
       const result = await saveFamilyTreeToDatabase(familyTree);
-      
+
       if (result && result.id) {
         console.log('Family tree saved to database with ID:', result.id);
-        
+
         // 创建URL（用于分享）
         const url = new URL(window.location.href);
         url.searchParams.set('id', result.id.toString());
-        
+
         // 更新URL（但不刷新页面）
         window.history.replaceState({}, "", url.toString());
-        
+
         // 显示成功对话框
         setSuccessDialogData({
           title: result.isUpdate ? "Family Tree Updated" : "Family Tree Saved",
@@ -356,7 +358,7 @@ const GeneratorPage = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6">Family Tree Generator</h1>
-      
+
       {/* 使用拆分出来的组件 */}
       <MemberForm
         currentMember={currentMember}
@@ -365,22 +367,40 @@ const GeneratorPage = () => {
         onGenerateChart={handleGenerateChart}
         onSaveToDatabase={handleSaveToDatabase}
       />
-      
+
       <MemberList
         members={familyTree.members}
         onDeleteMember={handleDeleteMember}
         onClearFamilyTree={handleClearFamilyTree}
       />
-      
+
       <FamilyTreeChart ref={chartRef} chartDefinition={chartDefinition} />
-      
+
       {/* 导出选项 */}
-      <ExportOptions 
+      <ExportOptions
         familyTreeName={familyTree.name || 'family-tree'}
         chartRef={chartRef}
         disabled={!chartDefinition || familyTree.members.length === 0}
       />
-      
+
+      {/* 拖拽编辑器链接 */}
+      <div className="mt-4 mb-6 p-4 border border-dashed border-blue-300 rounded-lg bg-blue-50">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
+            <h3 className="text-lg font-medium text-blue-800">Try our new Drag & Drop Editor!</h3>
+            <p className="text-sm text-blue-600">
+              We've added a new drag and drop interface for easier family tree editing.
+              Your current family tree data will be available in the new editor.
+            </p>
+          </div>
+          <Link href={`/drag-editor${window.location.search}`} passHref>
+            <Button className="whitespace-nowrap">
+              Try Drag Editor
+            </Button>
+          </Link>
+        </div>
+      </div>
+
       {/* 成功对话框 */}
       <SuccessDialog
         isOpen={successDialogOpen}
@@ -390,7 +410,7 @@ const GeneratorPage = () => {
         familyTreeId={successDialogData.familyTreeId}
         familyTreeUrl={successDialogData.familyTreeUrl}
       />
-      
+
       {/* 错误对话框 */}
       <ErrorDialog
         isOpen={errorDialogOpen}
