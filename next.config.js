@@ -1,6 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
     domains: [],
     remotePatterns: [
@@ -20,10 +19,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Configure compression
   compress: true,
-  // App Router handles i18n differently - see app/[locale] for internationalization
-  // Minification is handled automatically in Next.js 13+
   // Use trailing slashes for SEO benefits
   trailingSlash: true,
 };
 
-export default nextConfig;
+module.exports = nextConfig;
