@@ -25,61 +25,61 @@ const DragEditorPage = () => {
   const [errorDialogData, setErrorDialogData] = useState({
     title: '',
     description: '',
-    actions: [] as { label: string; onClick: () => void; variant?: string }[]
+    actions: [] as { label: string; onClick: () => void; variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" }[]
   });
 
   const searchParams = useSearchParams();
   const router = useRouter();
 
-  // 加载数据
+  // Load data on component mount
   useEffect(() => {
     loadData();
   }, []);
 
-  // 从数据库或本地存储加载数据
+  // Load data from database or local storage
   const loadData = async () => {
-    // 从 URL 参数中获取家谱ID
+    // Get family tree ID from URL parameters
     const familyTreeId = searchParams.get('id');
 
     if (isDatabaseConfigured() && familyTreeId) {
       try {
-        // 从数据库加载
+        // Load from database
         const loadedFamilyTree = await loadFamilyTreeFromDatabase(Number(familyTreeId));
         if (loadedFamilyTree) {
-          console.log('从数据库加载家谱:', loadedFamilyTree);
+          console.log('Loaded family tree from database:', loadedFamilyTree);
           setFamilyTree(loadedFamilyTree);
         } else {
-          // 如果数据库中没有找到，尝试从本地存储加载
+          // If not found in database, try loading from local storage
           loadFromLocalStorage();
         }
       } catch (error) {
-        console.error('从数据库加载家谱失败:', error);
-        // 如果数据库加载失败，尝试从本地存储加载
+        console.error('Failed to load family tree from database:', error);
+        // If database loading fails, try loading from local storage
         loadFromLocalStorage();
       }
     } else {
-      // 数据库未配置或没有ID参数，直接从本地存储加载
+      // Database not configured or no ID parameter, load directly from local storage
       loadFromLocalStorage();
     }
   };
 
-  // 从本地存储加载
+  // Load from local storage
   const loadFromLocalStorage = () => {
     const savedFamilyTree = loadFamilyTreeFromLocalStorage();
     if (savedFamilyTree && savedFamilyTree.members.length > 0) {
-      console.log('从本地存储加载家谱:', savedFamilyTree);
+      console.log('Loaded family tree from local storage:', savedFamilyTree);
       setFamilyTree(savedFamilyTree);
     }
   };
 
-  // 更新家谱
+  // Update family tree
   const handleUpdateFamilyTree = (updatedFamilyTree: FamilyTree) => {
     setFamilyTree(updatedFamilyTree);
-    // 保存到本地存储（作为备份）
+    // Save to local storage (as backup)
     saveFamilyTreeToLocalStorage(updatedFamilyTree);
   };
 
-  // 保存到数据库
+  // Save to database
   const handleSaveToDatabase = async () => {
     if (!isDatabaseConfigured()) {
       setErrorDialogData({
@@ -92,20 +92,20 @@ const DragEditorPage = () => {
     }
 
     try {
-      // 保存到数据库
+      // Save to database
       const result = await saveFamilyTreeToDatabase(familyTree);
 
       if (result && result.id) {
-        console.log('家谱已保存到数据库，ID:', result.id);
+        console.log('Family tree saved to database with ID:', result.id);
 
-        // 创建URL（用于分享）
+        // Create URL (for sharing)
         const url = new URL(window.location.href);
         url.searchParams.set('id', result.id.toString());
 
-        // 更新URL（但不刷新页面）
+        // Update URL (without refreshing the page)
         window.history.replaceState({}, "", url.toString());
 
-        // 显示成功对话框
+        // Show success dialog
         setSuccessDialogData({
           title: result.isUpdate ? "Family Tree Updated" : "Family Tree Saved",
           description: result.isUpdate
@@ -117,9 +117,9 @@ const DragEditorPage = () => {
         setSuccessDialogOpen(true);
       }
     } catch (error) {
-      console.error('保存家谱到数据库失败:', error);
+      console.error('Failed to save family tree to database:', error);
 
-      // 检查是否需要认证
+      // Check if authentication is required
       if (error instanceof Error && error.message === 'AUTH_REQUIRED') {
         setErrorDialogData({
           title: "Login Required",
@@ -139,7 +139,7 @@ const DragEditorPage = () => {
           ]
         });
       } else {
-        // 其他错误
+        // Other errors
         setErrorDialogData({
           title: "Save Failed",
           description: error instanceof Error ? error.message : "An unknown error occurred while saving the family tree",
@@ -151,7 +151,7 @@ const DragEditorPage = () => {
     }
   };
 
-  // 对话框控制
+  // Dialog control
   const handleCloseSuccessDialog = () => {
     setSuccessDialogOpen(false);
   };
@@ -193,7 +193,7 @@ const DragEditorPage = () => {
         onUpdateFamilyTree={handleUpdateFamilyTree}
       />
 
-      {/* 成功对话框 */}
+      {/* Success dialog */}
       <SuccessDialog
         isOpen={successDialogOpen}
         onClose={handleCloseSuccessDialog}
@@ -203,7 +203,7 @@ const DragEditorPage = () => {
         familyTreeUrl={successDialogData.familyTreeUrl}
       />
 
-      {/* 错误对话框 */}
+      {/* Error dialog */}
       <ErrorDialog
         isOpen={errorDialogOpen}
         onClose={handleCloseErrorDialog}
