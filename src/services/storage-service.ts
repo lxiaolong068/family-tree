@@ -22,23 +22,23 @@ export class StorageService {
   async saveFamilyTree(familyTree: FamilyTree, key: string = 'familyTree'): Promise<SaveFamilyTreeResult | null> {
     // 总是保存到本地存储作为备份
     this.saveToLocalStorage(familyTree, key);
-    
+
     // 检查是否已登录并配置了数据库
     const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
-    
+
     if (!authToken) {
       logger.warn('用户未登录，家谱仅保存到本地存储');
       return null;
     }
-    
+
     // 尝试保存到数据库
     try {
       const response = await apiClient.post<SaveFamilyTreeResult>('/api/save-family-tree', { familyTree });
-      
+
       if (!response.success) {
         throw new Error(response.error || '保存到数据库失败');
       }
-      
+
       logger.info('家谱已成功保存到数据库');
       return response.data || null;
     } catch (error) {
@@ -46,7 +46,7 @@ export class StorageService {
       throw error;
     }
   }
-  
+
   /**
    * 从存储中加载家谱（首选数据库，备选本地存储）
    * @param familyTreeId 数据库中的家谱ID
@@ -56,21 +56,26 @@ export class StorageService {
     // 如果提供了ID，尝试从数据库加载
     if (familyTreeId) {
       try {
-        const response = await apiClient.get<FamilyTree>(`/api/family-trees?id=${familyTreeId}`);
-        
+        const response = await apiClient.get<FamilyTree>(`/api/family-trees/${familyTreeId}`);
+
         if (response.success && response.data) {
           logger.info(`已从数据库加载家谱，ID: ${familyTreeId}`);
           return response.data;
         }
       } catch (error) {
         logger.error(`从数据库加载家谱失败，ID: ${familyTreeId}`, error);
+
+        // 检查是否是认证错误
+        if (error instanceof Error && error.message === 'AUTH_REQUIRED') {
+          throw error; // 抛出认证错误，让调用者处理
+        }
       }
     }
-    
+
     // 如果从数据库加载失败或未提供ID，则尝试从本地存储加载
     return this.loadFromLocalStorage(key);
   }
-  
+
   /**
    * 获取用户的所有家谱
    * @param userId 用户ID
@@ -78,18 +83,18 @@ export class StorageService {
   async getUserFamilyTrees(userId: string): Promise<{ id: number, name: string }[]> {
     try {
       const response = await apiClient.get<{ id: number, name: string }[]>(`/api/family-trees?userId=${userId}`);
-      
+
       if (response.success && response.data) {
         return response.data;
       }
-      
+
       return [];
     } catch (error) {
       logger.error('获取用户家谱列表失败:', error);
       return [];
     }
   }
-  
+
   /**
    * 保存家谱到本地存储
    * @param familyTree 家谱对象
@@ -105,7 +110,7 @@ export class StorageService {
       }
     }
   }
-  
+
   /**
    * 从本地存储加载家谱
    * @param key 存储键名
@@ -123,11 +128,11 @@ export class StorageService {
         logger.error('从本地存储解析家谱数据失败:', error);
       }
     }
-    
+
     // 如果没有数据或解析失败，创建新的家谱
     return this.createNewFamilyTree();
   }
-  
+
   /**
    * 创建新的家谱
    * @returns 新的家谱对象
@@ -139,7 +144,7 @@ export class StorageService {
       updatedAt: new Date().toISOString()
     };
   }
-  
+
   /**
    * 清除本地存储中的家谱数据
    * @param key 存储键名

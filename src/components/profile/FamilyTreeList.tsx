@@ -31,13 +31,29 @@ export default function FamilyTreeList({ userId }: FamilyTreeListProps) {
       try {
         setIsLoading(true);
         setError(null);
-        
-        // API call to fetch user's family trees
-        const response = await fetch(`/api/family-trees?userId=${userId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch family trees');
+
+        // 获取认证令牌
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) {
+          throw new Error('Authentication required');
         }
-        
+
+        // API call to fetch user's family trees
+        const response = await fetch('/api/family-trees', {
+          headers: {
+            'Authorization': `Bearer ${authToken}`
+          }
+        });
+
+        if (response.status === 401) {
+          throw new Error('Authentication required');
+        }
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch family trees');
+        }
+
         const data = await response.json();
         setFamilyTrees(data.familyTrees || []);
       } catch (err) {
@@ -70,8 +86,8 @@ export default function FamilyTreeList({ userId }: FamilyTreeListProps) {
       <Card>
         <CardContent className="py-8">
           <p className="text-center text-red-500">Error: {error}</p>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="mt-4 mx-auto block"
             onClick={() => setError(null)}
           >
@@ -94,14 +110,14 @@ export default function FamilyTreeList({ userId }: FamilyTreeListProps) {
         {familyTrees.length > 0 ? (
           <div className="space-y-4">
             {familyTrees.map((tree) => (
-              <div 
-                key={tree.id} 
+              <div
+                key={tree.id}
                 className="p-4 border rounded-md hover:bg-gray-50 transition-colors flex justify-between items-center"
               >
                 <div>
                   <h3 className="font-medium">{tree.name || `Family Tree #${tree.id}`}</h3>
                 </div>
-                <Button 
+                <Button
                   onClick={() => navigateToFamilyTree(tree.id)}
                   size="sm"
                 >
@@ -113,7 +129,7 @@ export default function FamilyTreeList({ userId }: FamilyTreeListProps) {
         ) : (
           <div className="text-center py-8">
             <p className="text-gray-500 mb-4">You haven't created any family trees yet.</p>
-            <Button 
+            <Button
               onClick={() => router.push('/generator')}
               className="mx-auto"
             >

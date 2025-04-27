@@ -154,7 +154,7 @@ export function saveFamilyTreeToLocalStorage(familyTree: FamilyTree, key: string
     console.warn('无法在服务器端使用localStorage');
     return;
   }
-  
+
   try {
     localStorage.setItem(key, JSON.stringify(familyTree));
   } catch (error: unknown) {
@@ -173,7 +173,7 @@ export function loadFamilyTreeFromLocalStorage(key: string = 'familyTree'): Fami
     console.warn('无法在服务器端使用localStorage');
     return createNewFamilyTree();
   }
-  
+
   try {
     const storedData = localStorage.getItem(key);
     if (storedData) {
@@ -182,7 +182,7 @@ export function loadFamilyTreeFromLocalStorage(key: string = 'familyTree'): Fami
   } catch (error: unknown) {
     console.error('从本地存储加载家谱失败:', error instanceof Error ? error.message : String(error));
   }
-  
+
   // 如果没有找到或解析失败，返回一个新的家谱
   return createNewFamilyTree();
 }
@@ -239,56 +239,51 @@ export async function saveFamilyTreeToDatabase(familyTree: FamilyTree): Promise<
  * @returns Family tree object, or null if it doesn't exist
  */
 export async function loadFamilyTreeFromDatabase(familyTreeId: number): Promise<FamilyTree | null> {
-  // 如果数据库连接不可用，尝试从本地存储加载
-  if (!db) {
-    console.warn('数据库连接不可用，尝试从本地存储加载');
-    return loadFamilyTreeFromLocalStorage();
-  }
-
   try {
     console.log('Loading family tree from database, ID:', familyTreeId);
 
-    // Get family tree information
-    const familyTreeData = await db.select().from(familyTrees)
-      .where(eq(familyTrees.id, familyTreeId));
+    // 获取认证令牌
+    const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
 
-    console.log('Family tree data retrieved:', familyTreeData);
-
-    if (familyTreeData.length === 0) {
-      console.warn('No family tree found with ID:', familyTreeId);
-      return null;
+    if (!authToken) {
+      console.warn('No authentication token available, cannot load family tree');
+      throw new Error('AUTH_REQUIRED');
     }
 
-    // 获取家谱成员
-    // 直接使用数字ID，与数据库模式匹配
-    console.log('使用ID查询家谱成员:', familyTreeId);
-    const membersData = await db.select().from(members)
-      .where(eq(members.familyTreeId, familyTreeId));
+    // 使用API路由获取家谱数据
+    const response = await fetch(`/api/family-trees/${familyTreeId}`, {
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      }
+    });
 
-    console.log('Members data retrieved:', membersData);
+    // 检查是否需要认证
+    if (response.status === 401) {
+      const data = await response.json();
+      if (data.requireAuth) {
+        throw new Error('AUTH_REQUIRED');
+      }
+    }
 
-    // Build family tree object
-    const familyTree: FamilyTree = {
-      members: membersData.map(m => ({
-        id: m.id,
-        name: m.name,
-        relation: m.relation,
-        parentId: m.parentId || undefined,
-        birthDate: m.birthDate || undefined,
-        deathDate: m.deathDate || undefined,
-        gender: m.gender as 'male' | 'female' | 'other' | undefined,
-        description: m.description || undefined,
-      })),
-      name: familyTreeData[0].name || undefined,
-      rootId: familyTreeData[0].rootId || undefined,
-      createdAt: familyTreeData[0].createdAt?.toISOString() || new Date().toISOString(),
-      updatedAt: familyTreeData[0].updatedAt?.toISOString() || new Date().toISOString(),
-    };
+    // 检查其他错误
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to load family tree');
+    }
 
-    console.log('Built family tree object with members count:', familyTree.members.length);
+    // 解析家谱数据
+    const familyTree = await response.json();
+    console.log('Successfully loaded family tree with members count:', familyTree.members.length);
+
     return familyTree;
   } catch (error: unknown) {
     console.error('从数据库加载家谱失败:', error instanceof Error ? error.message : String(error));
+
+    // 如果是认证错误，直接抛出，让调用者处理
+    if (error instanceof Error && error.message === 'AUTH_REQUIRED') {
+      throw error;
+    }
+
     return null;
   }
 }
@@ -299,24 +294,38 @@ export async function loadFamilyTreeFromDatabase(familyTreeId: number): Promise<
  * @returns List of family trees
  */
 export async function getUserFamilyTrees(userId: string): Promise<{ id: number, name: string | null }[]> {
-  // If database connection is unavailable, return empty array
-  if (!db) {
-    console.warn('Database connection unavailable, cannot get user family trees');
-    return [];
-  }
-
   try {
-    const result = await db.select({
-      id: familyTrees.id,
-      name: familyTrees.name,
-    }).from(familyTrees)
-      .where(eq(familyTrees.userId, userId));
-      
-    // 确保结果中的name字段不为null，如果为null则提供默认值
-    return result.map(item => ({
-      id: item.id,
-      name: item.name || `家谱 #${item.id}` // 提供默认名称
-    }));
+    // 获取认证令牌
+    const authToken = typeof window !== 'undefined' ? localStorage.getItem('authToken') : null;
+
+    if (!authToken) {
+      console.warn('No authentication token available, cannot get user family trees');
+      return [];
+    }
+
+    // 使用API路由获取家谱列表
+    const response = await fetch('/api/family-trees', {
+      headers: {
+        'Authorization': `Bearer ${authToken}`
+      }
+    });
+
+    // 检查是否需要认证
+    if (response.status === 401) {
+      console.warn('Authentication required to get user family trees');
+      return [];
+    }
+
+    // 检查其他错误
+    if (!response.ok) {
+      const errorData = await response.json();
+      console.error('Failed to get user family trees:', errorData.error);
+      return [];
+    }
+
+    // 解析家谱列表数据
+    const data = await response.json();
+    return data.familyTrees || [];
   } catch (error: unknown) {
     console.error('获取用户家谱列表失败:', error instanceof Error ? error.message : String(error));
     return [];
