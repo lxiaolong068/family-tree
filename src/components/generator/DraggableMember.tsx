@@ -34,20 +34,20 @@ const DraggableMember: React.FC<DraggableMemberProps> = ({
       member
     }
   });
-  
+
   // 计算拖拽时的样式
   const style = transform ? {
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
     zIndex: isActive ? 10 : 1,
   } : undefined;
-  
+
   // 根据性别选择不同的边框颜色
-  const genderBorderColor = member.gender === 'male' 
-    ? 'border-blue-400' 
-    : member.gender === 'female' 
-      ? 'border-pink-400' 
+  const genderBorderColor = member.gender === 'male'
+    ? 'border-blue-400'
+    : member.gender === 'female'
+      ? 'border-pink-400'
       : 'border-gray-400';
-  
+
   return (
     <div
       ref={setNodeRef}
@@ -66,43 +66,43 @@ const DraggableMember: React.FC<DraggableMemberProps> = ({
       )}>
         <CardContent className="p-3">
           <div className="flex items-center justify-between mb-2">
-            <div 
-              className="cursor-grab p-1 rounded hover:bg-gray-100" 
-              {...attributes} 
+            <div
+              className="cursor-grab p-1 rounded hover:bg-gray-100"
+              {...attributes}
               {...listeners}
             >
               <GripVertical className="h-4 w-4 text-gray-500" />
             </div>
-            
+
             <div className="flex space-x-1">
               {!isRoot && member.parentId && (
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-6 w-6" 
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6"
                   onClick={() => onRemoveParent?.(member.id)}
-                  title="移除父级关系"
+                  title="Remove Parent Relation"
                 >
                   <X className="h-3 w-3" />
                 </Button>
               )}
-              
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-6 w-6" 
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-6 w-6"
                 onClick={() => onDelete?.(member.id)}
-                title="删除成员"
+                title="Delete Member"
               >
                 <X className="h-3 w-3 text-red-500" />
               </Button>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2 mb-2">
             <UserCircle className={cn(
               "h-8 w-8",
-              member.gender === 'male' ? 'text-blue-500' : 
+              member.gender === 'male' ? 'text-blue-500' :
               member.gender === 'female' ? 'text-pink-500' : 'text-gray-500'
             )} />
             <div>
@@ -110,21 +110,21 @@ const DraggableMember: React.FC<DraggableMemberProps> = ({
               <div className="text-xs text-gray-500">{member.relation}</div>
             </div>
           </div>
-          
+
           {member.birthDate && (
             <div className="text-xs text-gray-500 mt-1">
-              出生: {member.birthDate}
+              Birth: {member.birthDate}
             </div>
           )}
-          
-          <Button 
-            variant="ghost" 
-            size="sm" 
+
+          <Button
+            variant="ghost"
+            size="sm"
             className="w-full mt-2 text-xs h-7 border border-dashed border-gray-300"
             onClick={() => onAddChild?.(member.id)}
           >
             <PlusCircle className="h-3 w-3 mr-1" />
-            添加子女
+            Add Child
           </Button>
         </CardContent>
       </Card>

@@ -24,31 +24,37 @@ module.exports = {
       priority = 1.0;
       changefreq = 'daily';
     }
-    
+
     // How to make a family tree guide
     if (path === '/how-to-make-a-family-tree/') {
       priority = 0.9;
       changefreq = 'weekly';
     }
-    
+
     // Generator page
     if (path === '/generator/') {
       priority = 0.8;
       changefreq = 'weekly';
     }
-    
+
+    // Drag Editor page
+    if (path === '/drag-editor/') {
+      priority = 0.8;
+      changefreq = 'weekly';
+    }
+
     // Templates page
     if (path === '/templates/') {
       priority = 0.8;
       changefreq = 'weekly';
     }
-    
+
     // Privacy Policy page
     if (path === '/privacy/') {
       priority = 0.6;
       changefreq = 'monthly';
     }
-    
+
     // Terms of Use page
     if (path === '/terms/') {
       priority = 0.6;

@@ -27,20 +27,20 @@ const DragEditorPage = () => {
     description: '',
     actions: [] as { label: string; onClick: () => void; variant?: string }[]
   });
-  
+
   const searchParams = useSearchParams();
   const router = useRouter();
-  
+
   // 加载数据
   useEffect(() => {
     loadData();
   }, []);
-  
+
   // 从数据库或本地存储加载数据
   const loadData = async () => {
     // 从 URL 参数中获取家谱ID
     const familyTreeId = searchParams.get('id');
-    
+
     if (isDatabaseConfigured() && familyTreeId) {
       try {
         // 从数据库加载
@@ -62,7 +62,7 @@ const DragEditorPage = () => {
       loadFromLocalStorage();
     }
   };
-  
+
   // 从本地存储加载
   const loadFromLocalStorage = () => {
     const savedFamilyTree = loadFamilyTreeFromLocalStorage();
@@ -71,46 +71,46 @@ const DragEditorPage = () => {
       setFamilyTree(savedFamilyTree);
     }
   };
-  
+
   // 更新家谱
   const handleUpdateFamilyTree = (updatedFamilyTree: FamilyTree) => {
     setFamilyTree(updatedFamilyTree);
     // 保存到本地存储（作为备份）
     saveFamilyTreeToLocalStorage(updatedFamilyTree);
   };
-  
+
   // 保存到数据库
   const handleSaveToDatabase = async () => {
     if (!isDatabaseConfigured()) {
       setErrorDialogData({
-        title: "数据库未配置",
-        description: "无法保存到数据库，因为数据库未配置。您的家谱已保存到本地存储。",
+        title: "Database Not Configured",
+        description: "Unable to save to database because it is not configured. Your family tree has been saved to local storage.",
         actions: []
       });
       setErrorDialogOpen(true);
       return;
     }
-    
+
     try {
       // 保存到数据库
       const result = await saveFamilyTreeToDatabase(familyTree);
-      
+
       if (result && result.id) {
         console.log('家谱已保存到数据库，ID:', result.id);
-        
+
         // 创建URL（用于分享）
         const url = new URL(window.location.href);
         url.searchParams.set('id', result.id.toString());
-        
+
         // 更新URL（但不刷新页面）
         window.history.replaceState({}, "", url.toString());
-        
+
         // 显示成功对话框
         setSuccessDialogData({
-          title: result.isUpdate ? "家谱已更新" : "家谱已保存",
+          title: result.isUpdate ? "Family Tree Updated" : "Family Tree Saved",
           description: result.isUpdate
-            ? "您的家谱已成功更新到数据库。"
-            : "您的家谱已成功保存到数据库。",
+            ? "Your family tree has been successfully updated in the database."
+            : "Your family tree has been successfully saved to the database.",
           familyTreeId: result.id,
           familyTreeUrl: url.toString()
         });
@@ -118,20 +118,20 @@ const DragEditorPage = () => {
       }
     } catch (error) {
       console.error('保存家谱到数据库失败:', error);
-      
+
       // 检查是否需要认证
       if (error instanceof Error && error.message === 'AUTH_REQUIRED') {
         setErrorDialogData({
-          title: "需要登录",
-          description: "保存到数据库需要先登录您的账户。",
+          title: "Login Required",
+          description: "You need to log in to save to the database.",
           actions: [
             {
-              label: "取消",
+              label: "Cancel",
               onClick: () => setErrorDialogOpen(false),
               variant: "outline"
             },
             {
-              label: "去登录",
+              label: "Login",
               onClick: () => {
                 router.push('/login?redirect=' + encodeURIComponent(window.location.pathname + window.location.search));
               }
@@ -141,58 +141,58 @@ const DragEditorPage = () => {
       } else {
         // 其他错误
         setErrorDialogData({
-          title: "保存失败",
-          description: error instanceof Error ? error.message : "保存家谱时发生未知错误",
+          title: "Save Failed",
+          description: error instanceof Error ? error.message : "An unknown error occurred while saving the family tree",
           actions: []
         });
       }
-      
+
       setErrorDialogOpen(true);
     }
   };
-  
+
   // 对话框控制
   const handleCloseSuccessDialog = () => {
     setSuccessDialogOpen(false);
   };
-  
+
   const handleCloseErrorDialog = () => {
     setErrorDialogOpen(false);
   };
-  
+
   return (
     <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-6">拖拽式家谱编辑器</h1>
-      
+      <h1 className="text-2xl font-bold mb-6">Drag & Drop Family Tree Editor</h1>
+
       <Card className="mb-6">
         <CardHeader>
-          <CardTitle>使用说明</CardTitle>
+          <CardTitle>Instructions</CardTitle>
           <CardDescription>
-            通过拖拽来建立家庭成员之间的关系。将一个成员拖放到另一个成员上，可以建立父子关系。
+            Create relationships between family members by dragging and dropping. Drag one member onto another to establish a parent-child relationship.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={loadData}>
-              重新加载
+              Reload
             </Button>
             <Button onClick={handleSaveToDatabase}>
-              保存到数据库
+              Save to Database
             </Button>
             <Link href="/generator" passHref>
               <Button variant="secondary">
-                返回表单编辑器
+                Back to Form Editor
               </Button>
             </Link>
           </div>
         </CardContent>
       </Card>
-      
+
       <DraggableFamilyTree
         familyTree={familyTree}
         onUpdateFamilyTree={handleUpdateFamilyTree}
       />
-      
+
       {/* 成功对话框 */}
       <SuccessDialog
         isOpen={successDialogOpen}
@@ -202,7 +202,7 @@ const DragEditorPage = () => {
         familyTreeId={successDialogData.familyTreeId}
         familyTreeUrl={successDialogData.familyTreeUrl}
       />
-      
+
       {/* 错误对话框 */}
       <ErrorDialog
         isOpen={errorDialogOpen}

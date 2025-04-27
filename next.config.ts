@@ -20,13 +20,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Configure compression
   compress: true,
-  // Configure i18n
-  i18n: {
-    locales: ['en-US'],
-    defaultLocale: 'en-US',
-  },
-  // Optimize for search engines
-  swcMinify: true,
+  // App Router handles i18n differently - see app/[locale] for internationalization
+  // Minification is handled automatically in Next.js 13+
   // Use trailing slashes for SEO benefits
   trailingSlash: true,
 };
