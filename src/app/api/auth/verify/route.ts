@@ -4,6 +4,8 @@ import { users } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { verify } from 'jsonwebtoken';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     // 从请求头获取令牌
@@ -16,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     const token = authHeader.substring(7);
-    
+
     // 验证令牌
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
@@ -27,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
 
     const decoded = verify(token, jwtSecret) as { userId: string };
-    
+
     // 获取用户信息
     // 检查数据库连接
     if (!db) {
@@ -36,9 +38,9 @@ export async function GET(request: NextRequest) {
         { status: 500 }
       );
     }
-    
+
     const userData = await db.select().from(users).where(eq(users.id, decoded.userId));
-    
+
     if (userData.length === 0) {
       return NextResponse.json(
         { error: 'User not found' },

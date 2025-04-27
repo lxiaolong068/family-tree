@@ -21,6 +21,8 @@ const nextConfig = {
   compress: true,
   // Use trailing slashes for SEO benefits
   trailingSlash: true,
+  // Output standalone build for better compatibility with Vercel
+  output: 'standalone',
 };
 
 module.exports = nextConfig;

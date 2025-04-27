@@ -393,7 +393,7 @@ const GeneratorPage = () => {
               Your current family tree data will be available in the new editor.
             </p>
           </div>
-          <Link href={`/drag-editor${window.location.search}`} passHref>
+          <Link href="/drag-editor" passHref>
             <Button className="whitespace-nowrap">
               Try Drag Editor
             </Button>

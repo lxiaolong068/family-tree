@@ -28,7 +28,6 @@ const DragEditorContent = () => {
     actions: [] as { label: string; onClick: () => void; variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link" }[]
   });
 
-  const searchParams = useSearchParams();
   const router = useRouter();
 
   // Load data on component mount
@@ -39,7 +38,8 @@ const DragEditorContent = () => {
   // Load data from database or local storage
   const loadData = async () => {
     // Get family tree ID from URL parameters
-    const familyTreeId = searchParams.get('id');
+    const urlParams = new URLSearchParams(window.location.search);
+    const familyTreeId = urlParams.get('id');
 
     if (isDatabaseConfigured() && familyTreeId) {
       try {
@@ -101,10 +101,10 @@ const DragEditorContent = () => {
         // Create URL (for sharing)
         const url = new URL(window.location.href);
         url.searchParams.set('id', result.id.toString());
-        
+
         // Update URL (without refreshing the page)
         window.history.replaceState({}, "", url.toString());
-        
+
         // Show success dialog
         setSuccessDialogData({
           title: result.isUpdate ? "Family Tree Updated" : "Family Tree Saved",

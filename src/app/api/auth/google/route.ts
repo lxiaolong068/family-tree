@@ -6,6 +6,8 @@ import { sign } from 'jsonwebtoken';
 import crypto from 'crypto';
 import { verifyFirebaseToken } from '@/lib/token-verifier';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     // 解析请求体
@@ -99,7 +101,7 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
-    
+
     const userData = await db.select().from(users).where(eq(users.id, userId));
 
     return NextResponse.json({
