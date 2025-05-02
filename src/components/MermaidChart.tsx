@@ -12,9 +12,10 @@ interface MermaidRenderResult {
 interface MermaidChartProps {
   chartDefinition: string;
   className?: string;
+  'data-testid'?: string;
 }
 
-const MermaidChart: React.FC<MermaidChartProps> = ({ chartDefinition, className }) => {
+const MermaidChart: React.FC<MermaidChartProps> = ({ chartDefinition, className, 'data-testid': dataTestId }) => {
   const chartRef = useRef<HTMLDivElement>(null);
 
   // Initialize mermaid only once
@@ -62,7 +63,7 @@ const MermaidChart: React.FC<MermaidChartProps> = ({ chartDefinition, className 
   }, [chartDefinition]);
 
   return (
-    <div ref={chartRef} className={className}>
+    <div ref={chartRef} className={className} data-testid={dataTestId}>
       {/* Mermaid chart will be rendered here */}
     </div>
   );

@@ -131,11 +131,11 @@ graph TD
 
 ## 七、单元测试与质量保证
 
-- **测试框架**：Jest（JavaScript 测试框架）和 React Testing Library（组件测试）🟥【待开发】
-- **测试覆盖率**：目标覆盖率 75%+ 的核心功能 🟥【待开发】
+- **测试框架**：Jest（JavaScript 测试框架）和 React Testing Library（组件测试）🟧【进行中】
+- **测试覆盖率**：目标覆盖率 75%+ 的核心功能 🟧【进行中】
 - **测试类型**：
-  - 单元测试：针对独立函数和工具方法 🟥【待开发】
-  - 组件测试：验证 UI 组件渲染和交互 🟥【待开发】
+  - 单元测试：针对独立函数和工具方法 🟧【进行中】
+  - 组件测试：验证 UI 组件渲染和交互 🟧【进行中】
   - 集成测试：测试多个组件之间的交互 🟥【待开发】
   - API 测试：验证后端接口功能 🟥【待开发】
 - **测试自动化**：
@@ -146,6 +146,41 @@ graph TD
   - TypeScript：类型检查 🟩【已完成】
   - Prettier：代码格式化 🟥【待开发】
   - SonarQube：代码质量分析（可选） 🟥【待开发】
+
+### 测试实施计划
+
+#### 已完成的测试文件
+1. **工具函数测试**
+   - `src/lib/__tests__/error-handler.test.ts`：错误处理工具函数测试（覆盖率94.73%）🟩【已完成】
+
+2. **组件测试**
+   - `src/components/__tests__/MermaidChart.test.tsx`：Mermaid图表组件测试（覆盖率100%）🟩【已完成】
+   - `src/components/generator/__tests__/MemberForm.test.tsx`：家谱成员表单组件测试（覆盖率100%）🟩【已完成】
+   - `src/components/generator/__tests__/MemberList.test.tsx`：家谱成员列表组件测试（覆盖率100%）🟩【已完成】
+
+3. **自定义Hook测试**
+   - `src/hooks/__tests__/useFamilyTree.test.ts`：家谱数据管理Hook测试（覆盖率89.33%）🟩【已完成】
+   - `src/hooks/__tests__/useFamilyTreeMembers.test.ts`：家谱成员管理Hook测试（覆盖率100%）🟩【已完成】
+
+#### 待开发的测试文件（按优先级排序）
+1. **自定义Hook测试**
+   - `src/hooks/__tests__/useFamilyTreeStorage.test.ts`：家谱数据存储Hook测试 🟥【待开发】
+   - `src/hooks/__tests__/useErrorHandling.test.ts`：错误处理Hook测试 🟥【待开发】
+   - `src/hooks/__tests__/useDraggableFamilyTree.test.ts`：拖拽式家谱编辑器Hook测试 🟥【待开发】
+
+2. **核心工具函数测试**
+   - `src/lib/__tests__/family-tree-utils.test.ts`：家谱工具函数测试（已有部分测试，需扩展）🟥【待开发】
+   - `src/lib/__tests__/api-client.test.ts`：API客户端测试 🟥【待开发】
+   - `src/lib/__tests__/token-verifier.test.ts`：令牌验证测试 🟥【待开发】
+
+3. **页面组件测试**
+   - `src/app/generator/__tests__/page.test.tsx`：家谱生成器页面测试 🟥【待开发】
+   - `src/app/drag-editor/__tests__/page.test.tsx`：拖拽式编辑器页面测试 🟥【待开发】
+   - `src/app/profile/__tests__/page.test.tsx`：用户资料页面测试 🟥【待开发】
+
+4. **API路由测试**
+   - `src/app/api/family-trees/__tests__/route.test.ts`：家谱列表API测试 🟥【待开发】
+   - `src/app/api/save-family-tree/__tests__/route.test.ts`：保存家谱API测试 🟥【待开发】
 
 ---
 
@@ -159,7 +194,7 @@ graph TD
 - 集成谷歌账号登录方式 🟩【已完成】
 - 实现用户认证状态管理（Context API） 🟩【已完成】
 - 添加用户个人资料页面 🟩【已完成】
-- 实现用户家谱数据的权限控制 🟧【进行中】
+- 实现用户家谱数据的权限控制 �【已完成】
 - 添加登录/注册页面和组件 🟩【已完成】
 
 ### 2. 模板资源完善
@@ -188,7 +223,7 @@ graph TD
 
 ---
 
-## 九、项目当前进度总结（2023年5月更新，最近更新：2023年5月20日）
+## 九、项目当前进度总结（2024年6月更新，最近更新：2024年6月10日）
 
 ### 已完成功能
 - 项目已成功部署到 Vercel，并配置了所有必要的环境变量
@@ -220,11 +255,16 @@ graph TD
 - 实现"Save to Database"时的登录提醒功能
 
 ### 进行中功能
-- 用户家谱数据的权限控制
 - 结构化数据：JSON-LD 标注家谱相关内容
 - 完善家谱生成器的复杂关系设置功能（如配偶、兄弟姐妹等）
 
 ### 最近完成功能
+- 编写核心组件和自定义Hook的单元测试，包括MermaidChart、MemberForm、MemberList、useFamilyTree和useFamilyTreeMembers
+- 实现测试覆盖率监控，核心组件和Hook达到89-100%的覆盖率
+- 实现用户家谱数据的权限控制，确保用户只能访问自己的家谱数据
+- 创建API路由权限验证机制，防止未授权访问
+- 添加家谱数据访问的认证令牌验证
+- 编写权限控制单元测试和集成测试
 - 实现家谱生成器的可视化拖拽功能，支持通过拖放建立父子关系
 - 创建拖拽式家谱编辑器页面，提供更直观的家谱编辑体验
 - 将项目从 Next.js 15 降级到 Next.js 14，提高稳定性和部署可靠性
@@ -248,11 +288,9 @@ graph TD
 - 集成html2canvas和jsPDF库实现高质量图表导出
 
 ### 下一阶段计划
-- 配置Firebase授权域名，将www.family-tree.cc添加为合法域名 🟩【已完成】
-- 完成Vercel部署配置，设置环境变量 🟩【已完成】
-- 实现家谱生成器的可视化拖拽功能 🟩【已完成】
-- 实现家谱图导出为图片/PDF功能 🟩【已完成】
 - 完善家谱生成器的复杂关系设置功能（如配偶、兄弟姐妹等） 🟧【进行中】
+- 完成结构化数据：JSON-LD 标注家谱相关内容 🟧【进行中】
+- 继续编写单元测试和集成测试，提高测试覆盖率 🟧【进行中】
 - 添加更多成员属性（如照片、详细介绍等） 🟥【待开发】
 - 进一步优化 UI/UX 和移动端体验 🟥【待开发】
 - 添加错误边界组件捕获渲染错误 🟥【待开发】
