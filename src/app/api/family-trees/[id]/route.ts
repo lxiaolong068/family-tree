@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * 获取单个家谱详情
- * 
+ *
  * 此API路由实现了权限控制，确保用户只能访问自己的家谱
  */
 export async function GET(
@@ -20,7 +20,7 @@ export async function GET(
   try {
     // 获取家谱ID
     const familyTreeId = parseInt(params.id);
-    
+
     if (isNaN(familyTreeId)) {
       return NextResponse.json(
         { error: 'Invalid family tree ID' },
@@ -54,8 +54,8 @@ export async function GET(
       userId = decoded.userId;
     } catch (error: unknown) {
       return NextResponse.json(
-        { 
-          error: 'Invalid authentication token', 
+        {
+          error: 'Invalid authentication token',
           requireAuth: true,
           message: error instanceof Error ? error.message : 'Token verification failed'
         },
@@ -103,6 +103,7 @@ export async function GET(
         deathDate: m.deathDate || undefined,
         gender: m.gender as 'male' | 'female' | 'other' | undefined,
         description: m.description || undefined,
+        relationships: m.relationships || [],
       })),
       name: familyTreeData[0].name || undefined,
       rootId: familyTreeData[0].rootId || undefined,

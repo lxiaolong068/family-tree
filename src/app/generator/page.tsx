@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Member, FamilyTree, SaveFamilyTreeResult } from '@/types/family-tree';
+import { Member, FamilyTree, SaveFamilyTreeResult, Relationship, RelationType } from '@/types/family-tree';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import { ErrorDialog } from '@/components/ui/error-dialog';
 import MemberForm from '@/components/generator/MemberForm';
@@ -14,7 +14,9 @@ import {
   saveFamilyTreeToLocalStorage,
   loadFamilyTreeFromLocalStorage,
   saveFamilyTreeToDatabase,
-  loadFamilyTreeFromDatabase
+  loadFamilyTreeFromDatabase,
+  addRelationshipToMember,
+  removeRelationship
 } from '@/lib/family-tree-utils';
 import { isDatabaseConfigured } from '@/db';
 import { useAuth } from '@/contexts/AuthContext';
@@ -237,6 +239,63 @@ const GeneratorPage = () => {
     }
   };
 
+  // 添加关系
+  const handleAddRelationship = (memberId: string, relationship: Relationship) => {
+    try {
+      // 使用工具函数添加关系
+      const updatedFamilyTree = addRelationshipToMember(familyTree, memberId, relationship);
+
+      // 更新家谱状态
+      setFamilyTree(updatedFamilyTree);
+
+      // 保存到本地存储（作为备份）
+      saveFamilyTreeToLocalStorage(updatedFamilyTree);
+
+      // 更新图表
+      updateChartDefinition(updatedFamilyTree.members);
+
+      // 显示成功消息
+      setSuccessDialogData({
+        title: "Relationship Added",
+        description: "The relationship has been successfully added."
+      });
+      setSuccessDialogOpen(true);
+    } catch (error) {
+      console.error('Error adding relationship:', error);
+      // 显示错误对话框
+      setErrorDialogData({
+        title: "Error Adding Relationship",
+        description: error instanceof Error ? error.message : 'An unknown error occurred'
+      });
+      setErrorDialogOpen(true);
+    }
+  };
+
+  // 移除关系
+  const handleRemoveRelationship = (memberId: string, targetId: string, relationType: RelationType) => {
+    try {
+      // 使用工具函数移除关系
+      const updatedFamilyTree = removeRelationship(familyTree, memberId, targetId, relationType);
+
+      // 更新家谱状态
+      setFamilyTree(updatedFamilyTree);
+
+      // 保存到本地存储（作为备份）
+      saveFamilyTreeToLocalStorage(updatedFamilyTree);
+
+      // 更新图表
+      updateChartDefinition(updatedFamilyTree.members);
+    } catch (error) {
+      console.error('Error removing relationship:', error);
+      // 显示错误对话框
+      setErrorDialogData({
+        title: "Error Removing Relationship",
+        description: error instanceof Error ? error.message : 'An unknown error occurred'
+      });
+      setErrorDialogOpen(true);
+    }
+  };
+
   // 生成家谱图
   const handleGenerateChart = () => {
     if (familyTree.members.length > 0) {
@@ -408,6 +467,8 @@ const GeneratorPage = () => {
         members={familyTree.members}
         onDeleteMember={handleDeleteMember}
         onClearFamilyTree={handleClearFamilyTree}
+        onAddRelationship={handleAddRelationship}
+        onRemoveRelationship={handleRemoveRelationship}
       />
 
       <FamilyTreeChart ref={chartRef} chartDefinition={chartDefinition} />

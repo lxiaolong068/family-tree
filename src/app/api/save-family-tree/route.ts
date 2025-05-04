@@ -34,8 +34,8 @@ export async function POST(request: NextRequest) {
       userId = decoded.userId;
     } catch (error: unknown) {
       return NextResponse.json(
-        { 
-          error: '无效的认证令牌', 
+        {
+          error: '无效的认证令牌',
           requireAuth: true,
           message: error instanceof Error ? error.message : '令牌验证失败'
         },
@@ -118,6 +118,7 @@ export async function POST(request: NextRequest) {
           deathDate: member.deathDate,
           gender: member.gender,
           description: member.description,
+          relationships: member.relationships || [],
           // 使用数字类型的ID，与数据库模式匹配
           familyTreeId: familyTreeId,
           createdAt: new Date(),

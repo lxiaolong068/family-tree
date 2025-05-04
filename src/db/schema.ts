@@ -20,6 +20,7 @@ export const members = pgTable('members', {
   deathDate: text('death_date'),
   gender: text('gender'), // 'male', 'female', 'other'
   description: text('description'),
+  relationships: json('relationships').$type<{ type: string; targetId: string; description?: string }[]>(), // 存储关系数组
   // 修改为integer类型，与familyTrees表的id字段类型保持一致
   // 这样可以避免类型转换问题和潜在的错误
   familyTreeId: serial('family_tree_id').notNull(), // 外键关联到家谱表

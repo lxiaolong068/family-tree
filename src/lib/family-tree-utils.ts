@@ -1,4 +1,4 @@
-import { Member, FamilyTree, FamilyTreeChartType, SaveFamilyTreeResult } from '@/types/family-tree';
+import { Member, FamilyTree, FamilyTreeChartType, SaveFamilyTreeResult, RelationType, Relationship } from '@/types/family-tree';
 import { db } from '@/db';
 import { familyTrees, members } from '@/db/schema';
 import { eq } from 'drizzle-orm';
@@ -49,13 +49,45 @@ export function generateMermaidChart(
     chartDef += `  ${member.id}${shape}${member.name}${endShape}\n`;
   });
 
-  // Add connection definitions
+  // Add connection definitions for parent-child relationships
   members.forEach(member => {
+    // 处理传统的parentId关系
     if (member.parentId) {
       const parent = members.find(m => m.id === member.parentId);
       if (parent) {
         chartDef += `  ${parent.id} --> ${member.id}\n`;
       }
+    }
+
+    // 处理新的relationships关系
+    if (member.relationships && member.relationships.length > 0) {
+      member.relationships.forEach(rel => {
+        const target = members.find(m => m.id === rel.targetId);
+        if (target) {
+          // 根据关系类型使用不同的连接样式
+          switch (rel.type) {
+            case RelationType.PARENT:
+              // 父母关系：目标 --> 成员
+              chartDef += `  ${rel.targetId} --> ${member.id}\n`;
+              break;
+            case RelationType.CHILD:
+              // 子女关系：成员 --> 目标
+              chartDef += `  ${member.id} --> ${rel.targetId}\n`;
+              break;
+            case RelationType.SPOUSE:
+              // 配偶关系：使用虚线连接
+              chartDef += `  ${member.id} -.-> ${rel.targetId}\n`;
+              break;
+            case RelationType.SIBLING:
+              // 兄弟姐妹关系：使用点线连接
+              chartDef += `  ${member.id} -...- ${rel.targetId}\n`;
+              break;
+            default:
+              // 其他关系：使用普通线条
+              chartDef += `  ${member.id} --- ${rel.targetId}\n`;
+          }
+        }
+      });
     }
   });
 
@@ -133,12 +165,251 @@ export function addMemberToFamilyTree(familyTree: FamilyTree, member: Partial<Me
     gender: member.gender,
     birthDate: member.birthDate,
     deathDate: member.deathDate,
-    description: member.description
+    description: member.description,
+    relationships: member.relationships || []
   };
 
   return {
     ...familyTree,
     members: [...familyTree.members, newMember],
+    updatedAt: new Date().toISOString()
+  };
+}
+
+/**
+ * 添加关系到成员
+ * @param familyTree 家谱对象
+ * @param memberId 成员ID
+ * @param relationship 关系对象
+ * @returns 更新后的家谱对象
+ */
+export function addRelationshipToMember(
+  familyTree: FamilyTree,
+  memberId: string,
+  relationship: Relationship
+): FamilyTree {
+  // 复制成员数组，避免修改原数组
+  const updatedMembers = [...familyTree.members];
+
+  // 查找成员
+  const memberIndex = updatedMembers.findIndex(m => m.id === memberId);
+  if (memberIndex === -1) {
+    throw new Error(`Member with ID ${memberId} not found`);
+  }
+
+  // 获取成员
+  const member = updatedMembers[memberIndex];
+
+  // 添加关系
+  const relationships = member.relationships || [];
+
+  // 检查是否已存在相同关系
+  const existingRelIndex = relationships.findIndex(
+    r => r.targetId === relationship.targetId && r.type === relationship.type
+  );
+
+  if (existingRelIndex !== -1) {
+    // 更新现有关系
+    relationships[existingRelIndex] = relationship;
+  } else {
+    // 添加新关系
+    relationships.push(relationship);
+  }
+
+  // 更新成员
+  updatedMembers[memberIndex] = {
+    ...member,
+    relationships
+  };
+
+  // 如果是父子关系，同时更新parentId字段（向后兼容）
+  if (relationship.type === RelationType.PARENT) {
+    updatedMembers[memberIndex].parentId = relationship.targetId;
+  }
+
+  // 如果是配偶或兄弟姐妹关系，需要在目标成员上也添加相应的关系（双向关系）
+  if (
+    relationship.type === RelationType.SPOUSE ||
+    relationship.type === RelationType.SIBLING
+  ) {
+    const targetIndex = updatedMembers.findIndex(m => m.id === relationship.targetId);
+    if (targetIndex !== -1) {
+      const target = updatedMembers[targetIndex];
+      const targetRelationships = target.relationships || [];
+
+      // 检查目标成员是否已有相应的关系
+      const existingTargetRelIndex = targetRelationships.findIndex(
+        r => r.targetId === memberId && r.type === relationship.type
+      );
+
+      if (existingTargetRelIndex !== -1) {
+        // 更新现有关系
+        targetRelationships[existingTargetRelIndex] = {
+          type: relationship.type,
+          targetId: memberId,
+          description: relationship.description
+        };
+      } else {
+        // 添加新关系
+        targetRelationships.push({
+          type: relationship.type,
+          targetId: memberId,
+          description: relationship.description
+        });
+      }
+
+      // 更新目标成员
+      updatedMembers[targetIndex] = {
+        ...target,
+        relationships: targetRelationships
+      };
+    }
+  }
+
+  // 如果是子女关系，需要在目标成员上添加父母关系
+  if (relationship.type === RelationType.CHILD) {
+    const targetIndex = updatedMembers.findIndex(m => m.id === relationship.targetId);
+    if (targetIndex !== -1) {
+      const target = updatedMembers[targetIndex];
+      const targetRelationships = target.relationships || [];
+
+      // 检查目标成员是否已有相应的关系
+      const existingTargetRelIndex = targetRelationships.findIndex(
+        r => r.targetId === memberId && r.type === RelationType.PARENT
+      );
+
+      if (existingTargetRelIndex !== -1) {
+        // 更新现有关系
+        targetRelationships[existingTargetRelIndex] = {
+          type: RelationType.PARENT,
+          targetId: memberId,
+          description: relationship.description
+        };
+      } else {
+        // 添加新关系
+        targetRelationships.push({
+          type: RelationType.PARENT,
+          targetId: memberId,
+          description: relationship.description
+        });
+      }
+
+      // 更新目标成员的parentId（向后兼容）
+      updatedMembers[targetIndex] = {
+        ...target,
+        relationships: targetRelationships,
+        parentId: memberId
+      };
+    }
+  }
+
+  return {
+    ...familyTree,
+    members: updatedMembers,
+    updatedAt: new Date().toISOString()
+  };
+}
+
+/**
+ * 移除成员的关系
+ * @param familyTree 家谱对象
+ * @param memberId 成员ID
+ * @param targetId 目标成员ID
+ * @param relationType 关系类型
+ * @returns 更新后的家谱对象
+ */
+export function removeRelationship(
+  familyTree: FamilyTree,
+  memberId: string,
+  targetId: string,
+  relationType: RelationType
+): FamilyTree {
+  // 复制成员数组，避免修改原数组
+  const updatedMembers = [...familyTree.members];
+
+  // 查找成员
+  const memberIndex = updatedMembers.findIndex(m => m.id === memberId);
+  if (memberIndex === -1) {
+    throw new Error(`Member with ID ${memberId} not found`);
+  }
+
+  // 获取成员
+  const member = updatedMembers[memberIndex];
+
+  // 如果没有关系数组，直接返回
+  if (!member.relationships || member.relationships.length === 0) {
+    return familyTree;
+  }
+
+  // 移除关系
+  const relationships = member.relationships.filter(
+    r => !(r.targetId === targetId && r.type === relationType)
+  );
+
+  // 更新成员
+  updatedMembers[memberIndex] = {
+    ...member,
+    relationships
+  };
+
+  // 如果是父子关系，同时更新parentId字段（向后兼容）
+  if (relationType === RelationType.PARENT) {
+    const { parentId, ...rest } = updatedMembers[memberIndex];
+    updatedMembers[memberIndex] = rest;
+  }
+
+  // 如果是配偶或兄弟姐妹关系，需要在目标成员上也移除相应的关系（双向关系）
+  if (
+    relationType === RelationType.SPOUSE ||
+    relationType === RelationType.SIBLING
+  ) {
+    const targetIndex = updatedMembers.findIndex(m => m.id === targetId);
+    if (targetIndex !== -1) {
+      const target = updatedMembers[targetIndex];
+      if (target.relationships && target.relationships.length > 0) {
+        // 移除目标成员上的关系
+        const targetRelationships = target.relationships.filter(
+          r => !(r.targetId === memberId && r.type === relationType)
+        );
+
+        // 更新目标成员
+        updatedMembers[targetIndex] = {
+          ...target,
+          relationships: targetRelationships
+        };
+      }
+    }
+  }
+
+  // 如果是子女关系，需要在目标成员上移除父母关系
+  if (relationType === RelationType.CHILD) {
+    const targetIndex = updatedMembers.findIndex(m => m.id === targetId);
+    if (targetIndex !== -1) {
+      const target = updatedMembers[targetIndex];
+      if (target.relationships && target.relationships.length > 0) {
+        // 移除目标成员上的关系
+        const targetRelationships = target.relationships.filter(
+          r => !(r.targetId === memberId && r.type === RelationType.PARENT)
+        );
+
+        // 更新目标成员
+        updatedMembers[targetIndex] = {
+          ...target,
+          relationships: targetRelationships
+        };
+
+        // 如果parentId等于memberId，则移除parentId
+        if (target.parentId === memberId) {
+          const { parentId, ...rest } = updatedMembers[targetIndex];
+          updatedMembers[targetIndex] = rest;
+        }
+      }
+    }
+  }
+
+  return {
+    ...familyTree,
+    members: updatedMembers,
     updatedAt: new Date().toISOString()
   };
 }
