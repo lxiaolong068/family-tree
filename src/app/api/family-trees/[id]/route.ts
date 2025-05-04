@@ -4,7 +4,7 @@ import { familyTrees, members } from '@/db/schema';
 import { eq, and } from 'drizzle-orm';
 import { verify } from 'jsonwebtoken';
 import { handleApiError } from '@/lib/error-handler';
-import { FamilyTree } from '@/types/family-tree';
+import { FamilyTree, RelationType, Relationship } from '@/types/family-tree';
 
 export const dynamic = 'force-dynamic';
 
@@ -103,7 +103,10 @@ export async function GET(
         deathDate: m.deathDate || undefined,
         gender: m.gender as 'male' | 'female' | 'other' | undefined,
         description: m.description || undefined,
-        relationships: m.relationships || [],
+        relationships: (m.relationships || []).map(rel => ({
+          ...rel,
+          type: rel.type as RelationType,
+        })) as Relationship[],
       })),
       name: familyTreeData[0].name || undefined,
       rootId: familyTreeData[0].rootId || undefined,
