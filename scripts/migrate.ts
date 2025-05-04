@@ -26,7 +26,7 @@ async function runMigration() {
     console.log(migrationSql);
     
     // 执行迁移
-    const result = await sql(migrationSql);
+    const result = await sql.unsafe(migrationSql);
     
     console.log('Migration completed successfully');
     console.log(result);
