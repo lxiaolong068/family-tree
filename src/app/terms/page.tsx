@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Script from 'next/script';
 import PageLayout from "@/components/PageLayout";
 import { Metadata } from 'next';
 
@@ -14,6 +15,66 @@ export default function TermsOfUsePage() {
       title="Terms of Use"
       description="Guidelines and rules for using our family tree creation service"
     >
+      {/* Structured Data for SEO */}
+      <Script
+        id="schema-terms"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Terms of Use",
+            "description": "Our terms of use outline the rules and guidelines for using our family tree creation service.",
+            "datePublished": "2025-04-23",
+            "dateModified": "2025-04-23",
+            "publisher": {
+              "@type": "Organization",
+              "name": "Family Tree Maker",
+              "logo": {
+                "@type": "ImageObject",
+                "url": "https://www.family-tree.cc/logo.png"
+              }
+            },
+            "mainEntity": {
+              "@type": "Article",
+              "headline": "Terms of Use",
+              "description": "Guidelines and rules for using our family tree creation service",
+              "author": {
+                "@type": "Organization",
+                "name": "Family Tree Maker"
+              },
+              "publisher": {
+                "@type": "Organization",
+                "name": "Family Tree Maker",
+                "logo": {
+                  "@type": "ImageObject",
+                  "url": "https://www.family-tree.cc/logo.png"
+                }
+              },
+              "datePublished": "2025-04-23",
+              "dateModified": "2025-04-23"
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://www.family-tree.cc/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Terms of Use",
+                  "item": "https://www.family-tree.cc/terms/"
+                }
+              ]
+            }
+          })
+        }}
+      />
+
       <article className="prose max-w-4xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Terms of Use</h1>
         <p className="text-sm text-gray-500 mb-6">Last Updated: April 23, 2025</p>

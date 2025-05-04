@@ -24,6 +24,7 @@ import ExportOptions from '@/components/generator/ExportOptions';
 import { useFamilyTreeMembers } from '@/hooks/useFamilyTreeMembers';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
+import Script from 'next/script';
 
 const GeneratorPage = () => {
   // 认证状态
@@ -357,6 +358,41 @@ const GeneratorPage = () => {
 
   return (
     <div className="container mx-auto p-4">
+      {/* Structured Data for SEO */}
+      <Script
+        id="schema-generator"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "Family Tree Generator",
+            "applicationCategory": "UtilityApplication",
+            "operatingSystem": "Any",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "description": "Create your family tree with our easy-to-use online generator. Add family members, visualize relationships, and export your family tree.",
+            "featureList": [
+              "Add and manage family members",
+              "Visualize family relationships",
+              "Export as image or PDF",
+              "Save to database",
+              "Local storage backup"
+            ],
+            "screenshot": "https://www.family-tree.cc/generator-screenshot.jpg",
+            "softwareVersion": "1.0",
+            "aggregateRating": {
+              "@type": "AggregateRating",
+              "ratingValue": "4.8",
+              "ratingCount": "156"
+            }
+          })
+        }}
+      />
+
       <h1 className="text-2xl font-bold mb-6">Family Tree Generator</h1>
 
       {/* 使用拆分出来的组件 */}

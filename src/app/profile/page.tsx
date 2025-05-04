@@ -7,11 +7,12 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import FamilyTreeList from '@/components/profile/FamilyTreeList';
+import Script from 'next/script';
 
 export default function ProfilePage() {
   const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
-  
+
   // If not authenticated and not loading, redirect to home
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -33,6 +34,43 @@ export default function ProfilePage() {
 
   return (
     <div className="container mx-auto py-8 px-4 md:px-6">
+      {/* Structured Data for SEO */}
+      <Script
+        id="schema-profile"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "ProfilePage",
+            "dateCreated": new Date().toISOString(),
+            "dateModified": new Date().toISOString(),
+            "mainEntity": {
+              "@type": "Person",
+              "name": user?.name || "User",
+              "email": user?.email,
+              "image": user?.profileImage || "https://www.family-tree.cc/default-avatar.png"
+            },
+            "breadcrumb": {
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://www.family-tree.cc/"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "User Profile",
+                  "item": "https://www.family-tree.cc/profile/"
+                }
+              ]
+            }
+          })
+        }}
+      />
+
       <h1 className="text-3xl font-bold mb-8">User Profile</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { AuthProvider } from '@/contexts/AuthContext';
+import Script from 'next/script';
 
 const inter = Inter({
   variable: "--font-inter",
@@ -41,6 +42,57 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script
+          id="schema-website-organization"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@graph": [
+                {
+                  "@type": "WebSite",
+                  "@id": "https://www.family-tree.cc/#website",
+                  "url": "https://www.family-tree.cc/",
+                  "name": "Family Tree Maker",
+                  "description": "Professional Online Family Tree Maker",
+                  "potentialAction": [
+                    {
+                      "@type": "SearchAction",
+                      "target": {
+                        "@type": "EntryPoint",
+                        "urlTemplate": "https://www.family-tree.cc/search?q={search_term_string}"
+                      },
+                      "query-input": "required name=search_term_string"
+                    }
+                  ],
+                  "inLanguage": "en-US"
+                },
+                {
+                  "@type": "Organization",
+                  "@id": "https://www.family-tree.cc/#organization",
+                  "name": "Family Tree Maker",
+                  "url": "https://www.family-tree.cc/",
+                  "logo": {
+                    "@type": "ImageObject",
+                    "inLanguage": "en-US",
+                    "@id": "https://www.family-tree.cc/#/schema/logo/image/",
+                    "url": "https://www.family-tree.cc/logo.png",
+                    "contentUrl": "https://www.family-tree.cc/logo.png",
+                    "width": 512,
+                    "height": 512,
+                    "caption": "Family Tree Maker"
+                  },
+                  "image": {
+                    "@id": "https://www.family-tree.cc/#/schema/logo/image/"
+                  },
+                  "sameAs": []
+                }
+              ]
+            })
+          }}
+        />
+      </head>
       <body
         className={`${inter.variable} ${robotoMono.variable} antialiased flex flex-col min-h-screen`}
       >
