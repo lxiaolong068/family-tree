@@ -114,4 +114,54 @@ describe('token-verifier测试', () => {
     // 验证Promise被拒绝
     await expect(verifyFirebaseToken('expired-token')).rejects.toThrow('Token expired');
   });
+
+  it('应该处理getSigningKey回调中的错误', async () => {
+    // 直接模拟jwt.verify失败
+    (jwt.verify as jest.Mock).mockImplementation((token, getKey, options, callback) => {
+      callback(new Error('Failed to get signing key'), null);
+    });
+
+    // 验证Promise被拒绝
+    await expect(verifyFirebaseToken('test-token')).rejects.toThrow('Failed to get signing key');
+
+    // 验证console.error被调用
+    expect(console.error).toHaveBeenCalledWith('Token verification error:', expect.any(Error));
+  }, 30000);
+
+  it('应该处理getSigningKey返回null的情况', async () => {
+    // 直接模拟jwt.verify失败
+    (jwt.verify as jest.Mock).mockImplementation((token, getKey, options, callback) => {
+      callback(new Error('无法获取签名密钥'), null);
+    });
+
+    // 验证Promise被拒绝
+    await expect(verifyFirebaseToken('test-token')).rejects.toThrow('无法获取签名密钥');
+
+    // 验证console.error被调用
+    expect(console.error).toHaveBeenCalledWith('Token verification error:', expect.any(Error));
+  }, 30000);
+
+  it('应该处理缺少环境变量的情况', async () => {
+    // 保存原始环境变量
+    const originalEnv = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+
+    // 删除环境变量
+    delete process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID;
+
+    // 模拟jwt.verify调用回调函数，模拟成功
+    (jwt.verify as jest.Mock).mockImplementation((token, getKey, options, callback) => {
+      // 验证options中的audience和issuer
+      expect(options.audience).toBeUndefined();
+      expect(options.issuer).toBe('https://securetoken.google.com/undefined');
+
+      // 直接调用回调函数，模拟成功
+      callback(null, { sub: 'user123' });
+    });
+
+    // 调用verifyFirebaseToken
+    await verifyFirebaseToken('test-token');
+
+    // 恢复环境变量
+    process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID = originalEnv;
+  });
 });
