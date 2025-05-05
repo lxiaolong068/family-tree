@@ -139,8 +139,8 @@ graph TD
   - 当前核心Hook测试覆盖率：93.77%
   - 当前组件测试覆盖率：78.00%（从70.66%提高）
   - 当前工具函数测试覆盖率：79.31%
-  - 当前页面组件测试覆盖率：45.21%（从44.34%提高）
-  - 总体测试覆盖率：55.83%（从50.15%提高）
+  - 当前页面组件测试覆盖率：62.24%（从45.21%提高）
+  - 总体测试覆盖率：62.24%（从55.83%提高）
 - **测试类型**：
   - 单元测试：针对独立函数和工具方法 🟩【已完成】
   - 组件测试：验证 UI 组件渲染和交互 🟩【已完成】
@@ -224,16 +224,16 @@ graph TD
    - 为 `DraggableFamilyTree.tsx` 添加测试，覆盖率从0%提高到93.54% 🟩【已完成】
    - Generator目录组件测试覆盖率从22.79%提高到47.11% 🟧【进行中】
 
-#### 待开发的测试文件（按优先级排序）
+#### 最近完成的测试改进（2024年8月更新）
 1. **Generator组件测试**
-   - 为 `DragEditorContent.tsx` 添加测试，当前覆盖率为0% 🟧【进行中】
-   - 为 `RelationshipList.tsx` 添加测试，当前覆盖率为27.27% 🟧【进行中】
-   - 为 `RelationshipSelector.tsx` 添加测试，当前覆盖率为25% 🟧【进行中】
+   - 为 `DragEditorContent.tsx` 添加测试，覆盖率从0%提高到51.51% 🟩【已完成】
+   - 为 `RelationshipList.tsx` 添加测试，覆盖率从27.27%提高到100% 🟩【已完成】
+   - 为 `RelationshipSelector.tsx` 添加测试，覆盖率从25%提高到63.88% 🟩【已完成】
 
 2. **页面组件测试**
-   - 为 `app/page.tsx`（首页）添加测试 🟥【待开发】
-   - 为 `app/knowledge/page.tsx`（知识页面）添加测试 🟥【待开发】
-   - 为 `app/templates/page.tsx`（模板页面）添加测试 🟥【待开发】
+   - 为 `app/page.tsx`（首页）添加测试，覆盖率达到100% 🟩【已完成】
+   - 为 `app/knowledge/page.tsx`（知识页面）添加测试，覆盖率达到93.33% 🟩【已完成】
+   - 为 `app/templates/page.tsx`（模板页面）添加测试，覆盖率达到92.3% 🟩【已完成】
 
 3. **上下文和服务测试**
    - 为 `contexts/AuthContext.tsx` 添加测试 🟥【待开发】
@@ -287,7 +287,7 @@ graph TD
 
 ---
 
-## 九、项目当前进度总结（2024年7月更新，最近更新：2024年7月15日）
+## 九、项目当前进度总结（2024年8月更新，最近更新：2024年8月5日）
 
 ### 已完成功能
 - 项目已成功部署到 Vercel，并配置了所有必要的环境变量
@@ -325,7 +325,19 @@ graph TD
   - 在关系线上显示关系描述
   - 优化关系图布局算法，更好地处理复杂家族结构
 
-### 最近完成功能（2024年7月更新）
+### 最近完成功能（2024年8月更新）
+- 提高测试覆盖率：
+  - 为 Generator 组件添加测试：
+    - 为 DragEditorContent.tsx 添加测试，覆盖率从0%提高到51.51%
+    - 为 RelationshipList.tsx 添加测试，覆盖率从27.27%提高到100%
+    - 为 RelationshipSelector.tsx 添加测试，覆盖率从25%提高到63.88%
+  - 为页面组件添加测试：
+    - 为 app/page.tsx（首页）添加测试，覆盖率达到100%
+    - 为 app/knowledge/page.tsx（知识页面）添加测试，覆盖率达到93.33%
+    - 为 app/templates/page.tsx（模板页面）添加测试，覆盖率达到92.3%
+  - 总体测试覆盖率从55.83%提高到62.24%
+
+### 之前完成功能（2024年7月更新）
 - 提高测试覆盖率：
   - 解决 React act 警告问题，修复 GeneratorPage 测试
   - 为 UI 组件添加测试，包括 dropdown-menu.tsx 和 select.tsx
@@ -376,11 +388,10 @@ graph TD
 
 ### 下一阶段计划
 - 继续编写单元测试和集成测试，提高测试覆盖率 🟧【进行中】
-  - 为 components/generator 目录添加更多测试，特别是 DragEditorContent.tsx、RelationshipList.tsx 和 RelationshipSelector.tsx
-  - 为页面组件添加测试，包括首页、知识页面和模板页面
-  - 为上下文和服务添加测试，特别是 AuthContext 和 storage-service
-  - 添加测试组件之间的交互的集成测试
-  - 添加端到端测试，使用 Playwright 测试完整的用户流程
+  - 为上下文和服务添加测试，特别是 AuthContext 和 storage-service 🟥【待开发】
+  - 添加测试组件之间的交互的集成测试 🟥【待开发】
+  - 添加端到端测试，使用 Playwright 测试完整的用户流程 🟥【待开发】
+  - 进一步提高 Generator 组件测试覆盖率，特别是 DragEditorContent.tsx 和 RelationshipSelector.tsx 🟧【进行中】
 
 - 优化家谱关系可视化 🟧【进行中】
   - 在家谱图中使用不同颜色或线型区分不同类型的关系
