@@ -60,3 +60,7 @@ global.localStorage = new LocalStorageMock();
 
 // 全局模拟fetch
 global.fetch = jest.fn();
+
+// 模拟TextDecoder和TextEncoder，解决@neondatabase/serverless的依赖问题
+global.TextDecoder = require('util').TextDecoder;
+global.TextEncoder = require('util').TextEncoder;
