@@ -46,13 +46,6 @@ describe('MemberList组件', () => {
     // 检查标题
     expect(screen.getByText('Family Member List')).toBeInTheDocument();
 
-    // 检查表头
-    expect(screen.getByText('Name')).toBeInTheDocument();
-    expect(screen.getByText('Relationship')).toBeInTheDocument();
-    expect(screen.getByText('Gender')).toBeInTheDocument();
-    expect(screen.getByText('Birth Date')).toBeInTheDocument();
-    expect(screen.getByText('Actions')).toBeInTheDocument();
-
     // 检查成员数据
     expect(screen.getByText('John Doe')).toBeInTheDocument();
     expect(screen.getByText('Jane Doe')).toBeInTheDocument();
@@ -62,17 +55,28 @@ describe('MemberList组件', () => {
     expect(screen.getByText('mother')).toBeInTheDocument();
     expect(screen.getByText('child')).toBeInTheDocument();
 
+    // 检查性别标签
+    expect(screen.getAllByText(/Gender:/)).toHaveLength(mockMembers.length);
     expect(screen.getAllByText('Male')[0]).toBeInTheDocument();
     expect(screen.getByText('Female')).toBeInTheDocument();
     expect(screen.getByText('Other')).toBeInTheDocument();
 
+    // 检查出生日期标签
+    expect(screen.getAllByText(/Birth:/)).toHaveLength(mockMembers.length);
     expect(screen.getByText('1980-01-01')).toBeInTheDocument();
     expect(screen.getByText('1985-05-05')).toBeInTheDocument();
     expect(screen.getByText('-')).toBeInTheDocument(); // 空出生日期显示为'-'
 
+    // 检查关系标签
+    expect(screen.getAllByText(/Relationships:/)).toHaveLength(mockMembers.length);
+
     // 检查成员删除按钮
     const memberDeleteButtons = screen.getAllByRole('button', { name: /^Delete$/i });
     expect(memberDeleteButtons).toHaveLength(mockMembers.length);
+
+    // 检查添加关系按钮
+    const addRelationButtons = screen.getAllByRole('button', { name: /Add Relation$/i });
+    expect(addRelationButtons).toHaveLength(mockMembers.length);
 
     // 检查清空家谱按钮
     const clearButton = screen.getByRole('button', { name: /Clear Family Tree/i });
@@ -113,8 +117,8 @@ describe('MemberList组件', () => {
     // 标题不应该存在
     expect(screen.queryByText('Family Member List')).not.toBeInTheDocument();
 
-    // 表格不应该存在
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+    // 成员列表不应该存在
+    expect(screen.queryByText('John Doe')).not.toBeInTheDocument();
 
     // 清空按钮不应该存在
     expect(screen.queryByRole('button', { name: /Clear Family Tree/i })).not.toBeInTheDocument();

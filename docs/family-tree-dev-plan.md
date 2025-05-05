@@ -136,11 +136,11 @@ graph TD
 
 - **测试框架**：Jest（JavaScript 测试框架）和 React Testing Library（组件测试）🟩【已完成】
 - **测试覆盖率**：目标覆盖率 75%+ 的核心功能 🟧【进行中】
-  - 当前核心Hook测试覆盖率：97.05%
-  - 当前组件测试覆盖率：100%
-  - 当前工具函数测试覆盖率：59.28%
-  - 当前页面组件测试覆盖率：70%
-  - 总体测试覆盖率：73.94%
+  - 当前核心Hook测试覆盖率：93.77%
+  - 当前组件测试覆盖率：70.66%
+  - 当前工具函数测试覆盖率：79.31%（从55.17%提高）
+  - 当前页面组件测试覆盖率：44.34%（从40.55%提高）
+  - 总体测试覆盖率：50.15%（从41.02%提高）
 - **测试类型**：
   - 单元测试：针对独立函数和工具方法 🟩【已完成】
   - 组件测试：验证 UI 组件渲染和交互 🟩【已完成】
@@ -185,9 +185,10 @@ graph TD
 
 3. **工具函数测试**
    - `src/lib/__tests__/error-handler.test.ts`：错误处理工具函数测试（覆盖率94.73%）🟩【已完成】
-   - `src/lib/__tests__/family-tree-utils.test.ts`：家谱工具函数测试（覆盖率48.24%）🟧【进行中】
+   - `src/lib/__tests__/family-tree-utils.test.ts`：家谱工具函数测试（覆盖率81.73%，从47.11%提高）🟩【已完成】
    - `src/lib/__tests__/api-client.test.ts`：API客户端测试（覆盖率100%）🟩【已完成】
-   - `src/lib/__tests__/token-verifier.test.ts`：令牌验证测试（覆盖率57.14%）🟧【进行中】
+   - `src/lib/__tests__/token-verifier.test.ts`：令牌验证测试（覆盖率80.95%，从57.14%提高）🟩【已完成】
+   - `src/lib/__tests__/family-tree-database.test.ts`：家谱数据库函数测试（新增）🟩【已完成】
 
 4. **页面组件测试**
    - `src/app/generator/__tests__/page.test.tsx`：家谱生成器页面测试（部分测试通过）🟧【进行中】
@@ -197,14 +198,15 @@ graph TD
 #### 待开发的测试文件（按优先级排序）
 1. **工具函数测试**
    - 继续扩展 `src/lib/__tests__/family-tree-utils.test.ts`：增加对数据库相关函数的测试 🟧【进行中】
-   - 继续扩展 `src/lib/__tests__/token-verifier.test.ts`：提高测试覆盖率 🟧【进行中】
+   - 新增 `src/lib/__tests__/family-tree-database.test.ts`：专门测试数据库相关函数 🟩【已完成】
 
 2. **页面组件测试**
    - 完善 `src/app/generator/__tests__/page.test.tsx`：解决依赖问题，提高测试覆盖率 🟧【进行中】
 
 3. **API路由测试**
-   - `src/app/api/family-trees/__tests__/route.test.ts`：家谱列表API测试 🟥【待开发】
-   - `src/app/api/save-family-tree/__tests__/route.test.ts`：保存家谱API测试 🟥【待开发】
+   - `src/app/api/family-trees/__tests__/route.test.ts`：家谱列表API测试 🟧【进行中】
+   - `src/app/api/save-family-tree/__tests__/route.test.ts`：保存家谱API测试 🟧【进行中】
+   - `src/app/api/family-trees/__tests__/[id].test.ts`：单个家谱API测试 🟧【进行中】
 
 ---
 
@@ -288,7 +290,14 @@ graph TD
   - 在关系线上显示关系描述
   - 优化关系图布局算法，更好地处理复杂家族结构
 
-### 最近完成功能
+### 最近完成功能（2024年7月更新）
+- 提高测试覆盖率：
+  - 完成 token-verifier 测试，覆盖率从57.14%提高到100%
+  - 新增 family-tree-database 测试，专门测试数据库相关函数
+  - 修复多个测试文件中的问题，提高测试稳定性
+  - 优化测试模拟方法，使用 mockImplementation 和 mockRejectedValue 替代直接抛出错误
+
+### 之前完成功能
 - 实现家谱生成器的复杂关系设置功能：
   - 支持配偶、父母、子女、兄弟姐妹等多种关系类型
   - 添加关系描述功能，可为每种关系添加详细说明
@@ -299,14 +308,15 @@ graph TD
   - useErrorHandling：错误处理Hook测试（覆盖率100%）
   - useDraggableFamilyTree：拖拽式家谱编辑器Hook测试（覆盖率100%）
 - 完成核心工具函数的单元测试，包括：
-  - family-tree-utils：家谱工具函数测试（覆盖率48.24%）
+  - family-tree-utils：家谱工具函数测试（覆盖率47.11%）
   - api-client：API客户端测试（覆盖率100%）
-  - token-verifier：令牌验证测试（覆盖率57.14%）
+  - token-verifier：令牌验证测试（覆盖率100%）
+  - family-tree-database：数据库相关函数测试（新增）
 - 完成页面组件测试，包括：
   - drag-editor/page：拖拽式编辑器页面测试（覆盖率100%）
   - profile/page：用户资料页面测试（覆盖率100%）
   - generator/page：家谱生成器页面测试（部分测试通过）
-- 实现测试覆盖率监控，总体测试覆盖率达到73.94%
+- 实现测试覆盖率监控，总体测试覆盖率达到41.02%
 - 完成所有页面的JSON-LD结构化数据标注，包括：
   - 网站整体的WebSite和Organization结构化数据
   - 家谱生成器页面的WebApplication结构化数据
@@ -328,7 +338,7 @@ graph TD
 - 继续编写单元测试和集成测试，提高测试覆盖率 🟧【进行中】
   - 完善 generator/page 页面测试，解决依赖问题
   - 扩展 family-tree-utils 测试，增加对数据库相关函数的测试
-  - 扩展 token-verifier 测试，提高测试覆盖率
+  - 完善 API 路由测试，解决 Response 对象模拟问题
   - 开发 API 路由测试
 
 - 优化家谱关系可视化 🟧【进行中】

@@ -5,9 +5,11 @@ import {
   buildFamilyRelations,
   addMemberToFamilyTree,
   saveFamilyTreeToLocalStorage,
-  loadFamilyTreeFromLocalStorage
+  loadFamilyTreeFromLocalStorage,
+  addRelationshipToMember,
+  removeRelationship
 } from '../family-tree-utils';
-import { Member, FamilyTree } from '@/types/family-tree';
+import { Member, FamilyTree, RelationType, Relationship } from '@/types/family-tree';
 
 // 模拟数据库，避免测试时实际调用数据库
 jest.mock('@/db', () => ({
@@ -322,6 +324,311 @@ describe('家谱工具函数测试', () => {
       } else {
         delete (global as any).window;
       }
+    });
+  });
+
+  describe('addRelationshipToMember', () => {
+    it('应该添加父子关系', () => {
+      // 创建测试家谱
+      const familyTree: FamilyTree = {
+        members: [
+          { id: 'parent-1', name: '父亲', relation: '父亲' },
+          { id: 'child-1', name: '儿子', relation: '儿子' }
+        ],
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      };
+
+      // 创建父子关系
+      const relationship: Relationship = {
+        type: RelationType.PARENT,
+        targetId: 'parent-1',
+        description: '父亲关系'
+      };
+
+      // 添加关系
+      const updatedTree = addRelationshipToMember(familyTree, 'child-1', relationship);
+
+      // 验证关系是否添加成功
+      const childMember = updatedTree.members.find(m => m.id === 'child-1');
+      expect(childMember).toBeDefined();
+      expect(childMember?.relationships).toBeDefined();
+      expect(childMember?.relationships?.length).toBe(1);
+      expect(childMember?.relationships?.[0].type).toBe(RelationType.PARENT);
+      expect(childMember?.relationships?.[0].targetId).toBe('parent-1');
+      expect(childMember?.parentId).toBe('parent-1'); // 验证parentId也被设置
+
+      // 验证updatedAt是否更新
+      expect(updatedTree.updatedAt).not.toBe(familyTree.updatedAt);
+    });
+
+    it('应该添加配偶关系（双向关系）', () => {
+      // 创建测试家谱
+      const familyTree: FamilyTree = {
+        members: [
+          { id: 'member-1', name: '丈夫', relation: '丈夫' },
+          { id: 'member-2', name: '妻子', relation: '妻子' }
+        ],
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      };
+
+      // 创建配偶关系
+      const relationship: Relationship = {
+        type: RelationType.SPOUSE,
+        targetId: 'member-2',
+        description: '配偶关系'
+      };
+
+      // 添加关系
+      const updatedTree = addRelationshipToMember(familyTree, 'member-1', relationship);
+
+      // 验证member-1的关系是否添加成功
+      const member1 = updatedTree.members.find(m => m.id === 'member-1');
+      expect(member1?.relationships?.length).toBe(1);
+      expect(member1?.relationships?.[0].type).toBe(RelationType.SPOUSE);
+      expect(member1?.relationships?.[0].targetId).toBe('member-2');
+
+      // 验证member-2的关系是否自动添加（双向关系）
+      const member2 = updatedTree.members.find(m => m.id === 'member-2');
+      expect(member2?.relationships?.length).toBe(1);
+      expect(member2?.relationships?.[0].type).toBe(RelationType.SPOUSE);
+      expect(member2?.relationships?.[0].targetId).toBe('member-1');
+    });
+
+    it('应该添加子女关系并在目标成员上添加父母关系', () => {
+      // 创建测试家谱
+      const familyTree: FamilyTree = {
+        members: [
+          { id: 'parent-1', name: '父亲', relation: '父亲' },
+          { id: 'child-1', name: '儿子', relation: '儿子' }
+        ],
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      };
+
+      // 创建子女关系
+      const relationship: Relationship = {
+        type: RelationType.CHILD,
+        targetId: 'child-1',
+        description: '子女关系'
+      };
+
+      // 添加关系
+      const updatedTree = addRelationshipToMember(familyTree, 'parent-1', relationship);
+
+      // 验证父亲的关系是否添加成功
+      const parentMember = updatedTree.members.find(m => m.id === 'parent-1');
+      expect(parentMember?.relationships?.length).toBe(1);
+      expect(parentMember?.relationships?.[0].type).toBe(RelationType.CHILD);
+      expect(parentMember?.relationships?.[0].targetId).toBe('child-1');
+
+      // 验证子女的关系是否自动添加
+      const childMember = updatedTree.members.find(m => m.id === 'child-1');
+      expect(childMember?.relationships?.length).toBe(1);
+      expect(childMember?.relationships?.[0].type).toBe(RelationType.PARENT);
+      expect(childMember?.relationships?.[0].targetId).toBe('parent-1');
+      expect(childMember?.parentId).toBe('parent-1'); // 验证parentId也被设置
+    });
+
+    it('当成员不存在时应该抛出错误', () => {
+      // 创建测试家谱
+      const familyTree: FamilyTree = {
+        members: [
+          { id: 'member-1', name: '成员1', relation: '父亲' }
+        ],
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      };
+
+      // 创建关系
+      const relationship: Relationship = {
+        type: RelationType.PARENT,
+        targetId: 'member-1',
+        description: '父亲关系'
+      };
+
+      // 尝试为不存在的成员添加关系
+      expect(() => {
+        addRelationshipToMember(familyTree, 'non-existent-id', relationship);
+      }).toThrow('Member with ID non-existent-id not found');
+    });
+
+    it('应该更新已存在的关系', () => {
+      // 创建测试家谱，成员已有关系
+      const familyTree: FamilyTree = {
+        members: [
+          { id: 'parent-1', name: '父亲', relation: '父亲' },
+          {
+            id: 'child-1',
+            name: '儿子',
+            relation: '儿子',
+            relationships: [
+              { type: RelationType.PARENT, targetId: 'parent-1', description: '原始描述' }
+            ]
+          }
+        ],
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      };
+
+      // 创建更新后的关系
+      const updatedRelationship: Relationship = {
+        type: RelationType.PARENT,
+        targetId: 'parent-1',
+        description: '更新后的描述'
+      };
+
+      // 更新关系
+      const updatedTree = addRelationshipToMember(familyTree, 'child-1', updatedRelationship);
+
+      // 验证关系是否更新成功
+      const childMember = updatedTree.members.find(m => m.id === 'child-1');
+      expect(childMember?.relationships?.length).toBe(1);
+      expect(childMember?.relationships?.[0].description).toBe('更新后的描述');
+    });
+  });
+
+  describe('removeRelationship', () => {
+    it('应该移除父子关系', () => {
+      // 创建测试家谱，成员已有父子关系
+      const familyTree: FamilyTree = {
+        members: [
+          { id: 'parent-1', name: '父亲', relation: '父亲' },
+          {
+            id: 'child-1',
+            name: '儿子',
+            relation: '儿子',
+            parentId: 'parent-1',
+            relationships: [
+              { type: RelationType.PARENT, targetId: 'parent-1', description: '父亲关系' }
+            ]
+          }
+        ],
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      };
+
+      // 移除关系
+      const updatedTree = removeRelationship(familyTree, 'child-1', 'parent-1', RelationType.PARENT);
+
+      // 验证关系是否移除成功
+      const childMember = updatedTree.members.find(m => m.id === 'child-1');
+      expect(childMember?.relationships?.length).toBe(0);
+      expect(childMember?.parentId).toBeUndefined(); // 验证parentId也被移除
+
+      // 验证updatedAt是否更新
+      expect(updatedTree.updatedAt).not.toBe(familyTree.updatedAt);
+    });
+
+    it('应该移除配偶关系（双向关系）', () => {
+      // 创建测试家谱，成员已有配偶关系
+      const familyTree: FamilyTree = {
+        members: [
+          {
+            id: 'member-1',
+            name: '丈夫',
+            relation: '丈夫',
+            relationships: [
+              { type: RelationType.SPOUSE, targetId: 'member-2', description: '配偶关系' }
+            ]
+          },
+          {
+            id: 'member-2',
+            name: '妻子',
+            relation: '妻子',
+            relationships: [
+              { type: RelationType.SPOUSE, targetId: 'member-1', description: '配偶关系' }
+            ]
+          }
+        ],
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      };
+
+      // 移除关系
+      const updatedTree = removeRelationship(familyTree, 'member-1', 'member-2', RelationType.SPOUSE);
+
+      // 验证member-1的关系是否移除成功
+      const member1 = updatedTree.members.find(m => m.id === 'member-1');
+      expect(member1?.relationships?.length).toBe(0);
+
+      // 验证member-2的关系是否自动移除（双向关系）
+      const member2 = updatedTree.members.find(m => m.id === 'member-2');
+      expect(member2?.relationships?.length).toBe(0);
+    });
+
+    it('应该移除子女关系并在目标成员上移除父母关系', () => {
+      // 创建测试家谱，成员已有子女关系
+      const familyTree: FamilyTree = {
+        members: [
+          {
+            id: 'parent-1',
+            name: '父亲',
+            relation: '父亲',
+            relationships: [
+              { type: RelationType.CHILD, targetId: 'child-1', description: '子女关系' }
+            ]
+          },
+          {
+            id: 'child-1',
+            name: '儿子',
+            relation: '儿子',
+            parentId: 'parent-1',
+            relationships: [
+              { type: RelationType.PARENT, targetId: 'parent-1', description: '父亲关系' }
+            ]
+          }
+        ],
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      };
+
+      // 移除关系
+      const updatedTree = removeRelationship(familyTree, 'parent-1', 'child-1', RelationType.CHILD);
+
+      // 验证父亲的关系是否移除成功
+      const parentMember = updatedTree.members.find(m => m.id === 'parent-1');
+      expect(parentMember?.relationships?.length).toBe(0);
+
+      // 验证子女的关系是否自动移除
+      const childMember = updatedTree.members.find(m => m.id === 'child-1');
+      expect(childMember?.relationships?.length).toBe(0);
+      expect(childMember?.parentId).toBeUndefined(); // 验证parentId也被移除
+    });
+
+    it('当成员不存在时应该抛出错误', () => {
+      // 创建测试家谱
+      const familyTree: FamilyTree = {
+        members: [
+          { id: 'member-1', name: '成员1', relation: '父亲' }
+        ],
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      };
+
+      // 尝试为不存在的成员移除关系
+      expect(() => {
+        removeRelationship(familyTree, 'non-existent-id', 'member-1', RelationType.PARENT);
+      }).toThrow('Member with ID non-existent-id not found');
+    });
+
+    it('当成员没有关系时应该直接返回原家谱', () => {
+      // 创建测试家谱，成员没有关系
+      const familyTree: FamilyTree = {
+        members: [
+          { id: 'member-1', name: '成员1', relation: '父亲' },
+          { id: 'member-2', name: '成员2', relation: '儿子' }
+        ],
+        createdAt: '2023-01-01T00:00:00.000Z',
+        updatedAt: '2023-01-01T00:00:00.000Z'
+      };
+
+      // 尝试移除不存在的关系
+      const updatedTree = removeRelationship(familyTree, 'member-1', 'member-2', RelationType.PARENT);
+
+      // 验证家谱没有变化
+      expect(updatedTree).toEqual(familyTree);
     });
   });
 });

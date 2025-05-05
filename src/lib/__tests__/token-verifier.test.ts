@@ -7,7 +7,12 @@ jest.mock('jsonwebtoken');
 // 手动模拟jwks-rsa，避免ESM模块问题
 jest.mock('jwks-rsa', () => {
   return jest.fn().mockImplementation(() => ({
-    getSigningKey: jest.fn()
+    getSigningKey: jest.fn((kid, callback) => {
+      // 默认实现，可以在测试中覆盖
+      callback(null, {
+        getPublicKey: () => 'mock-public-key'
+      });
+    })
   }));
 });
 
@@ -34,10 +39,27 @@ describe('token-verifier测试', () => {
   });
 
   it('应该在验证成功时解析令牌', async () => {
-    // 模拟jwt.verify成功调用回调函数
+    // 获取jwks-rsa模块的模拟实现
+    const jwksRsaMock = require('jwks-rsa');
+    const mockClient = jwksRsaMock();
+
+    // 模拟getSigningKey成功返回密钥
+    mockClient.getSigningKey.mockImplementationOnce((kid, callback) => {
+      callback(null, {
+        getPublicKey: () => 'mock-public-key'
+      });
+    });
+
+    // 模拟jwt.verify调用getKey函数并成功验证
     (jwt.verify as jest.Mock).mockImplementation((token, getKey, options, callback) => {
-      // 直接调用回调函数，模拟成功
-      callback(null, { sub: 'user123', email: 'test@example.com' });
+      // 调用getKey函数，它会内部调用client.getSigningKey
+      getKey({ kid: 'test-kid' }, (err, key) => {
+        // 验证key是否正确
+        expect(key).toBe('mock-public-key');
+
+        // 模拟验证成功
+        callback(null, { sub: 'user123', email: 'test@example.com' });
+      });
     });
 
     const result = await verifyFirebaseToken('valid-token');
@@ -118,6 +140,7 @@ describe('token-verifier测试', () => {
   it('应该处理getSigningKey回调中的错误', async () => {
     // 直接模拟jwt.verify失败
     (jwt.verify as jest.Mock).mockImplementation((token, getKey, options, callback) => {
+      // 直接调用回调函数，模拟失败
       callback(new Error('Failed to get signing key'), null);
     });
 
@@ -131,6 +154,7 @@ describe('token-verifier测试', () => {
   it('应该处理getSigningKey返回null的情况', async () => {
     // 直接模拟jwt.verify失败
     (jwt.verify as jest.Mock).mockImplementation((token, getKey, options, callback) => {
+      // 直接调用回调函数，模拟失败
       callback(new Error('无法获取签名密钥'), null);
     });
 
