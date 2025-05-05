@@ -38,16 +38,55 @@ export function generateMermaidChart(
     return 'graph TD\n  EmptyNode["No family tree data yet"]';
   }
 
-  // Start building chart definition
-  let chartDef = 'flowchart TD\n';
+  // Start building chart definition with advanced layout options
+  let chartDef = '%%{init: { "flowchart": { "curve": "basis", "htmlLabels": true } } }%%\n';
+  chartDef += 'flowchart TD\n';
+
+  // Define node classes for different genders
+  chartDef += '  %% Node style classes\n';
+  chartDef += '  classDef male fill:#e6f7ff,stroke:#1890ff,stroke-width:2px\n';
+  chartDef += '  classDef female fill:#fff0f6,stroke:#eb2f96,stroke-width:2px\n';
+  chartDef += '  classDef other fill:#f6ffed,stroke:#52c41a,stroke-width:2px\n';
+  chartDef += '  classDef root fill:#fff7e6,stroke:#fa8c16,stroke-width:3px,stroke-dasharray: 5 5\n\n';
 
   // Add node definitions
   members.forEach(member => {
     // Use shapes instead of classes to distinguish gender
     const shape = member.gender === 'male' ? '([' : '((';
     const endShape = member.gender === 'male' ? '])' : '))';
-    chartDef += `  ${member.id}${shape}${member.name}${endShape}\n`;
+
+    // Add birth and death dates if available
+    let displayName = member.name;
+    if (member.birthDate || member.deathDate) {
+      displayName += '<br>';
+      if (member.birthDate) {
+        displayName += `b. ${member.birthDate}`;
+      }
+      if (member.deathDate) {
+        displayName += member.birthDate ? ` - d. ${member.deathDate}` : `d. ${member.deathDate}`;
+      }
+    }
+
+    chartDef += `  ${member.id}${shape}${displayName}${endShape}\n`;
+
+    // Apply gender-specific class
+    if (member.gender === 'male') {
+      chartDef += `  class ${member.id} male\n`;
+    } else if (member.gender === 'female') {
+      chartDef += `  class ${member.id} female\n`;
+    } else {
+      chartDef += `  class ${member.id} other\n`;
+    }
+
+    // Mark root node with special style
+    if (member.id === root?.id) {
+      chartDef += `  class ${member.id} root\n`;
+    }
   });
+
+  // Track relationship edges for styling
+  const relationshipEdges: { id: string, type: RelationType, description?: string }[] = [];
+  let edgeCounter = 0;
 
   // Add connection definitions for parent-child relationships
   members.forEach(member => {
@@ -55,7 +94,9 @@ export function generateMermaidChart(
     if (member.parentId) {
       const parent = members.find(m => m.id === member.parentId);
       if (parent) {
-        chartDef += `  ${parent.id} --> ${member.id}\n`;
+        const edgeId = `edge${edgeCounter++}`;
+        chartDef += `  ${parent.id} -->|Parent| ${member.id}\n`;
+        relationshipEdges.push({ id: edgeId, type: RelationType.PARENT });
       }
     }
 
@@ -64,34 +105,109 @@ export function generateMermaidChart(
       member.relationships.forEach(rel => {
         const target = members.find(m => m.id === rel.targetId);
         if (target) {
+          const edgeId = `edge${edgeCounter++}`;
+          // 显示关系描述（如果有）
+          const relationLabel = rel.description
+            ? `|${getRelationshipLabel(rel.type)}: ${rel.description}|`
+            : `|${getRelationshipLabel(rel.type)}|`;
+
           // 根据关系类型使用不同的连接样式
           switch (rel.type) {
             case RelationType.PARENT:
               // 父母关系：目标 --> 成员
-              chartDef += `  ${rel.targetId} --> ${member.id}\n`;
+              chartDef += `  ${rel.targetId} -->${relationLabel} ${member.id}\n`;
               break;
             case RelationType.CHILD:
               // 子女关系：成员 --> 目标
-              chartDef += `  ${member.id} --> ${rel.targetId}\n`;
+              chartDef += `  ${member.id} -->${relationLabel} ${rel.targetId}\n`;
               break;
             case RelationType.SPOUSE:
               // 配偶关系：使用虚线连接
-              chartDef += `  ${member.id} -.-> ${rel.targetId}\n`;
+              chartDef += `  ${member.id} -..->${relationLabel} ${rel.targetId}\n`;
               break;
             case RelationType.SIBLING:
               // 兄弟姐妹关系：使用点线连接
-              chartDef += `  ${member.id} -...- ${rel.targetId}\n`;
+              chartDef += `  ${member.id} -.-${relationLabel} ${rel.targetId}\n`;
               break;
             default:
               // 其他关系：使用普通线条
-              chartDef += `  ${member.id} --- ${rel.targetId}\n`;
+              chartDef += `  ${member.id} ---${relationLabel} ${rel.targetId}\n`;
           }
+
+          relationshipEdges.push({ id: edgeId, type: rel.type, description: rel.description });
         }
       });
     }
   });
 
+  // Add link styles for different relationship types
+  chartDef += '\n  %% Relationship style definitions\n';
+  chartDef += '  linkStyle default stroke:#333,stroke-width:1px\n';
+
+  // Group edges by type for styling
+  const parentEdges: number[] = [];
+  const childEdges: number[] = [];
+  const spouseEdges: number[] = [];
+  const siblingEdges: number[] = [];
+  const otherEdges: number[] = [];
+
+  relationshipEdges.forEach((edge, index) => {
+    switch (edge.type) {
+      case RelationType.PARENT:
+        parentEdges.push(index);
+        break;
+      case RelationType.CHILD:
+        childEdges.push(index);
+        break;
+      case RelationType.SPOUSE:
+        spouseEdges.push(index);
+        break;
+      case RelationType.SIBLING:
+        siblingEdges.push(index);
+        break;
+      default:
+        otherEdges.push(index);
+    }
+  });
+
+  // Apply styles to edge groups
+  if (parentEdges.length > 0) {
+    chartDef += `  linkStyle ${parentEdges.join(',')} stroke:#1890ff,stroke-width:2px\n`;
+  }
+  if (childEdges.length > 0) {
+    chartDef += `  linkStyle ${childEdges.join(',')} stroke:#52c41a,stroke-width:2px\n`;
+  }
+  if (spouseEdges.length > 0) {
+    chartDef += `  linkStyle ${spouseEdges.join(',')} stroke:#eb2f96,stroke-width:2px,stroke-dasharray: 5 5\n`;
+  }
+  if (siblingEdges.length > 0) {
+    chartDef += `  linkStyle ${siblingEdges.join(',')} stroke:#722ed1,stroke-width:2px,stroke-dasharray: 3 3\n`;
+  }
+  if (otherEdges.length > 0) {
+    chartDef += `  linkStyle ${otherEdges.join(',')} stroke:#faad14,stroke-width:1px\n`;
+  }
+
   return chartDef;
+}
+
+/**
+ * 获取关系类型的显示标签
+ * @param type 关系类型
+ * @returns 关系类型的显示标签
+ */
+function getRelationshipLabel(type: RelationType): string {
+  switch (type) {
+    case RelationType.PARENT:
+      return 'Parent';
+    case RelationType.CHILD:
+      return 'Child';
+    case RelationType.SPOUSE:
+      return 'Spouse';
+    case RelationType.SIBLING:
+      return 'Sibling';
+    default:
+      return 'Other';
+  }
 }
 
 /**

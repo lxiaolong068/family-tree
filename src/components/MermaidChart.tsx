@@ -27,7 +27,10 @@ const MermaidChart: React.FC<MermaidChartProps> = ({ chartDefinition, className,
       flowchart: {
         useMaxWidth: true,
         htmlLabels: true,
-        curve: 'basis'
+        curve: 'basis',
+        rankSpacing: 80,
+        nodeSpacing: 50,
+        padding: 15
       },
       logLevel: 'error'
     });
