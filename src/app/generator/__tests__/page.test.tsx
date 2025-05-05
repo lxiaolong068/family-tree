@@ -94,8 +94,11 @@ describe('GeneratorPage组件', () => {
     mockURLSearchParams.mockReturnValue(null);
   });
 
-  it('应该正确渲染页面标题和主要组件', () => {
-    render(<GeneratorPage />);
+  it('应该正确渲染页面标题和主要组件', async () => {
+    // 使用act包裹render，因为组件内部的useEffect会触发状态更新
+    await act(async () => {
+      render(<GeneratorPage />);
+    });
 
     // 检查页面标题
     expect(screen.getByText('Family Tree Generator')).toBeInTheDocument();
@@ -107,14 +110,24 @@ describe('GeneratorPage组件', () => {
   });
 
   it('应该能够添加新成员', async () => {
-    render(<GeneratorPage />);
+    // 使用act包裹render
+    await act(async () => {
+      render(<GeneratorPage />);
+    });
 
     // 填写成员表单
-    fireEvent.change(screen.getByLabelText(/Name \*/i), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByLabelText(/Relationship \*/i), { target: { value: 'Father' } });
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/Name \*/i), { target: { value: 'John Doe' } });
+    });
+
+    await act(async () => {
+      fireEvent.change(screen.getByLabelText(/Relationship \*/i), { target: { value: 'Father' } });
+    });
 
     // 点击添加按钮
-    fireEvent.click(screen.getByRole('button', { name: /Add Member/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Add Member/i }));
+    });
 
     // 验证saveFamilyTreeToLocalStorage被调用
     expect(saveFamilyTreeToLocalStorage).toHaveBeenCalled();
@@ -125,10 +138,15 @@ describe('GeneratorPage组件', () => {
   });
 
   it('当没有填写必填字段时，应该显示错误对话框', async () => {
-    render(<GeneratorPage />);
+    // 使用act包裹render
+    await act(async () => {
+      render(<GeneratorPage />);
+    });
 
     // 不填写任何字段，直接点击添加按钮
-    fireEvent.click(screen.getByRole('button', { name: /Add Member/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Add Member/i }));
+    });
 
     // 验证错误对话框显示
     await waitFor(() => {
@@ -142,7 +160,10 @@ describe('GeneratorPage组件', () => {
 
     // 关闭错误对话框 - 查找所有关闭按钮并点击第一个
     const closeButtons = await screen.findAllByRole('button', { name: /Close/i });
-    fireEvent.click(closeButtons[0]);
+
+    await act(async () => {
+      fireEvent.click(closeButtons[0]);
+    });
 
     // 验证错误对话框已关闭
     await waitFor(() => {
@@ -166,22 +187,34 @@ describe('GeneratorPage组件', () => {
       return true;
     });
 
-    render(<GeneratorPage />);
+    // 使用act包裹render
+    await act(async () => {
+      render(<GeneratorPage />);
+    });
 
     // 点击生成图表按钮
-    fireEvent.click(screen.getByRole('button', { name: /Generate Chart/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Generate Chart/i }));
+    });
+
+    // 使用waitForChanges等待所有状态更新完成
+    const { waitForChanges } = render(<></>); // 创建一个实例以获取waitForChanges函数
+    await waitForChanges();
 
     // 验证图表标题存在，表明图表组件已渲染
-    await waitFor(() => {
-      expect(screen.getByText('Family Tree Chart')).toBeInTheDocument();
-    });
+    expect(screen.getByText('Family Tree Chart')).toBeInTheDocument();
   });
 
   it('应该在未认证时显示登录提示', async () => {
-    render(<GeneratorPage />);
+    // 使用act包裹render
+    await act(async () => {
+      render(<GeneratorPage />);
+    });
 
     // 点击保存到数据库按钮
-    fireEvent.click(screen.getByRole('button', { name: /Save to Database/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /Save to Database/i }));
+    });
 
     // 验证登录对话框组件被渲染
     expect(screen.getByTestId('mock-login-dialog')).toBeInTheDocument();
@@ -276,10 +309,12 @@ describe('GeneratorPage组件', () => {
     });
 
     // 渲染组件
-    render(<GeneratorPage />);
+    await act(async () => {
+      render(<GeneratorPage />);
+    });
 
     // 直接调用清空家谱的函数
-    act(() => {
+    await act(async () => {
       // 模拟点击确认按钮后的操作
       const newFamilyTree = createNewFamilyTreeMock();
       (saveFamilyTreeToLocalStorage as jest.Mock).mockClear();
@@ -302,10 +337,13 @@ describe('GeneratorPage组件', () => {
 
     (loadFamilyTreeFromLocalStorage as jest.Mock).mockReturnValueOnce(mockFamilyTree);
 
-    render(<GeneratorPage />);
+    // 渲染组件
+    await act(async () => {
+      render(<GeneratorPage />);
+    });
 
     // 直接测试删除成员的功能
-    act(() => {
+    await act(async () => {
       // 模拟删除成员的操作
       const updatedFamilyTree = {
         ...mockFamilyTree,
