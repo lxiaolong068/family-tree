@@ -338,6 +338,26 @@ export function addRelationshipToMember(
   // 添加关系
   const relationships = member.relationships || [];
 
+  // 检查是否已存在相同的关系
+  const existingRelIndex = relationships.findIndex(
+    r => r.targetId === relationship.targetId && r.type === relationship.type
+  );
+
+  if (existingRelIndex !== -1) {
+    // 更新现有关系
+    relationships[existingRelIndex] = {
+      ...relationships[existingRelIndex],
+      description: relationship.description
+    };
+  } else {
+    // 添加新关系
+    relationships.push({
+      type: relationship.type,
+      targetId: relationship.targetId,
+      description: relationship.description
+    });
+  }
+
   // 更新成员
   updatedMembers[memberIndex] = {
     ...member,
@@ -456,11 +476,24 @@ export function addRelationshipsToMember(
   const conflicts: { type: string; message: string }[] = [];
 
   for (const relationship of relationships) {
-    const result = addRelationshipToMember(updatedFamilyTree, memberId, relationship);
-    updatedFamilyTree = result.familyTree;
+    // 检查关系冲突
+    const conflictResult = checkRelationshipConflict(updatedFamilyTree, memberId, relationship);
 
-    if (result.conflict) {
-      conflicts.push(result.conflict);
+    if (conflictResult.hasConflict) {
+      // 如果有冲突，记录冲突信息但继续处理其他关系
+      conflicts.push({
+        type: conflictResult.conflictType || 'unknown',
+        message: conflictResult.message || 'Unknown conflict'
+      });
+    } else {
+      // 如果没有冲突，添加关系
+      const result = addRelationshipToMember(updatedFamilyTree, memberId, relationship);
+      updatedFamilyTree = result.familyTree;
+
+      // 如果添加过程中出现冲突（这种情况应该很少见），也记录下来
+      if (result.conflict) {
+        conflicts.push(result.conflict);
+      }
     }
   }
 

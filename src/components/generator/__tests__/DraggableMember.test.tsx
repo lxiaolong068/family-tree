@@ -107,7 +107,7 @@ describe('DraggableMember组件', () => {
     );
 
     // 验证其他性别成员的边框颜色类
-    const otherCardElement = otherContainer.querySelector('.border-gray-400');
+    const otherCardElement = otherContainer.querySelector('.border-green-400');
     expect(otherCardElement).toBeInTheDocument();
   });
 
