@@ -10,7 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Member } from '@/types/family-tree';
-import { UserPlus, BarChart2, Save, Calendar, Male, Female, Users } from 'lucide-react';
+import { UserPlus, BarChart2, Save, Calendar, Users, CircleUser, UserCircle } from 'lucide-react';
 
 interface MemberFormProps {
   currentMember: Partial<Member>;
@@ -88,14 +88,14 @@ const MemberForm: React.FC<MemberFormProps> = ({
                     <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-muted/50 transition-colors">
                       <RadioGroupItem value="male" id="gender-male" />
                       <Label htmlFor="gender-male" className="flex items-center gap-2 cursor-pointer">
-                        <Male className="h-4 w-4 text-blue-500" />
+                        <UserCircle className="h-4 w-4 text-blue-500" />
                         <span>Male</span>
                       </Label>
                     </div>
                     <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-muted/50 transition-colors">
                       <RadioGroupItem value="female" id="gender-female" />
                       <Label htmlFor="gender-female" className="flex items-center gap-2 cursor-pointer">
-                        <Female className="h-4 w-4 text-pink-500" />
+                        <CircleUser className="h-4 w-4 text-pink-500" />
                         <span>Female</span>
                       </Label>
                     </div>
