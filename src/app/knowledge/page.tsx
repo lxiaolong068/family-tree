@@ -20,25 +20,52 @@ const KnowledgePage = () => {
   const faqData = [
     {
       question: "What should a family tree include?",
-      answer: "Typically includes: preface, legend, genealogical chart, main content (member information), family rules, biographies, and literary works."
+      answer: "Typically includes: preface, legend, genealogical chart, main content (member information), family rules, biographies, and literary works. Modern family trees often focus on names, dates (birth, marriage, death), locations, and relationships, but can be expanded with photos, stories, and occupations."
     },
     {
       question: "How to find family member information?",
-      answer: "You can ask elders, check old items (letters, photos), household registration archives, local chronicles, libraries, online resources, etc."
+      answer: "Start by asking elders and relatives. Check old family items like letters, photos, and bibles. Official records such as household registration archives, birth/marriage/death certificates, census records, and local chronicles are valuable. Libraries, archives, and online genealogy resources (e.g., Ancestry, FamilySearch) can also provide significant information."
     },
     {
       question: "What are the ways to preserve a family tree?",
-      answer: "Paper printing, electronic documents (Word, PDF), specialized family tree software, online family tree platforms, etc. Pay attention to moisture, fire, and insect prevention."
+      answer: "Options include paper printing (use acid-free paper), electronic documents (Word, PDF, specialized genealogy software formats like GEDCOM), specialized family tree software for organization and charting, and online family tree platforms for collaboration and cloud backup. Regardless of the method, ensure proper storage to prevent damage from moisture, fire, and insects, and make multiple backups."
+    },
+    {
+      question: "What is a family tree and how is it different from family history?",
+      answer: "A family tree (or genealogical chart) visually represents family relationships, typically showing ancestors and descendants. Family history is a broader narrative that includes stories, historical context, and biographical details of family members, often using the family tree as a framework."
+    },
+    {
+      question: "What is the significance or value of a family tree?",
+      answer: "Creating a family tree helps understand one's heritage, preserve family stories for future generations, discover connections to historical events, and can sometimes provide insights into genetic health predispositions. It fosters a sense of identity and belonging."
+    },
+    {
+      question: "Where should I start when recording my family tree?",
+      answer: "Start with yourself and work backwards. Gather information about your parents, then grandparents, and so on. Collect names, dates (birth, marriage, death), and places for each individual. It's easier to verify information for recent generations."
     }
   ];
 
   // Steps for creating a family tree
   const steps = [
-    "Collect family member information",
-    "Determine the format and content of the family tree",
-    "Write the family tree",
-    "Proofread and improve the family tree",
-    "Print and preserve the family tree"
+    {
+      title: "Collect family member information",
+      details: "Begin by interviewing older relatives, as they are often a rich source of names, dates, stories, and relationships. Gather existing documents like birth/marriage/death certificates, family bibles, letters, diaries, photographs (check for notes on the back), and any existing family trees. Note down sources for each piece of information."
+    },
+    {
+      title: "Determine the format and content of the family tree",
+      details: "Decide what information you want to include for each person (e.g., full name, birth/death dates and places, marriage dates and places, occupation, photos). Choose a charting style: an ancestor chart (direct line backwards), a descendant chart (from an ancestor downwards), or a more comprehensive chart including all relatives. You can use paper, genealogy software, or online platforms."
+    },
+    {
+      title: "Write or draw the family tree",
+      details: "Start with yourself and work backwards (for an ancestor chart) or start with a key ancestor and work forwards (for a descendant chart). Use clear, consistent formatting. Standard genealogical conventions can be helpful (e.g., symbols for birth, marriage, death). If using software, it will often handle the drawing aspect for you."
+    },
+    {
+      title: "Proofread and verify information",
+      details: "Accuracy is key. Double-check names, dates, and places against your sources. Cross-reference information from different sources. If you find discrepancies, try to resolve them or note the conflicting information. Be open to correcting mistakes as you find new evidence."
+    },
+    {
+      title: "Share, print, and preserve the family tree",
+      details: "Share your findings with family members – they might have additional information or corrections. Consider printing a physical copy on acid-free paper for longevity. Make digital backups in multiple locations (e.g., external hard drive, cloud storage). Online platforms can also serve as a way to preserve and share your work."
+    }
   ];
 
   return (
@@ -96,8 +123,8 @@ const KnowledgePage = () => {
                 "step": steps.map((step, index) => ({
                   "@type": "HowToStep",
                   "position": index + 1,
-                  "name": `Step ${index + 1}`,
-                  "text": step
+                  "name": `Step ${index + 1}: ${step.title}`,
+                  "text": step.details
                 }))
               }
             ]
@@ -106,9 +133,12 @@ const KnowledgePage = () => {
       />
 
       <h2 className="text-2xl font-bold mb-2">How to Create a Family Tree</h2>
-      <ol className="list-decimal list-inside text-gray-700 mb-4">
+      <ol className="list-decimal list-inside space-y-3 mb-6">
         {steps.map((step, index) => (
-          <li key={index}>{step}</li>
+          <li key={index} className="text-gray-700 dark:text-gray-300">
+            <strong className="font-semibold text-gray-900 dark:text-white">{step.title}</strong>
+            <p className="ml-4 text-sm">{step.details}</p>
+          </li>
         ))}
       </ol>
       <h2 className="text-2xl font-bold mb-2">Frequently Asked Questions (FAQ)</h2>
