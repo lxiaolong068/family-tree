@@ -4,10 +4,11 @@ import {
   generateUniqueId,
   addMemberToFamilyTree
 } from '@/lib/family-tree-utils';
+import { validateMember as validateMemberData, sanitizeMember } from '@/lib/data-validator';
 
 /**
  * 自定义hook：管理家谱成员
- * 
+ *
  * 该hook包含以下功能：
  * 1. 管理当前正在编辑的成员数据
  * 2. 添加新成员
@@ -51,16 +52,20 @@ export function useFamilyTreeMembers(
 
   /**
    * 验证成员数据
-   * @returns {boolean} 是否有效
-   * @returns {string} 错误信息
+   * @returns {Object} 验证结果对象
    */
-  const validateMember = (): { isValid: boolean; errorMessage?: string } => {
-    if (!currentMember.name || !currentMember.relation) {
+  const validateMember = (): { isValid: boolean; errorMessage?: string; errors?: Record<string, string> } => {
+    // 使用增强的数据验证
+    const validationResult = validateMemberData(currentMember);
+
+    if (!validationResult.isValid) {
       return {
         isValid: false,
-        errorMessage: '姓名和关系都是必填字段'
+        errorMessage: validationResult.message || '成员数据验证失败',
+        errors: validationResult.errors
       };
     }
+
     return { isValid: true };
   };
 
@@ -76,30 +81,33 @@ export function useFamilyTreeMembers(
         return { success: false, error: errorMessage };
       }
 
-      // 创建新成员
+      // 清理并创建新成员
+      const sanitizedMember = sanitizeMember(currentMember);
       const newMember: Member = {
         id: generateUniqueId(),
-        name: currentMember.name!,
-        relation: currentMember.relation!,
-        gender: currentMember.gender || 'male',
-        birthDate: currentMember.birthDate || '',
+        name: sanitizedMember.name!,
+        relation: sanitizedMember.relation!,
+        gender: sanitizedMember.gender || 'male',
+        birthDate: sanitizedMember.birthDate || '',
+        deathDate: sanitizedMember.deathDate || '',
+        description: sanitizedMember.description,
       };
 
       // 更新家谱
       const updatedFamilyTree = addMemberToFamilyTree(familyTree, newMember);
-      
+
       // 调用更新回调
       onUpdateFamilyTree(updatedFamilyTree);
-      
+
       // 重置表单
       resetForm();
-      
+
       return { success: true };
     } catch (error) {
       console.error('添加家庭成员时出错:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : '添加成员时发生未知错误' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : '添加成员时发生未知错误'
       };
     }
   };
@@ -112,22 +120,22 @@ export function useFamilyTreeMembers(
     try {
       // 过滤掉要删除的成员
       const updatedMembers = familyTree.members.filter(member => member.id !== id);
-      
+
       // 创建更新后的家谱
       const updatedFamilyTree = {
         ...familyTree,
         members: updatedMembers
       };
-      
+
       // 调用更新回调
       onUpdateFamilyTree(updatedFamilyTree);
-      
+
       return { success: true };
     } catch (error) {
       console.error('删除家庭成员时出错:', error);
-      return { 
-        success: false, 
-        error: error instanceof Error ? error.message : '删除成员时发生未知错误' 
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : '删除成员时发生未知错误'
       };
     }
   };

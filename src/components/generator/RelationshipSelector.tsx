@@ -7,6 +7,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface RelationshipSelectorProps {
   isOpen: boolean;
@@ -14,6 +16,7 @@ interface RelationshipSelectorProps {
   member: Member;
   availableMembers: Member[];
   onAddRelationship: (memberId: string, relationship: Relationship) => void;
+  error?: { type: string; message: string };
 }
 
 const RelationshipSelector: React.FC<RelationshipSelectorProps> = ({
@@ -21,7 +24,8 @@ const RelationshipSelector: React.FC<RelationshipSelectorProps> = ({
   onClose,
   member,
   availableMembers,
-  onAddRelationship
+  onAddRelationship,
+  error
 }) => {
   // 关系状态
   const [selectedMemberId, setSelectedMemberId] = useState<string>('');
@@ -32,15 +36,15 @@ const RelationshipSelector: React.FC<RelationshipSelectorProps> = ({
   const filteredMembers = availableMembers.filter(m => {
     // 排除自己
     if (m.id === member.id) return false;
-    
+
     // 如果没有关系数组，则可以添加
     if (!member.relationships) return true;
-    
+
     // 检查是否已经有相同类型的关系
     const hasRelation = member.relationships.some(
       r => r.targetId === m.id && r.type === relationType
     );
-    
+
     return !hasRelation;
   });
 
@@ -52,7 +56,7 @@ const RelationshipSelector: React.FC<RelationshipSelectorProps> = ({
         targetId: selectedMemberId,
         description: description || undefined
       };
-      
+
       onAddRelationship(member.id, relationship);
       resetForm();
       onClose();
@@ -86,6 +90,14 @@ const RelationshipSelector: React.FC<RelationshipSelectorProps> = ({
         <DialogHeader>
           <DialogTitle>Add Relationship for {member.name}</DialogTitle>
         </DialogHeader>
+
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>{error.message}</AlertDescription>
+          </Alert>
+        )}
 
         <div className="grid gap-4 py-4">
           {filteredMembers.length === 0 ? (
@@ -156,7 +168,7 @@ const RelationshipSelector: React.FC<RelationshipSelectorProps> = ({
           <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleSubmit}
             disabled={!selectedMemberId || filteredMembers.length === 0}
           >

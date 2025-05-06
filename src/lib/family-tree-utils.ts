@@ -2,6 +2,7 @@ import { Member, FamilyTree, FamilyTreeChartType, SaveFamilyTreeResult, Relation
 import { db } from '@/db';
 import { familyTrees, members } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { checkRelationshipConflict, RelationshipConflictType } from './relationship-validator';
 
 /**
  * Generate Mermaid.js chart definition
@@ -297,20 +298,38 @@ export function addMemberToFamilyTree(familyTree: FamilyTree, member: Partial<Me
  * @param familyTree 家谱对象
  * @param memberId 成员ID
  * @param relationship 关系对象
- * @returns 更新后的家谱对象
+ * @returns 更新后的家谱对象和可能的冲突信息
  */
 export function addRelationshipToMember(
   familyTree: FamilyTree,
   memberId: string,
   relationship: Relationship
-): FamilyTree {
+): { familyTree: FamilyTree; conflict?: { type: string; message: string } } {
+  // 检查关系冲突
+  const conflictResult = checkRelationshipConflict(familyTree, memberId, relationship);
+  if (conflictResult.hasConflict) {
+    return {
+      familyTree,
+      conflict: {
+        type: conflictResult.conflictType || 'unknown',
+        message: conflictResult.message || 'Unknown conflict'
+      }
+    };
+  }
+
   // 复制成员数组，避免修改原数组
   const updatedMembers = [...familyTree.members];
 
   // 查找成员
   const memberIndex = updatedMembers.findIndex(m => m.id === memberId);
   if (memberIndex === -1) {
-    throw new Error(`Member with ID ${memberId} not found`);
+    return {
+      familyTree,
+      conflict: {
+        type: 'not_found',
+        message: `Member with ID ${memberId} not found`
+      }
+    };
   }
 
   // 获取成员
@@ -318,19 +337,6 @@ export function addRelationshipToMember(
 
   // 添加关系
   const relationships = member.relationships || [];
-
-  // 检查是否已存在相同关系
-  const existingRelIndex = relationships.findIndex(
-    r => r.targetId === relationship.targetId && r.type === relationship.type
-  );
-
-  if (existingRelIndex !== -1) {
-    // 更新现有关系
-    relationships[existingRelIndex] = relationship;
-  } else {
-    // 添加新关系
-    relationships.push(relationship);
-  }
 
   // 更新成员
   updatedMembers[memberIndex] = {
@@ -420,9 +426,11 @@ export function addRelationshipToMember(
   }
 
   return {
-    ...familyTree,
-    members: updatedMembers,
-    updatedAt: new Date().toISOString()
+    familyTree: {
+      ...familyTree,
+      members: updatedMembers,
+      updatedAt: new Date().toISOString()
+    }
   };
 }
 
@@ -431,26 +439,35 @@ export function addRelationshipToMember(
  * @param familyTree 家谱对象
  * @param memberId 成员ID
  * @param relationships 关系对象数组
- * @returns 更新后的家谱对象
+ * @returns 更新后的家谱对象和可能的冲突信息
  */
 export function addRelationshipsToMember(
   familyTree: FamilyTree,
   memberId: string,
   relationships: Relationship[]
-): FamilyTree {
+): { familyTree: FamilyTree; conflicts?: { type: string; message: string }[] } {
   // 如果没有关系要添加，直接返回原家谱
   if (!relationships || relationships.length === 0) {
-    return familyTree;
+    return { familyTree };
   }
 
   // 逐个添加关系，每次更新家谱
   let updatedFamilyTree = { ...familyTree };
+  const conflicts: { type: string; message: string }[] = [];
 
   for (const relationship of relationships) {
-    updatedFamilyTree = addRelationshipToMember(updatedFamilyTree, memberId, relationship);
+    const result = addRelationshipToMember(updatedFamilyTree, memberId, relationship);
+    updatedFamilyTree = result.familyTree;
+
+    if (result.conflict) {
+      conflicts.push(result.conflict);
+    }
   }
 
-  return updatedFamilyTree;
+  return {
+    familyTree: updatedFamilyTree,
+    conflicts: conflicts.length > 0 ? conflicts : undefined
+  };
 }
 
 /**
