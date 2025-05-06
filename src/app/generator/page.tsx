@@ -244,16 +244,27 @@ const GeneratorPage = () => {
   const handleAddRelationship = (memberId: string, relationship: Relationship) => {
     try {
       // 使用工具函数添加关系
-      const updatedFamilyTree = addRelationshipToMember(familyTree, memberId, relationship);
+      const result = addRelationshipToMember(familyTree, memberId, relationship);
+
+      // 检查是否有冲突
+      if (result.conflict) {
+        // 显示冲突错误对话框
+        setErrorDialogData({
+          title: "Relationship Conflict",
+          description: result.conflict.message
+        });
+        setErrorDialogOpen(true);
+        return;
+      }
 
       // 更新家谱状态
-      setFamilyTree(updatedFamilyTree);
+      setFamilyTree(result.familyTree);
 
       // 保存到本地存储（作为备份）
-      saveFamilyTreeToLocalStorage(updatedFamilyTree);
+      saveFamilyTreeToLocalStorage(result.familyTree);
 
       // 更新图表
-      updateChartDefinition(updatedFamilyTree.members);
+      updateChartDefinition(result.familyTree.members);
 
       // 显示成功消息
       setSuccessDialogData({
@@ -276,21 +287,42 @@ const GeneratorPage = () => {
   const handleAddRelationships = (memberId: string, relationships: Relationship[]) => {
     try {
       // 使用工具函数批量添加关系
-      const updatedFamilyTree = addRelationshipsToMember(familyTree, memberId, relationships);
+      const result = addRelationshipsToMember(familyTree, memberId, relationships);
+
+      // 检查是否有冲突
+      if (result.conflicts && result.conflicts.length > 0) {
+        // 显示冲突错误对话框
+        const conflictMessages = result.conflicts.map(c => c.message).join('\n');
+        setErrorDialogData({
+          title: "Relationship Conflicts",
+          description: `Some relationships could not be added:\n${conflictMessages}`
+        });
+        setErrorDialogOpen(true);
+
+        // 如果所有关系都有冲突，直接返回
+        if (result.conflicts.length === relationships.length) {
+          return;
+        }
+      }
 
       // 更新家谱状态
-      setFamilyTree(updatedFamilyTree);
+      setFamilyTree(result.familyTree);
 
       // 保存到本地存储（作为备份）
-      saveFamilyTreeToLocalStorage(updatedFamilyTree);
+      saveFamilyTreeToLocalStorage(result.familyTree);
 
       // 更新图表
-      updateChartDefinition(updatedFamilyTree.members);
+      updateChartDefinition(result.familyTree.members);
+
+      // 计算成功添加的关系数量
+      const successCount = result.conflicts
+        ? relationships.length - result.conflicts.length
+        : relationships.length;
 
       // 显示成功消息
       setSuccessDialogData({
         title: "Relationships Added",
-        description: `${relationships.length} relationship${relationships.length !== 1 ? 's' : ''} have been successfully added.`
+        description: `${successCount} relationship${successCount !== 1 ? 's' : ''} have been successfully added.`
       });
       setSuccessDialogOpen(true);
     } catch (error) {

@@ -349,10 +349,13 @@ describe('家谱工具函数测试', () => {
       };
 
       // 添加关系
-      const updatedTree = addRelationshipToMember(familyTree, 'child-1', relationship);
+      const result = addRelationshipToMember(familyTree, 'child-1', relationship);
+
+      // 验证没有冲突
+      expect(result.conflict).toBeUndefined();
 
       // 验证关系是否添加成功
-      const childMember = updatedTree.members.find(m => m.id === 'child-1');
+      const childMember = result.familyTree.members.find(m => m.id === 'child-1');
       expect(childMember).toBeDefined();
       expect(childMember?.relationships).toBeDefined();
       expect(childMember?.relationships?.length).toBe(1);
@@ -361,7 +364,7 @@ describe('家谱工具函数测试', () => {
       expect(childMember?.parentId).toBe('parent-1'); // 验证parentId也被设置
 
       // 验证updatedAt是否更新
-      expect(updatedTree.updatedAt).not.toBe(familyTree.updatedAt);
+      expect(result.familyTree.updatedAt).not.toBe(familyTree.updatedAt);
     });
 
     it('应该添加配偶关系（双向关系）', () => {
@@ -383,16 +386,19 @@ describe('家谱工具函数测试', () => {
       };
 
       // 添加关系
-      const updatedTree = addRelationshipToMember(familyTree, 'member-1', relationship);
+      const result = addRelationshipToMember(familyTree, 'member-1', relationship);
+
+      // 验证没有冲突
+      expect(result.conflict).toBeUndefined();
 
       // 验证member-1的关系是否添加成功
-      const member1 = updatedTree.members.find(m => m.id === 'member-1');
+      const member1 = result.familyTree.members.find(m => m.id === 'member-1');
       expect(member1?.relationships?.length).toBe(1);
       expect(member1?.relationships?.[0].type).toBe(RelationType.SPOUSE);
       expect(member1?.relationships?.[0].targetId).toBe('member-2');
 
       // 验证member-2的关系是否自动添加（双向关系）
-      const member2 = updatedTree.members.find(m => m.id === 'member-2');
+      const member2 = result.familyTree.members.find(m => m.id === 'member-2');
       expect(member2?.relationships?.length).toBe(1);
       expect(member2?.relationships?.[0].type).toBe(RelationType.SPOUSE);
       expect(member2?.relationships?.[0].targetId).toBe('member-1');
@@ -417,16 +423,19 @@ describe('家谱工具函数测试', () => {
       };
 
       // 添加关系
-      const updatedTree = addRelationshipToMember(familyTree, 'parent-1', relationship);
+      const result = addRelationshipToMember(familyTree, 'parent-1', relationship);
+
+      // 验证没有冲突
+      expect(result.conflict).toBeUndefined();
 
       // 验证父亲的关系是否添加成功
-      const parentMember = updatedTree.members.find(m => m.id === 'parent-1');
+      const parentMember = result.familyTree.members.find(m => m.id === 'parent-1');
       expect(parentMember?.relationships?.length).toBe(1);
       expect(parentMember?.relationships?.[0].type).toBe(RelationType.CHILD);
       expect(parentMember?.relationships?.[0].targetId).toBe('child-1');
 
       // 验证子女的关系是否自动添加
-      const childMember = updatedTree.members.find(m => m.id === 'child-1');
+      const childMember = result.familyTree.members.find(m => m.id === 'child-1');
       expect(childMember?.relationships?.length).toBe(1);
       expect(childMember?.relationships?.[0].type).toBe(RelationType.PARENT);
       expect(childMember?.relationships?.[0].targetId).toBe('parent-1');
@@ -451,9 +460,12 @@ describe('家谱工具函数测试', () => {
       };
 
       // 尝试为不存在的成员添加关系
-      expect(() => {
-        addRelationshipToMember(familyTree, 'non-existent-id', relationship);
-      }).toThrow('Member with ID non-existent-id not found');
+      const result = addRelationshipToMember(familyTree, 'non-existent-id', relationship);
+
+      // 验证返回冲突信息
+      expect(result.conflict).toBeDefined();
+      expect(result.conflict?.type).toBe('not_found');
+      expect(result.conflict?.message).toBe('Member with ID non-existent-id not found');
     });
 
     it('应该更新已存在的关系', () => {
@@ -482,10 +494,13 @@ describe('家谱工具函数测试', () => {
       };
 
       // 更新关系
-      const updatedTree = addRelationshipToMember(familyTree, 'child-1', updatedRelationship);
+      const result = addRelationshipToMember(familyTree, 'child-1', updatedRelationship);
+
+      // 验证没有冲突
+      expect(result.conflict).toBeUndefined();
 
       // 验证关系是否更新成功
-      const childMember = updatedTree.members.find(m => m.id === 'child-1');
+      const childMember = result.familyTree.members.find(m => m.id === 'child-1');
       expect(childMember?.relationships?.length).toBe(1);
       expect(childMember?.relationships?.[0].description).toBe('更新后的描述');
     });
