@@ -152,6 +152,83 @@ const KnowledgePage = () => {
           </AccordionItem>
         ))}
       </Accordion>
+
+      <h2 className="text-2xl font-bold mt-8 mb-2">Types and Styles of Family Trees</h2>
+      <p className="text-gray-700 dark:text-gray-300 mb-4">
+        Family trees can be presented in various formats, each highlighting different aspects of family lineage. Common types include:
+      </p>
+      <ul className="list-disc list-inside space-y-2 mb-6 text-gray-700 dark:text-gray-300">
+        <li>
+          <strong className="font-semibold text-gray-900 dark:text-white">Ancestor Chart (Pedigree Chart):</strong> Shows an individual's direct ancestors (parents, grandparents, etc.). It typically branches outwards from the individual at the bottom or left.
+        </li>
+        <li>
+          <strong className="font-semibold text-gray-900 dark:text-white">Descendant Chart:</strong> Starts with a common ancestor (or couple) and shows all their descendants. This type of chart grows downwards or outwards.
+        </li>
+        <li>
+          <strong className="font-semibold text-gray-900 dark:text-white">Family Group Sheet:</strong> Details information about one family unit (parents and children), including names, dates, and places for vital events.
+        </li>
+        <li>
+          <strong className="font-semibold text-gray-900 dark:text-white">Fan Chart:</strong> A circular or semi-circular chart that displays ancestors, often used to visualize many generations compactly.
+        </li>
+        <li>
+          <strong className="font-semibold text-gray-900 dark:text-white">All Relatives (or Dropline) Chart:</strong> A more comprehensive chart that attempts to show all known relatives, including aunts, uncles, cousins, etc. Can become very large and complex.
+        </li>
+      </ul>
+      <p className="text-gray-700 dark:text-gray-300 mb-4">
+        The choice of chart often depends on the research goals and the amount of information available.
+      </p>
+
+      <h2 className="text-2xl font-bold mt-8 mb-2">Common Genealogy Terms</h2>
+      <Accordion type="single" collapsible className="w-full">
+        <AccordionItem value="item-term-1">
+          <AccordionTrigger>Ancestor</AccordionTrigger>
+          <AccordionContent>
+            A person from whom one is descended, typically further back than a grandparent (e.g., great-grandparent, great-great-grandparent).
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-term-2">
+          <AccordionTrigger>Descendant</AccordionTrigger>
+          <AccordionContent>
+            A person who is descended from a particular ancestor.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-term-3">
+          <AccordionTrigger>Lineage</AccordionTrigger>
+          <AccordionContent>
+            Direct descent from an ancestor; ancestry or pedigree.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-term-4">
+          <AccordionTrigger>Pedigree</AccordionTrigger>
+          <AccordionContent>
+            A record of ancestry, typically presented as a chart or tree.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-term-5">
+          <AccordionTrigger>Vital Records</AccordionTrigger>
+          <AccordionContent>
+            Records of life events kept under governmental authority, such as birth certificates, marriage licenses, and death certificates.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-term-6">
+          <AccordionTrigger>GEDCOM</AccordionTrigger>
+          <AccordionContent>
+            An acronym for GEnealogical Data COMmunication. It's a standard file format used for exchanging genealogical data between different genealogy software.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-term-7">
+          <AccordionTrigger>Direct Line</AccordionTrigger>
+          <AccordionContent>
+            Ancestors from whom you directly descend (parents, grandparents, great-grandparents, etc.), without branching to siblings, aunts, uncles, or cousins.
+          </AccordionContent>
+        </AccordionItem>
+        <AccordionItem value="item-term-8">
+          <AccordionTrigger>Collateral Line</AccordionTrigger>
+          <AccordionContent>
+            Family members who are not in your direct line of descent, such as siblings, aunts, uncles, cousins, nieces, and nephews.
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
     </PageLayout>
   );
 };
