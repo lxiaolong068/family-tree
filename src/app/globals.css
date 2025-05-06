@@ -24,77 +24,133 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
 
+  /* 更新为更现代的颜色方案 */
   --card: 0 0% 100%;
   --card-foreground: 222.2 84% 4.9%;
   --popover: 0 0% 100%;
   --popover-foreground: 222.2 84% 4.9%;
-  --primary: 222.2 47.4% 11.2%;
-  --primary-foreground: 210 40% 98%;
-  --secondary: 210 40% 96.1%;
-  --secondary-foreground: 222.2 47.4% 11.2%;
-  --muted: 210 40% 96.1%;
-  --muted-foreground: 215.4 16.3% 46.9%;
+
+  /* 主色调：蓝色 */
+  --primary: 210 100% 50%;
+  --primary-foreground: 0 0% 100%;
+
+  /* 次要色调：紫色 */
+  --secondary: 250 60% 60%;
+  --secondary-foreground: 0 0% 100%;
+
+  /* 中性色调 */
+  --muted: 210 20% 96%;
+  --muted-foreground: 215 20% 45%;
+
+  /* 强调色调：淡蓝色 */
   --accent: 210 40% 96.1%;
   --accent-foreground: 222.2 47.4% 11.2%;
+
+  /* 危险色调：红色 */
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
+
+  /* 成功色调：绿色 */
+  --success: 142 76% 36%;
+  --success-foreground: 0 0% 100%;
+
+  /* 警告色调：黄色 */
+  --warning: 38 92% 50%;
+  --warning-foreground: 0 0% 0%;
+
+  /* 信息色调：蓝色 */
+  --info: 200 100% 50%;
+  --info-foreground: 0 0% 100%;
+
+  /* 边框和输入框 */
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
-  --ring: 222.2 84% 4.9%;
+  --ring: 210 100% 50%;
 
-  --chart-1: 222.2 47.4% 11.2%;
-  --chart-2: 210 40% 96.1%;
-  --chart-3: 215.4 16.3% 46.9%;
-  --chart-4: 0 84.2% 60.2%;
-  --chart-5: 214.3 31.8% 91.4%;
+  /* 家谱图表颜色 */
+  --chart-1: 210 100% 50%;  /* 蓝色 - 父母关系 */
+  --chart-2: 142 76% 36%;   /* 绿色 - 子女关系 */
+  --chart-3: 250 60% 60%;   /* 紫色 - 兄弟姐妹关系 */
+  --chart-4: 340 82% 52%;   /* 粉色 - 配偶关系 */
+  --chart-5: 38 92% 50%;    /* 黄色 - 其他关系 */
 
+  /* 侧边栏颜色 */
   --sidebar: 0 0% 100%;
   --sidebar-foreground: 222.2 84% 4.9%;
-  --sidebar-primary: 222.2 47.4% 11.2%;
-  --sidebar-primary-foreground: 210 40% 98%;
+  --sidebar-primary: 210 100% 50%;
+  --sidebar-primary-foreground: 0 0% 100%;
   --sidebar-accent: 210 40% 96.1%;
   --sidebar-accent-foreground: 222.2 47.4% 11.2%;
   --sidebar-border: 214.3 31.8% 91.4%;
-  --sidebar-ring: 222.2 84% 4.9%;
+  --sidebar-ring: 210 100% 50%;
 }
 
 
 
 .dark {
-  --background: 222.2 84% 4.9%;
+  /* 暗色背景和前景 */
+  --background: 222 20% 10%;
   --foreground: 210 40% 98%;
-  --card: 222.2 84% 4.9%;
+
+  /* 卡片和弹出框 */
+  --card: 222 25% 12%;
   --card-foreground: 210 40% 98%;
-  --popover: 222.2 84% 4.9%;
+  --popover: 222 25% 12%;
   --popover-foreground: 210 40% 98%;
-  --primary: 210 40% 98%;
-  --primary-foreground: 222.2 47.4% 11.2%;
-  --secondary: 217.2 32.6% 17.5%;
-  --secondary-foreground: 210 40% 98%;
-  --muted: 217.2 32.6% 17.5%;
-  --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
+
+  /* 主色调：蓝色（暗色模式下更亮） */
+  --primary: 210 100% 60%;
+  --primary-foreground: 0 0% 100%;
+
+  /* 次要色调：紫色（暗色模式下更亮） */
+  --secondary: 250 70% 70%;
+  --secondary-foreground: 0 0% 0%;
+
+  /* 中性色调 */
+  --muted: 217 25% 20%;
+  --muted-foreground: 215 20% 70%;
+
+  /* 强调色调 */
+  --accent: 217 25% 25%;
   --accent-foreground: 210 40% 98%;
-  --destructive: 0 62.8% 30.6%;
+
+  /* 危险色调：红色 */
+  --destructive: 0 70% 50%;
   --destructive-foreground: 210 40% 98%;
-  --border: 217.2 32.6% 17.5%;
-  --input: 217.2 32.6% 17.5%;
-  --ring: 212.7 26.8% 83.9%;
 
-  --chart-1: 217.2 32.6% 17.5%;
-  --chart-2: 215 20.2% 65.1%;
-  --chart-3: 0 62.8% 30.6%;
-  --chart-4: 210 40% 98%;
-  --chart-5: 222.2 47.4% 11.2%;
+  /* 成功色调：绿色 */
+  --success: 142 70% 45%;
+  --success-foreground: 0 0% 100%;
 
-  --sidebar: 222.2 84% 4.9%;
+  /* 警告色调：黄色 */
+  --warning: 38 92% 60%;
+  --warning-foreground: 0 0% 0%;
+
+  /* 信息色调：蓝色 */
+  --info: 200 100% 60%;
+  --info-foreground: 0 0% 100%;
+
+  /* 边框和输入框 */
+  --border: 217 25% 25%;
+  --input: 217 25% 25%;
+  --ring: 210 100% 60%;
+
+  /* 家谱图表颜色（暗色模式下更亮） */
+  --chart-1: 210 100% 60%;  /* 蓝色 - 父母关系 */
+  --chart-2: 142 70% 45%;   /* 绿色 - 子女关系 */
+  --chart-3: 250 70% 70%;   /* 紫色 - 兄弟姐妹关系 */
+  --chart-4: 340 82% 65%;   /* 粉色 - 配偶关系 */
+  --chart-5: 38 92% 60%;    /* 黄色 - 其他关系 */
+
+  /* 侧边栏颜色 */
+  --sidebar: 222 25% 12%;
   --sidebar-foreground: 210 40% 98%;
-  --sidebar-primary: 210 40% 98%;
-  --sidebar-primary-foreground: 222.2 47.4% 11.2%;
-  --sidebar-accent: 217.2 32.6% 17.5%;
+  --sidebar-primary: 210 100% 60%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 217 25% 25%;
   --sidebar-accent-foreground: 210 40% 98%;
-  --sidebar-border: 217.2 32.6% 17.5%;
-  --sidebar-ring: 212.7 26.8% 83.9%;
+  --sidebar-border: 217 25% 25%;
+  --sidebar-ring: 210 100% 60%;
 }
 
 @layer base {

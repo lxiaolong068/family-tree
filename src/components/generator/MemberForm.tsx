@@ -5,7 +5,11 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import { Member } from '@/types/family-tree';
+import { UserPlus, BarChart2, Save, Calendar } from 'lucide-react';
 
 interface MemberFormProps {
   currentMember: Partial<Member>;
@@ -23,100 +27,159 @@ const MemberForm: React.FC<MemberFormProps> = ({
   onSaveToDatabase
 }) => {
   return (
-    <Card className="mb-6">
-      <CardHeader>
-        <CardTitle>Add Family Member</CardTitle>
+    <Card className="mb-8 shadow-md">
+      <CardHeader className="bg-muted/50 rounded-t-xl">
+        <CardTitle className="flex items-center gap-2 text-xl">
+          <UserPlus className="h-5 w-5 text-primary" />
+          Add Family Member
+        </CardTitle>
         <CardDescription>
           Fill in the basic information for the family member. You can add complex relationships after adding the member.
         </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <Tabs defaultValue="basic" className="w-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 mb-6">
             <TabsTrigger value="basic">Basic Info</TabsTrigger>
             <TabsTrigger value="additional">Additional Info</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="basic" className="mt-4">
-            <div className="grid gap-4">
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">Name *</label>
+          <TabsContent value="basic">
+            <div className="grid gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="name" className="text-sm font-medium">
+                    Name <span className="text-destructive">*</span>
+                  </Label>
                   <Input
                     id="name"
                     placeholder="Enter name"
                     value={currentMember.name || ''}
                     onChange={(e) => onInputChange('name', e.target.value)}
+                    className="focus-visible:ring-primary"
                     required
                   />
                 </div>
-                <div>
-                  <label htmlFor="relation" className="block text-sm font-medium text-gray-700 mb-1">Relationship *</label>
+                <div className="space-y-2">
+                  <Label htmlFor="relation" className="text-sm font-medium">
+                    Relationship <span className="text-destructive">*</span>
+                  </Label>
                   <Input
                     id="relation"
                     placeholder="e.g. father, mother, son"
                     value={currentMember.relation || ''}
                     onChange={(e) => onInputChange('relation', e.target.value)}
+                    className="focus-visible:ring-primary"
                     required
                   />
                 </div>
               </div>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <div>
-                  <label htmlFor="gender" className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
-                  <select
-                    id="gender"
-                    className="w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="gender" className="text-sm font-medium">
+                    Gender
+                  </Label>
+                  <Select
                     value={currentMember.gender || 'male'}
-                    onChange={(e) => onInputChange('gender', e.target.value)}
+                    onValueChange={(value) => onInputChange('gender', value)}
                   >
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="other">Other</option>
-                  </select>
+                    <SelectTrigger id="gender" className="w-full focus-visible:ring-primary">
+                      <SelectValue placeholder="Select gender" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="male">Male</SelectItem>
+                      <SelectItem value="female">Female</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div>
-                  <label htmlFor="birthDate" className="block text-sm font-medium text-gray-700 mb-1">Birth Date</label>
+                <div className="space-y-2">
+                  <Label htmlFor="birthDate" className="text-sm font-medium flex items-center gap-1">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    Birth Date
+                  </Label>
                   <Input
                     id="birthDate"
                     type="date"
                     value={currentMember.birthDate || ''}
                     onChange={(e) => onInputChange('birthDate', e.target.value)}
+                    className="focus-visible:ring-primary"
                   />
                 </div>
               </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="additional" className="mt-4">
-            <div className="grid gap-4">
-              <div>
-                <label htmlFor="deathDate" className="block text-sm font-medium text-gray-700 mb-1">Death Date</label>
-                <Input
-                  id="deathDate"
-                  type="date"
-                  value={currentMember.deathDate || ''}
-                  onChange={(e) => onInputChange('deathDate', e.target.value)}
-                />
+          <TabsContent value="additional">
+            <div className="grid gap-6">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="deathDate" className="text-sm font-medium flex items-center gap-1">
+                    <Calendar className="h-4 w-4 text-muted-foreground" />
+                    Death Date
+                  </Label>
+                  <Input
+                    id="deathDate"
+                    type="date"
+                    value={currentMember.deathDate || ''}
+                    onChange={(e) => onInputChange('deathDate', e.target.value)}
+                    className="focus-visible:ring-primary"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="birthPlace" className="text-sm font-medium">
+                    Birth Place
+                  </Label>
+                  <Input
+                    id="birthPlace"
+                    placeholder="City, Country"
+                    value={currentMember.birthPlace || ''}
+                    onChange={(e) => onInputChange('birthPlace', e.target.value)}
+                    className="focus-visible:ring-primary"
+                  />
+                </div>
               </div>
-              <div>
-                <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <Input
+              <div className="space-y-2">
+                <Label htmlFor="description" className="text-sm font-medium">
+                  Description
+                </Label>
+                <Textarea
                   id="description"
                   placeholder="Additional information about this person"
                   value={currentMember.description || ''}
                   onChange={(e) => onInputChange('description', e.target.value)}
+                  className="min-h-[100px] focus-visible:ring-primary"
                 />
               </div>
             </div>
           </TabsContent>
         </Tabs>
       </CardContent>
-      <CardFooter className="flex flex-col space-y-2 sm:flex-row sm:space-x-2 sm:space-y-0">
-        <Button onClick={onAddMember} className="w-full sm:w-auto">Add Member</Button>
+      <CardFooter className="flex flex-col space-y-3 sm:flex-row sm:space-x-3 sm:space-y-0 bg-muted/30 rounded-b-xl py-4">
+        <Button
+          onClick={onAddMember}
+          className="w-full sm:w-auto bg-primary hover:bg-primary/90 gap-2"
+        >
+          <UserPlus className="h-4 w-4" />
+          Add Member
+        </Button>
         <div className="flex-1 sm:flex-none"></div>
-        <Button variant="outline" onClick={onGenerateChart} className="w-full sm:w-auto">Generate Chart</Button>
-        <Button variant="secondary" onClick={onSaveToDatabase} className="w-full sm:w-auto">Save to Database</Button>
+        <Button
+          variant="outline"
+          onClick={onGenerateChart}
+          className="w-full sm:w-auto border-primary/50 text-primary hover:bg-primary/10 hover:text-primary gap-2"
+        >
+          <BarChart2 className="h-4 w-4" />
+          Generate Chart
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={onSaveToDatabase}
+          className="w-full sm:w-auto gap-2"
+        >
+          <Save className="h-4 w-4" />
+          Save to Database
+        </Button>
       </CardFooter>
     </Card>
   );

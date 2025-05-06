@@ -88,7 +88,9 @@ describe('家谱工具函数测试', () => {
       expect(chart).toContain('flowchart TD');
       expect(chart).toContain('1([祖父])');
       expect(chart).toContain('2([儿子])');
-      expect(chart).toContain('1 --> 2');
+      expect(chart).toContain('1 -->|Parent| 2');
+      expect(chart).toContain('class 1 male');
+      expect(chart).toContain('class 2 male');
     });
   });
 
