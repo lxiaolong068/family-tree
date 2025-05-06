@@ -22,6 +22,7 @@ export interface Member {
   parentId?: string;       // 父节点ID（向后兼容）
   birthDate?: string;      // 出生日期
   deathDate?: string;      // 死亡日期
+  birthPlace?: string;     // 出生地点
   gender?: 'male' | 'female' | 'other'; // 性别
   description?: string;    // 描述信息
   relationships?: Relationship[]; // 与其他成员的关系
