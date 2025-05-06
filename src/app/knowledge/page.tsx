@@ -157,21 +157,36 @@ const KnowledgePage = () => {
       <p className="text-gray-700 dark:text-gray-300 mb-4">
         Family trees can be presented in various formats, each highlighting different aspects of family lineage. Common types include:
       </p>
-      <ul className="list-disc list-inside space-y-2 mb-6 text-gray-700 dark:text-gray-300">
-        <li>
-          <strong className="font-semibold text-gray-900 dark:text-white">Ancestor Chart (Pedigree Chart):</strong> Shows an individual's direct ancestors (parents, grandparents, etc.). It typically branches outwards from the individual at the bottom or left.
+      <ul className="list-disc list-inside space-y-6 mb-6 text-gray-700 dark:text-gray-300">
+        <li className="space-y-2">
+          <div>
+            <strong className="font-semibold text-gray-900 dark:text-white">Ancestor Chart (Pedigree Chart):</strong> Shows an individual's direct ancestors (parents, grandparents, etc.). It typically branches outwards from the individual at the bottom or left.
+          </div>
+          <img src="/images/knowledge/ancestry-tree-7933639-1280.png" alt="Ancestor Chart Example" className="mt-2 rounded-md border max-w-full md:max-w-md" />
         </li>
-        <li>
-          <strong className="font-semibold text-gray-900 dark:text-white">Descendant Chart:</strong> Starts with a common ancestor (or couple) and shows all their descendants. This type of chart grows downwards or outwards.
+        <li className="space-y-2">
+          <div>
+            <strong className="font-semibold text-gray-900 dark:text-white">Descendant Chart:</strong> Starts with a common ancestor (or couple) and shows all their descendants. This type of chart grows downwards or outwards.
+          </div>
+          <img src="/images/knowledge/family-tree-295298-1280.png" alt="Descendant Chart Example" className="mt-2 rounded-md border max-w-full md:max-w-md" />
         </li>
-        <li>
-          <strong className="font-semibold text-gray-900 dark:text-white">Family Group Sheet:</strong> Details information about one family unit (parents and children), including names, dates, and places for vital events.
+        <li className="space-y-2">
+          <div>
+            <strong className="font-semibold text-gray-900 dark:text-white">Family Group Sheet:</strong> Details information about one family unit (parents and children), including names, dates, and places for vital events.
+          </div>
+          <img src="/images/knowledge/frame-3554310-1280.jpg" alt="Family Group Sheet Example" className="mt-2 rounded-md border max-w-full md:max-w-sm" />
         </li>
-        <li>
-          <strong className="font-semibold text-gray-900 dark:text-white">Fan Chart:</strong> A circular or semi-circular chart that displays ancestors, often used to visualize many generations compactly.
+        <li className="space-y-2">
+          <div>
+            <strong className="font-semibold text-gray-900 dark:text-white">Fan Chart:</strong> A circular or semi-circular chart that displays ancestors, often used to visualize many generations compactly.
+          </div>
+          <img src="/images/knowledge/family-tree-8249245-1280.png" alt="Fan Chart Example" className="mt-2 rounded-md border max-w-full md:max-w-xs" />
         </li>
-        <li>
-          <strong className="font-semibold text-gray-900 dark:text-white">All Relatives (or Dropline) Chart:</strong> A more comprehensive chart that attempts to show all known relatives, including aunts, uncles, cousins, etc. Can become very large and complex.
+        <li className="space-y-2">
+          <div>
+            <strong className="font-semibold text-gray-900 dark:text-white">All Relatives (or Dropline) Chart:</strong> A more comprehensive chart that attempts to show all known relatives, including aunts, uncles, cousins, etc. Can become very large and complex.
+          </div>
+          <img src="/images/knowledge/family-9294369-1280.png" alt="All Relatives Chart Example" className="mt-2 rounded-md border max-w-full md:max-w-lg" />
         </li>
       </ul>
       <p className="text-gray-700 dark:text-gray-300 mb-4">
