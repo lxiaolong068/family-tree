@@ -13,9 +13,52 @@ import {
 } from "@/components/ui/accordion";
 
 export const metadata: Metadata = {
-  title: "How to Make a Family Tree: Step-by-Step Guide & Tips | Family Tree Maker",
-  description: "Learn how to make a family tree with our comprehensive guide. Includes detailed steps, tips for gathering family information, and best practices for creating beautiful family trees.",
-  keywords: "how to make a family tree, family tree tutorial, family tree guide, genealogy guide, ancestry chart how-to",
+  title: "How to Make a Family Tree: A Comprehensive Guide (2024) | Family Tree CC",
+  description: "Your complete step-by-step guide to making a family tree. Learn to gather info, choose formats, use our free tools, and share your ancestry. Updated for 2024 by Family Tree CC.",
+  keywords: ["how to make a family tree", "family tree tutorial", "family tree guide", "genealogy guide", "ancestry chart how-to", "family tree 2024 guide", "Family Tree CC"],
+  openGraph: {
+    title: "How to Make a Family Tree: A Comprehensive Guide (2024) | Family Tree CC",
+    description: "Your complete step-by-step guide to making a family tree. Learn to gather info, choose formats, use our free tools, and share your ancestry. Updated for 2024 by Family Tree CC.",
+    url: "https://www.family-tree.cc/how-to-make-a-family-tree/",
+    siteName: "Family Tree CC",
+    images: [
+      {
+        url: "https://www.family-tree.cc/og-how-to-make-family-tree.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Guide to Making a Family Tree - Family Tree CC",
+      },
+    ],
+    locale: "en_US",
+    type: "article",
+    publishedTime: "2024-01-01T00:00:00Z",
+    modifiedTime: new Date().toISOString(),
+    authors: ["Family Tree CC Team"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "How to Make a Family Tree: A Comprehensive Guide (2024) | Family Tree CC",
+    description: "Your complete step-by-step guide to making a family tree. Updated for 2024 by Family Tree CC.",
+  },
+  alternates: {
+    canonical: "https://www.family-tree.cc/how-to-make-a-family-tree/",
+  },
+};
+
+const BreadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Home",
+    "item": "https://www.family-tree.cc/"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "How to Make a Family Tree",
+    "item": "https://www.family-tree.cc/how-to-make-a-family-tree/"
+  }]
 };
 
 export default function HowToMakeFamilyTreePage() {
@@ -101,6 +144,11 @@ export default function HowToMakeFamilyTreePage() {
       description="Follow our comprehensive step-by-step guide to create your own beautiful family tree"
     >
       {/* Structured Data for SEO */}
+      <Script
+        id="structured-data-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(BreadcrumbSchema) }}
+      />
       <Script
         id="schema-how-to"
         type="application/ld+json"
@@ -230,7 +278,7 @@ export default function HowToMakeFamilyTreePage() {
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900 dark:text-white">Online Tool Access</h3>
-                  <p className="text-sm text-gray-600 dark:text-gray-300">Access to our family tree maker tool for easy creation</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Access to our <Link href="/generator" className="text-blue-600 hover:underline">family tree maker tool</Link> for easy creation</p>
                 </div>
               </div>
 
@@ -319,6 +367,13 @@ export default function HowToMakeFamilyTreePage() {
                             <div className="text-gray-600 dark:text-gray-300 text-xs mt-1">{type.description}</div>
                           </div>
                         ))}
+                      </div>
+                    )}
+                    {index === 1 && (
+                      <div className="mt-2">
+                        <Link href="/templates" className="text-blue-600 hover:underline">
+                          Explore different family tree templates to find one that suits your needs.
+                        </Link>
                       </div>
                     )}
 
@@ -480,7 +535,7 @@ export default function HowToMakeFamilyTreePage() {
                 Have more questions?
               </h3>
               <p className="text-sm text-gray-600 dark:text-gray-300">
-                Check out our <Link href="/knowledge" className="text-blue-600 hover:underline">Knowledge Base</Link> for more detailed information about family trees and genealogy research, or <Link href="/contact" className="text-blue-600 hover:underline">contact us</Link> with your specific questions.
+                Check out our <Link href="/knowledge" className="text-blue-600 hover:underline">Knowledge Base</Link> for more detailed information about family trees and genealogy research.
               </p>
             </div>
           </div>
@@ -575,8 +630,6 @@ export default function HowToMakeFamilyTreePage() {
           })
         }}
       />
-
-
     </PageLayout>
   );
 }

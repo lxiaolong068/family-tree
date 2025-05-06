@@ -1,10 +1,44 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import type { Metadata } from "next";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Users, FileText, Download, Star, ChevronRight } from "lucide-react";
+
+// Add new metadata object
+export const metadata: Metadata = {
+  title: "Free Online Family Tree Maker | Create & Share Your Ancestry | Family Tree CC",
+  description: "Easily create, visualize, and share your family tree online for free with Family Tree CC. Discover your ancestry with our step-by-step guide and beautiful templates. Start preserving your family history today!",
+  keywords: ["free family tree maker", "online family tree", "create family tree", "share family tree", "ancestry chart", "genealogy tool", "family history", "family tree templates", "Family Tree CC"],
+  openGraph: {
+    title: "Free Online Family Tree Maker | Create & Share Your Ancestry | Family Tree CC",
+    description: "Easily create, visualize, and share your family tree online for free with Family Tree CC. Discover your ancestry with our step-by-step guide and beautiful templates.",
+    url: "https://www.family-tree.cc/", // Assuming this is the correct homepage URL
+    siteName: "Family Tree CC", // Updated siteName
+    images: [ // It's good practice to specify an image for OpenGraph
+      {
+        url: "https://www.family-tree.cc/og-image.jpg", // Replace with your actual OG image URL
+        width: 1200,
+        height: 630,
+        alt: "Family Tree CC - Online Family Tree Maker",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Free Online Family Tree Maker | Create & Share Your Ancestry | Family Tree CC",
+    description: "Easily create, visualize, and share your family tree online for free with Family Tree CC. Discover your ancestry with our step-by-step guide and beautiful templates.",
+    // images: ['https://www.family-tree.cc/twitter-image.jpg'], // Replace with your actual Twitter image URL if different from OG
+  },
+  // It's generally recommended to define alternates for canonical URLs if not handled elsewhere
+  alternates: {
+    canonical: "https://www.family-tree.cc/",
+  },
+};
 
 const HomePage = () => {
   return (
@@ -12,7 +46,7 @@ const HomePage = () => {
     <div className="container mx-auto py-10">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
         <div className="mb-4 md:mb-0">
-          <h1 className="text-3xl font-bold">How to Make a Family Tree</h1>
+          <h1 className="text-3xl font-bold"><Link href="/how-to-make-a-family-tree" className="hover:underline">How to Make a Family Tree</Link></h1>
           <p className="text-gray-700 mt-2">Learn how to make a family tree with our simple step-by-step guide and free online tools. Create, display, and share your family history easily.</p>
         </div>
       </div>
@@ -101,6 +135,7 @@ const HomePage = () => {
               <h3 className="text-xl font-semibold mb-2 group-hover:text-primary transition-colors">Easy-to-Use Tools</h3>
               <p className="text-muted-foreground mb-4">
                 Our intuitive family tree maker helps you create beautiful family trees in minutes.
+                Or try our new <Link href="/drag-editor" className="text-primary hover:underline">Drag & Drop Editor</Link> for a more visual experience.
               </p>
               <Link href="/generator" className="text-primary flex items-center text-sm font-medium">
                 Get Started <ChevronRight className="h-4 w-4 ml-1" />
@@ -167,7 +202,7 @@ const HomePage = () => {
             <div className="absolute -top-4 -left-4 bg-secondary text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">2</div>
             <div className="pt-6">
               <h3 className="font-bold text-xl mb-3 group-hover:text-secondary transition-colors">Choose a Family Tree Style</h3>
-              <p className="text-muted-foreground">Select from ancestor charts, descendant charts, or hourglass charts to best suit your needs.</p>
+              <p className="text-muted-foreground">Select from ancestor charts, descendant charts, or hourglass charts to best suit your needs. Explore options on our <Link href="/templates" className="text-secondary hover:underline">templates page</Link>.</p>
             </div>
           </div>
 
@@ -175,7 +210,7 @@ const HomePage = () => {
             <div className="absolute -top-4 -left-4 bg-[#f59e0b] text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-xl shadow-lg group-hover:scale-110 transition-transform">3</div>
             <div className="pt-6">
               <h3 className="font-bold text-xl mb-3 group-hover:text-[#f59e0b] transition-colors">Create Using Our Tool</h3>
-              <p className="text-muted-foreground">Use our online tool to organize information and generate a visual family tree.</p>
+              <p className="text-muted-foreground">Use our <Link href="/generator" className="text-[#f59e0b] hover:underline">online generator</Link> to organize information and generate a visual family tree.</p>
             </div>
           </div>
 
@@ -444,12 +479,12 @@ const HomePage = () => {
           {
             "@type": "HowToStep",
             "name": "Choose a Family Tree Style",
-            "text": "Select from ancestor charts, descendant charts, or hourglass charts to best suit your needs."
+            "text": "Select from ancestor charts, descendant charts, or hourglass charts to best suit your needs. Explore options on our templates page."
           },
           {
             "@type": "HowToStep",
             "name": "Create Using Our Tool",
-            "text": "Use our online tool to organize information and generate a visual family tree."
+            "text": "Use our online generator to organize information and generate a visual family tree."
           },
           {
             "@type": "HowToStep",

@@ -10,9 +10,36 @@ import {
 import PageLayout from "@/components/PageLayout";
 
 export const metadata: Metadata = {
-  title: "Family Tree Knowledge | Genealogy Guide & FAQs",
-  description: "Learn about family trees, genealogy charts, and how to create your own family history record. Includes step-by-step guides and frequently asked questions.",
-  keywords: "family tree knowledge, genealogy guide, family tree FAQ, how to create family tree",
+  title: "Family Tree Knowledge Base & Genealogy FAQ | Family Tree CC",
+  description: "Find answers to your family tree questions in our knowledge base. Learn about genealogy research, family history tips, and how to use our tools at Family Tree CC.",
+  keywords: ["family tree knowledge base", "genealogy faq", "family history questions", "ancestry research tips", "learn family tree", "Family Tree CC"],
+  openGraph: {
+    title: "Family Tree Knowledge Base & Genealogy FAQ | Family Tree CC",
+    description: "Find answers to your family tree questions in our knowledge base. Learn about genealogy research and family history tips.",
+    url: "https://www.family-tree.cc/knowledge/",
+    siteName: "Family Tree CC",
+    images: [
+      {
+        url: "https://www.family-tree.cc/og-knowledge.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Family Tree CC - Knowledge Base & FAQ",
+      },
+    ],
+    locale: "en_US",
+    type: "article",
+    publishedTime: "2024-01-15T00:00:00Z",
+    modifiedTime: new Date().toISOString(),
+    authors: ["Family Tree CC Team"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Family Tree Knowledge Base & Genealogy FAQ | Family Tree CC",
+    description: "Find answers to your family tree questions and learn genealogy tips from Family Tree CC.",
+  },
+  alternates: {
+    canonical: "https://www.family-tree.cc/knowledge/",
+  },
 };
 
 const KnowledgePage = () => {
@@ -83,23 +110,23 @@ const KnowledgePage = () => {
             "@graph": [
               {
                 "@type": "Article",
-                "headline": "Family Tree Knowledge",
-                "description": "A family tree, also known as a genealogical chart, is a document that records family lineage and important events of family members.",
-                "image": "https://www.family-tree.cc/knowledge-image.jpg",
+                "headline": "Family Tree Knowledge Base & Genealogy FAQ",
+                "description": "Find answers to your family tree questions in our knowledge base. Learn about genealogy research, family history tips, and how to use our tools.",
+                "image": "https://www.family-tree.cc/og-knowledge.jpg",
                 "author": {
                   "@type": "Organization",
-                  "name": "Family Tree Maker"
+                  "name": "Family Tree CC"
                 },
                 "publisher": {
                   "@type": "Organization",
-                  "name": "Family Tree Maker",
+                  "name": "Family Tree CC",
                   "logo": {
                     "@type": "ImageObject",
                     "url": "https://www.family-tree.cc/logo.png"
                   }
                 },
-                "datePublished": "2025-04-23",
-                "dateModified": "2025-04-23",
+                "datePublished": "2024-01-15T00:00:00Z",
+                "dateModified": new Date().toISOString(),
                 "mainEntityOfPage": {
                   "@type": "WebPage",
                   "@id": "https://www.family-tree.cc/knowledge/"

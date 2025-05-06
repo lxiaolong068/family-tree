@@ -13,9 +13,33 @@ import PageLayout from "@/components/PageLayout";
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Family Tree Templates | Free Downloadable Templates",
-  description: "Download free family tree templates in various styles. Choose from classic genealogy charts, modern minimalist designs, and illustrated versions.",
-  keywords: "family tree templates, genealogy templates, family tree chart templates, free family tree templates",
+  title: "Family Tree Templates | Free Printable Charts & Designs | Family Tree CC",
+  description: "Explore a collection of free family tree templates from Family Tree CC. Download printable ancestry charts and modern designs to beautifully display your family history.",
+  keywords: ["family tree templates", "free family tree templates", "printable family tree charts", "ancestry chart templates", "genealogy templates", "download family tree", "Family Tree CC"],
+  openGraph: {
+    title: "Family Tree Templates | Free Printable Charts & Designs | Family Tree CC",
+    description: "Explore a collection of free family tree templates from Family Tree CC. Download printable ancestry charts and modern designs.",
+    url: "https://www.family-tree.cc/templates/",
+    siteName: "Family Tree CC",
+    images: [
+      {
+        url: "https://www.family-tree.cc/og-templates.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Family Tree CC - Free Family Tree Templates",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Family Tree Templates | Free Printable Charts & Designs | Family Tree CC",
+    description: "Explore free, downloadable family tree templates from Family Tree CC.",
+  },
+  alternates: {
+    canonical: "https://www.family-tree.cc/templates/",
+  },
 };
 
 // Template data - images and files should be placed in the public directory in actual application

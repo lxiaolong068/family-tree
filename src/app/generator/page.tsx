@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import type { Metadata } from "next"; // Import Metadata type
 import { Member, FamilyTree, SaveFamilyTreeResult, Relationship, RelationType } from '@/types/family-tree';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import { ErrorDialog } from '@/components/ui/error-dialog';
@@ -28,6 +29,94 @@ import { useFamilyTreeMembers } from '@/hooks/useFamilyTreeMembers';
 import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import Script from 'next/script';
+
+// Add new metadata object
+export const metadata: Metadata = {
+  title: "Family Tree Generator | Create Your Ancestry Chart Online | Family Tree CC",
+  description: "Use our free and easy online family tree generator to build your family chart. Input your family members, visualize relationships, and create your ancestry tree in minutes with Family Tree CC.",
+  keywords: ["family tree generator", "create family tree", "build family tree", "online family tree tool", "ancestry chart maker", "genealogy software", "free family tree generator", "Family Tree CC"],
+  openGraph: {
+    title: "Family Tree Generator | Create Your Ancestry Chart Online | Family Tree CC",
+    description: "Use our free and easy online family tree generator to build your family chart. Input your family members, visualize relationships, and create your ancestry tree in minutes with Family Tree CC.",
+    url: "https://www.family-tree.cc/generator/",
+    siteName: "Family Tree CC",
+    images: [
+      {
+        url: "https://www.family-tree.cc/og-generator.jpg", // Replace with your actual OG image for the generator page
+        width: 1200,
+        height: 630,
+        alt: "Family Tree CC - Online Family Tree Generator Tool",
+      },
+    ],
+    locale: "en_US",
+    type: "website", // Can also be 'product' if you prefer to classify the generator as such
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Family Tree Generator | Create Your Ancestry Chart Online | Family Tree CC",
+    description: "Use our free and easy online family tree generator to build your family chart with Family Tree CC.",
+    // images: ['https://www.family-tree.cc/twitter-generator.jpg'], // Replace with your actual Twitter image for the generator page
+  },
+  alternates: {
+    canonical: "https://www.family-tree.cc/generator/",
+  },
+};
+
+const SoftwareApplicationSchema = {
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "name": "Family Tree Generator - Family Tree CC",
+  "operatingSystem": "Web",
+  "applicationCategory": "MultimediaApplication",
+  "softwareVersion": "1.0.0",
+  "featureList": [
+    "Create and manage family members",
+    "Visualize family relationships with interactive charts",
+    "Save family trees to your account (requires login)",
+    "Load family trees from your account or local storage",
+    "Export family trees as image (PNG, SVG, JPG)",
+    "Drag and drop editor for easy tree building (beta)"
+  ],
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "4.8",
+    "ratingCount": "250"
+  },
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "description": "Create and visualize your family tree online with our free and easy-to-use generator. Build your ancestry chart, add family members, and explore your heritage with Family Tree CC.",
+  "url": "https://www.family-tree.cc/generator/",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://www.family-tree.cc/generator/"
+  },
+  "image": "https://www.family-tree.cc/og-generator.jpg", // Same as OpenGraph image
+  "creator": {
+    "@type": "Organization",
+    "name": "Family Tree CC",
+    "url": "https://www.family-tree.cc"
+  },
+  "keywords": "family tree generator, create family tree, build family tree, online family tree tool, ancestry chart maker, genealogy software, free family tree generator"
+};
+
+const BreadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+    "@type": "ListItem",
+    "position": 1,
+    "name": "Home",
+    "item": "https://www.family-tree.cc/"
+  },{
+    "@type": "ListItem",
+    "position": 2,
+    "name": "Family Tree Generator",
+    "item": "https://www.family-tree.cc/generator/"
+  }]
+};
 
 const GeneratorPage = () => {
   // 认证状态
@@ -481,124 +570,101 @@ const GeneratorPage = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      {/* Structured Data for SEO */}
+    <>
       <Script
-        id="schema-generator"
+        id="structured-data-softwareapplication"
         type="application/ld+json"
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "Family Tree Generator",
-            "applicationCategory": "UtilityApplication",
-            "operatingSystem": "Any",
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "USD"
-            },
-            "description": "Create your family tree with our easy-to-use online generator. Add family members, visualize relationships, and export your family tree.",
-            "featureList": [
-              "Add and manage family members",
-              "Visualize family relationships",
-              "Export as image or PDF",
-              "Save to database",
-              "Local storage backup"
-            ],
-            "screenshot": "https://www.family-tree.cc/generator-screenshot.jpg",
-            "softwareVersion": "1.0",
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": "4.8",
-              "ratingCount": "156"
-            }
-          })
-        }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(SoftwareApplicationSchema) }}
       />
-
-      <h1 className="text-2xl font-bold mb-6">Family Tree Generator</h1>
-
-      {/* 使用拆分出来的组件 */}
-      <MemberForm
-        currentMember={currentMember}
-        onInputChange={handleInputChange}
-        onAddMember={handleAddMember}
-        onGenerateChart={handleGenerateChart}
-        onSaveToDatabase={handleSaveToDatabase}
+      <Script
+        id="structured-data-breadcrumb"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(BreadcrumbSchema) }}
       />
+      <div className="container mx-auto p-4">
+        <h1 className="text-3xl font-bold text-center my-6">Family Tree Generator</h1>
 
-      <MemberList
-        members={familyTree.members}
-        onDeleteMember={handleDeleteMember}
-        onClearFamilyTree={handleClearFamilyTree}
-        onAddRelationship={handleAddRelationship}
-        onAddRelationships={handleAddRelationships}
-        onRemoveRelationship={handleRemoveRelationship}
-      />
+        {/* 使用拆分出来的组件 */}
+        <MemberForm
+          currentMember={currentMember}
+          onInputChange={handleInputChange}
+          onAddMember={handleAddMember}
+          onGenerateChart={handleGenerateChart}
+          onSaveToDatabase={handleSaveToDatabase}
+        />
 
-      <FamilyTreeChart ref={chartRef} chartDefinition={chartDefinition} />
+        <MemberList
+          members={familyTree.members}
+          onDeleteMember={handleDeleteMember}
+          onClearFamilyTree={handleClearFamilyTree}
+          onAddRelationship={handleAddRelationship}
+          onAddRelationships={handleAddRelationships}
+          onRemoveRelationship={handleRemoveRelationship}
+        />
 
-      {/* 导出选项 */}
-      <ExportOptions
-        familyTreeName={familyTree.name || 'family-tree'}
-        chartRef={chartRef}
-        disabled={!chartDefinition || familyTree.members.length === 0}
-      />
+        <FamilyTreeChart ref={chartRef} chartDefinition={chartDefinition} />
 
-      {/* 拖拽编辑器链接 */}
-      <div className="mt-4 mb-6 p-4 border border-dashed border-blue-300 rounded-lg bg-blue-50">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            <h3 className="text-lg font-medium text-blue-800">Try our new Drag & Drop Editor!</h3>
-            <p className="text-sm text-blue-600">
-              We've added a new drag and drop interface for easier family tree editing.
-              Your current family tree data will be available in the new editor.
-            </p>
+        {/* 导出选项 */}
+        <ExportOptions
+          familyTreeName={familyTree.name || 'family-tree'}
+          chartRef={chartRef}
+          disabled={!chartDefinition || familyTree.members.length === 0}
+        />
+
+        {/* 拖拽编辑器链接 */}
+        <div className="mt-4 mb-6 p-4 border border-dashed border-blue-300 rounded-lg bg-blue-50">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-medium text-blue-800">Try our new Drag & Drop Editor!</h3>
+              <p className="text-sm text-blue-600">
+                We've added a new drag and drop interface for easier family tree editing.
+                Your current family tree data will be available in the new editor.
+              </p>
+            </div>
+            <Link href="/drag-editor" passHref>
+              <Button className="whitespace-nowrap">
+                Try Drag Editor
+              </Button>
+            </Link>
           </div>
-          <Link href="/drag-editor" passHref>
-            <Button className="whitespace-nowrap">
-              Try Drag Editor
-            </Button>
-          </Link>
         </div>
+
+        {/* 成功对话框 */}
+        <SuccessDialog
+          isOpen={successDialogOpen}
+          onClose={handleCloseSuccessDialog}
+          title={successDialogData.title}
+          description={successDialogData.description}
+          familyTreeId={successDialogData.familyTreeId}
+          familyTreeUrl={successDialogData.familyTreeUrl}
+        />
+
+        {/* 错误对话框 */}
+        <ErrorDialog
+          isOpen={errorDialogOpen}
+          onClose={handleCloseErrorDialog}
+          title={errorDialogData.title}
+          description={errorDialogData.description}
+          actions={errorDialogData.actions}
+        />
+
+        {/* 登录提示对话框 */}
+        <SaveLoginPrompt
+          open={showLoginPrompt}
+          onClose={() => setShowLoginPrompt(false)}
+          onLogin={() => {
+            setShowLoginPrompt(false);
+            setShowLoginDialog(true);
+          }}
+        />
+
+        {/* 登录对话框 */}
+        <LoginDialog
+          open={showLoginDialog}
+          onClose={() => setShowLoginDialog(false)}
+        />
       </div>
-
-      {/* 成功对话框 */}
-      <SuccessDialog
-        isOpen={successDialogOpen}
-        onClose={handleCloseSuccessDialog}
-        title={successDialogData.title}
-        description={successDialogData.description}
-        familyTreeId={successDialogData.familyTreeId}
-        familyTreeUrl={successDialogData.familyTreeUrl}
-      />
-
-      {/* 错误对话框 */}
-      <ErrorDialog
-        isOpen={errorDialogOpen}
-        onClose={handleCloseErrorDialog}
-        title={errorDialogData.title}
-        description={errorDialogData.description}
-        actions={errorDialogData.actions}
-      />
-
-      {/* 登录提示对话框 */}
-      <SaveLoginPrompt
-        open={showLoginPrompt}
-        onClose={() => setShowLoginPrompt(false)}
-        onLogin={() => {
-          setShowLoginPrompt(false);
-          setShowLoginDialog(true);
-        }}
-      />
-
-      {/* 登录对话框 */}
-      <LoginDialog
-        open={showLoginDialog}
-        onClose={() => setShowLoginDialog(false)}
-      />
-    </div>
+    </>
   );
 };
 
