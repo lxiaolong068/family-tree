@@ -41,12 +41,29 @@ const DraggableMember: React.FC<DraggableMemberProps> = ({
     zIndex: isActive ? 10 : 1,
   } : undefined;
 
-  // 根据性别选择不同的边框颜色
-  const genderBorderColor = member.gender === 'male'
-    ? 'border-blue-400'
-    : member.gender === 'female'
-      ? 'border-pink-400'
-      : 'border-gray-400';
+  // 根据性别选择不同的样式
+  const genderStyles = {
+    male: {
+      border: 'border-blue-400',
+      bg: 'bg-blue-50',
+      icon: 'text-blue-500',
+      shadow: 'shadow-blue-200'
+    },
+    female: {
+      border: 'border-pink-400',
+      bg: 'bg-pink-50',
+      icon: 'text-pink-500',
+      shadow: 'shadow-pink-200'
+    },
+    other: {
+      border: 'border-green-400',
+      bg: 'bg-green-50',
+      icon: 'text-green-500',
+      shadow: 'shadow-green-200'
+    }
+  };
+
+  const genderStyle = genderStyles[member.gender || 'other'];
 
   return (
     <div
@@ -59,15 +76,20 @@ const DraggableMember: React.FC<DraggableMemberProps> = ({
       )}
     >
       <Card className={cn(
-        "w-48 border-2",
-        genderBorderColor,
-        isRoot && "border-green-500",
-        isActive && "shadow-lg"
+        "w-48 border-2 transition-all duration-200",
+        genderStyle.border,
+        genderStyle.bg,
+        isRoot && "border-amber-500 border-dashed",
+        isActive && `shadow-lg ${genderStyle.shadow}`,
+        isOver && "scale-105"
       )}>
         <CardContent className="p-3">
           <div className="flex items-center justify-between mb-2">
             <div
-              className="cursor-grab p-1 rounded hover:bg-gray-100"
+              className={cn(
+                "cursor-grab p-1 rounded-md transition-colors",
+                "hover:bg-white/80 active:cursor-grabbing"
+              )}
               {...attributes}
               {...listeners}
             >
@@ -79,7 +101,7 @@ const DraggableMember: React.FC<DraggableMemberProps> = ({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-6 w-6"
+                  className="h-6 w-6 hover:bg-red-50 hover:text-red-500 transition-colors"
                   onClick={() => onRemoveParent?.(member.id)}
                   title="Remove Parent Relation"
                 >
@@ -90,7 +112,7 @@ const DraggableMember: React.FC<DraggableMemberProps> = ({
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-6 w-6"
+                className="h-6 w-6 hover:bg-red-50 hover:text-red-600 transition-colors"
                 onClick={() => onDelete?.(member.id)}
                 title="Delete Member"
               >
@@ -102,8 +124,7 @@ const DraggableMember: React.FC<DraggableMemberProps> = ({
           <div className="flex items-center space-x-2 mb-2">
             <UserCircle className={cn(
               "h-8 w-8",
-              member.gender === 'male' ? 'text-blue-500' :
-              member.gender === 'female' ? 'text-pink-500' : 'text-gray-500'
+              genderStyle.icon
             )} />
             <div>
               <div className="font-medium text-sm">{member.name}</div>
@@ -112,15 +133,20 @@ const DraggableMember: React.FC<DraggableMemberProps> = ({
           </div>
 
           {member.birthDate && (
-            <div className="text-xs text-gray-500 mt-1">
+            <div className="text-xs text-gray-500 mt-1 bg-white/50 p-1 rounded">
               Birth: {member.birthDate}
+              {member.deathDate && <span> | Death: {member.deathDate}</span>}
             </div>
           )}
 
           <Button
             variant="ghost"
             size="sm"
-            className="w-full mt-2 text-xs h-7 border border-dashed border-gray-300"
+            className={cn(
+              "w-full mt-2 text-xs h-7 border border-dashed",
+              "hover:bg-white/80 transition-colors",
+              "border-gray-300 hover:border-primary"
+            )}
             onClick={() => onAddChild?.(member.id)}
           >
             <PlusCircle className="h-3 w-3 mr-1" />

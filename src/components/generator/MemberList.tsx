@@ -5,8 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Member, RelationType, Relationship } from '@/types/family-tree';
-import { Plus, UserPlus, Trash2, ChevronDown, ChevronRight, Users, Calendar, User } from 'lucide-react';
+import { Plus, UserPlus, Trash2, ChevronDown, ChevronRight, Users, Calendar, User, UsersRound } from 'lucide-react';
 import RelationshipSelector from './RelationshipSelector';
+import BatchRelationshipSelector from './BatchRelationshipSelector';
 import RelationshipList from './RelationshipList';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { cn } from '@/lib/utils';
@@ -16,6 +17,7 @@ interface MemberListProps {
   onDeleteMember: (id: string) => void;
   onClearFamilyTree: () => void;
   onAddRelationship?: (memberId: string, relationship: Relationship) => void;
+  onAddRelationships?: (memberId: string, relationships: Relationship[]) => void;
   onRemoveRelationship?: (memberId: string, targetId: string, relationType: RelationType) => void;
 }
 
@@ -24,10 +26,12 @@ const MemberList: React.FC<MemberListProps> = ({
   onDeleteMember,
   onClearFamilyTree,
   onAddRelationship,
+  onAddRelationships,
   onRemoveRelationship
 }) => {
   // 关系选择器状态
   const [relationshipSelectorOpen, setRelationshipSelectorOpen] = useState(false);
+  const [batchRelationshipSelectorOpen, setBatchRelationshipSelectorOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState<Member | null>(null);
 
   // 展开状态
@@ -43,10 +47,23 @@ const MemberList: React.FC<MemberListProps> = ({
     setRelationshipSelectorOpen(true);
   };
 
+  // 处理批量添加关系按钮点击
+  const handleBatchRelationshipClick = (member: Member) => {
+    setSelectedMember(member);
+    setBatchRelationshipSelectorOpen(true);
+  };
+
   // 处理添加关系
   const handleAddRelationship = (memberId: string, relationship: Relationship) => {
     if (onAddRelationship) {
       onAddRelationship(memberId, relationship);
+    }
+  };
+
+  // 处理批量添加关系
+  const handleAddRelationships = (memberId: string, relationships: Relationship[]) => {
+    if (onAddRelationships) {
+      onAddRelationships(memberId, relationships);
     }
   };
 
@@ -136,7 +153,7 @@ const MemberList: React.FC<MemberListProps> = ({
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"
@@ -147,7 +164,19 @@ const MemberList: React.FC<MemberListProps> = ({
                         }}
                       >
                         <UserPlus className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">Add Relation</span>
+                        <span className="hidden xs:inline">Add Relation</span>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="h-8 gap-1 text-secondary border-secondary/30 hover:bg-secondary/10"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleBatchRelationshipClick(member);
+                        }}
+                      >
+                        <UsersRound className="h-3.5 w-3.5" />
+                        <span className="hidden xs:inline">Batch Add</span>
                       </Button>
                       <Button
                         variant="outline"
@@ -159,7 +188,7 @@ const MemberList: React.FC<MemberListProps> = ({
                         }}
                       >
                         <Trash2 className="h-3.5 w-3.5" />
-                        <span className="hidden sm:inline">Delete</span>
+                        <span className="hidden xs:inline">Delete</span>
                       </Button>
                     </div>
                   </div>
@@ -204,13 +233,22 @@ const MemberList: React.FC<MemberListProps> = ({
 
         {/* 关系选择器对话框 */}
         {selectedMember && (
-          <RelationshipSelector
-            isOpen={relationshipSelectorOpen}
-            onClose={() => setRelationshipSelectorOpen(false)}
-            member={selectedMember}
-            availableMembers={members}
-            onAddRelationship={handleAddRelationship}
-          />
+          <>
+            <RelationshipSelector
+              isOpen={relationshipSelectorOpen}
+              onClose={() => setRelationshipSelectorOpen(false)}
+              member={selectedMember}
+              availableMembers={members}
+              onAddRelationship={handleAddRelationship}
+            />
+            <BatchRelationshipSelector
+              isOpen={batchRelationshipSelectorOpen}
+              onClose={() => setBatchRelationshipSelectorOpen(false)}
+              member={selectedMember}
+              availableMembers={members}
+              onAddRelationships={handleAddRelationships}
+            />
+          </>
         )}
       </CardContent>
     </Card>

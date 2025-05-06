@@ -427,6 +427,33 @@ export function addRelationshipToMember(
 }
 
 /**
+ * 批量添加关系到成员
+ * @param familyTree 家谱对象
+ * @param memberId 成员ID
+ * @param relationships 关系对象数组
+ * @returns 更新后的家谱对象
+ */
+export function addRelationshipsToMember(
+  familyTree: FamilyTree,
+  memberId: string,
+  relationships: Relationship[]
+): FamilyTree {
+  // 如果没有关系要添加，直接返回原家谱
+  if (!relationships || relationships.length === 0) {
+    return familyTree;
+  }
+
+  // 逐个添加关系，每次更新家谱
+  let updatedFamilyTree = { ...familyTree };
+
+  for (const relationship of relationships) {
+    updatedFamilyTree = addRelationshipToMember(updatedFamilyTree, memberId, relationship);
+  }
+
+  return updatedFamilyTree;
+}
+
+/**
  * 移除成员的关系
  * @param familyTree 家谱对象
  * @param memberId 成员ID

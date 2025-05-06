@@ -16,6 +16,7 @@ import {
   saveFamilyTreeToDatabase,
   loadFamilyTreeFromDatabase,
   addRelationshipToMember,
+  addRelationshipsToMember,
   removeRelationship
 } from '@/lib/family-tree-utils';
 import { isDatabaseConfigured } from '@/db';
@@ -271,6 +272,38 @@ const GeneratorPage = () => {
     }
   };
 
+  // 批量添加关系
+  const handleAddRelationships = (memberId: string, relationships: Relationship[]) => {
+    try {
+      // 使用工具函数批量添加关系
+      const updatedFamilyTree = addRelationshipsToMember(familyTree, memberId, relationships);
+
+      // 更新家谱状态
+      setFamilyTree(updatedFamilyTree);
+
+      // 保存到本地存储（作为备份）
+      saveFamilyTreeToLocalStorage(updatedFamilyTree);
+
+      // 更新图表
+      updateChartDefinition(updatedFamilyTree.members);
+
+      // 显示成功消息
+      setSuccessDialogData({
+        title: "Relationships Added",
+        description: `${relationships.length} relationship${relationships.length !== 1 ? 's' : ''} have been successfully added.`
+      });
+      setSuccessDialogOpen(true);
+    } catch (error) {
+      console.error('Error adding relationships:', error);
+      // 显示错误对话框
+      setErrorDialogData({
+        title: "Error Adding Relationships",
+        description: error instanceof Error ? error.message : 'An unknown error occurred'
+      });
+      setErrorDialogOpen(true);
+    }
+  };
+
   // 移除关系
   const handleRemoveRelationship = (memberId: string, targetId: string, relationType: RelationType) => {
     try {
@@ -468,6 +501,7 @@ const GeneratorPage = () => {
         onDeleteMember={handleDeleteMember}
         onClearFamilyTree={handleClearFamilyTree}
         onAddRelationship={handleAddRelationship}
+        onAddRelationships={handleAddRelationships}
         onRemoveRelationship={handleRemoveRelationship}
       />
 

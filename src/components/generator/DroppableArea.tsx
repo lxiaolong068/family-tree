@@ -19,16 +19,19 @@ const DroppableArea: React.FC<DroppableAreaProps> = ({
   const { isOver, setNodeRef } = useDroppable({
     id
   });
-  
+
   return (
     <div
       ref={setNodeRef}
       className={cn(
-        "transition-colors duration-200",
-        isOver && "bg-primary/10 rounded-lg",
+        "transition-all duration-300 relative",
+        isOver && "bg-primary/10 rounded-lg scale-105 shadow-md",
         className
       )}
     >
+      {isOver && (
+        <div className="absolute inset-0 border-2 border-dashed border-primary rounded-lg animate-pulse pointer-events-none" />
+      )}
       {children}
     </div>
   );

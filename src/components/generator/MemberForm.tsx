@@ -8,8 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Member } from '@/types/family-tree';
-import { UserPlus, BarChart2, Save, Calendar } from 'lucide-react';
+import { UserPlus, BarChart2, Save, Calendar, Male, Female, Users } from 'lucide-react';
 
 interface MemberFormProps {
   currentMember: Partial<Member>;
@@ -79,19 +80,33 @@ const MemberForm: React.FC<MemberFormProps> = ({
                   <Label htmlFor="gender" className="text-sm font-medium">
                     Gender
                   </Label>
-                  <Select
+                  <RadioGroup
                     value={currentMember.gender || 'male'}
                     onValueChange={(value) => onInputChange('gender', value)}
+                    className="flex flex-col space-y-1 mt-2"
                   >
-                    <SelectTrigger id="gender" className="w-full focus-visible:ring-primary">
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="male">Male</SelectItem>
-                      <SelectItem value="female">Female</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-muted/50 transition-colors">
+                      <RadioGroupItem value="male" id="gender-male" />
+                      <Label htmlFor="gender-male" className="flex items-center gap-2 cursor-pointer">
+                        <Male className="h-4 w-4 text-blue-500" />
+                        <span>Male</span>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-muted/50 transition-colors">
+                      <RadioGroupItem value="female" id="gender-female" />
+                      <Label htmlFor="gender-female" className="flex items-center gap-2 cursor-pointer">
+                        <Female className="h-4 w-4 text-pink-500" />
+                        <span>Female</span>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-muted/50 transition-colors">
+                      <RadioGroupItem value="other" id="gender-other" />
+                      <Label htmlFor="gender-other" className="flex items-center gap-2 cursor-pointer">
+                        <Users className="h-4 w-4 text-green-500" />
+                        <span>Other</span>
+                      </Label>
+                    </div>
+                  </RadioGroup>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="birthDate" className="text-sm font-medium flex items-center gap-1">

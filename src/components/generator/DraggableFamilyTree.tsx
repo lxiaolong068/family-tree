@@ -115,6 +115,13 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
     const children = getChildMembers(member.id);
     const isRoot = level === 0;
 
+    // 根据性别选择连接线颜色
+    const lineColor = member.gender === 'male'
+      ? 'bg-blue-300'
+      : member.gender === 'female'
+        ? 'bg-pink-300'
+        : 'bg-green-300';
+
     return (
       <div key={member.id} className="flex flex-col items-center">
         <DroppableArea id={member.id}>
@@ -134,10 +141,30 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
         {children.length > 0 && (
           <div className="mt-4 relative">
             {/* 连接线 */}
-            <div className="absolute top-0 left-1/2 w-0.5 h-4 -translate-x-1/2 bg-gray-300"></div>
+            <div className={`absolute top-0 left-1/2 w-1 h-6 -translate-x-1/2 ${lineColor} rounded-full transition-all duration-300`}></div>
 
-            <div className="flex flex-wrap justify-center gap-4">
-              {children.map(child => renderMemberWithChildren(child, level + 1))}
+            <div className="flex flex-wrap justify-center gap-6">
+              {children.map((child, index) => {
+                // 如果有多个子节点，添加水平连接线
+                const isFirstChild = index === 0;
+                const isLastChild = index === children.length - 1;
+                const showHorizontalLine = children.length > 1;
+
+                return (
+                  <div key={child.id} className="relative">
+                    {showHorizontalLine && !isFirstChild && !isLastChild && (
+                      <div className={`absolute top-[-24px] left-[-16px] right-[-16px] h-0.5 ${lineColor}`}></div>
+                    )}
+                    {showHorizontalLine && isFirstChild && (
+                      <div className={`absolute top-[-24px] left-[50%] right-[-16px] h-0.5 ${lineColor}`}></div>
+                    )}
+                    {showHorizontalLine && isLastChild && (
+                      <div className={`absolute top-[-24px] left-[-16px] right-[50%] h-0.5 ${lineColor}`}></div>
+                    )}
+                    {renderMemberWithChildren(child, level + 1)}
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -146,32 +173,65 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Drag & Drop Family Tree Editor</CardTitle>
+    <Card className="shadow-lg">
+      <CardHeader className="bg-muted/50 rounded-t-xl">
+        <CardTitle className="flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+            <path d="M8 3v2"></path>
+            <path d="M16 3v2"></path>
+            <path d="M21 7H3"></path>
+            <path d="M16 10a4 4 0 1 1-8 0"></path>
+            <path d="M18 21H6a2 2 0 0 1-2-2V7h16v12a2 2 0 0 1-2 2Z"></path>
+            <path d="M9 17h6"></path>
+          </svg>
+          Drag & Drop Family Tree Editor
+        </CardTitle>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-6">
+        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-sm">
+          <p className="flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 16v-4"></path>
+              <path d="M12 8h.01"></path>
+            </svg>
+            <span>
+              <strong>Tip:</strong> Drag a family member onto another to create a parent-child relationship.
+              Click "Add Child" to add a new child to a member.
+            </span>
+          </p>
+        </div>
+
         <DndContext
           onDragStart={onDragStart}
           onDragEnd={onDragEnd}
           onDragOver={onDragOver}
         >
           {familyTree.members.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-8 border-2 border-dashed border-gray-300 rounded-lg">
-              <p className="text-gray-500 mb-4">No family members yet. Start creating your family tree!</p>
+            <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-primary/30 rounded-lg bg-primary/5">
+              <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-primary/50 mb-4">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+              <p className="text-gray-600 mb-6 text-center max-w-md">
+                No family members yet. Start creating your family tree by adding your first member!
+              </p>
               <Button
                 onClick={() => {
                   setNewMemberParentId(null);
                   setIsAddMemberDialogOpen(true);
                 }}
+                className="gap-2 shadow-md hover:shadow-lg transition-all"
               >
-                <PlusCircle className="mr-2 h-4 w-4" />
+                <PlusCircle className="h-4 w-4" />
                 Add First Member
               </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto p-4">
-              <div className="flex flex-wrap justify-center gap-8">
+            <div className="overflow-x-auto p-4 border rounded-lg bg-white/50">
+              <div className="flex flex-wrap justify-center gap-10 min-h-[400px] p-4">
                 {rootMembers.map(member => renderMemberWithChildren(member))}
               </div>
             </div>
@@ -216,16 +276,57 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
                 <Label htmlFor="gender" className="text-right">
                   Gender
                 </Label>
-                <select
-                  id="gender"
-                  value={newMember.gender || 'male'}
-                  onChange={(e) => setNewMember({...newMember, gender: e.target.value as 'male' | 'female' | 'other'})}
-                  className="col-span-3 w-full rounded-md border border-gray-300 bg-white py-2 px-3 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500"
-                >
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
+                <div className="col-span-3 grid grid-cols-3 gap-2">
+                  <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => setNewMember({...newMember, gender: 'male'})}>
+                    <input
+                      type="radio"
+                      id="gender-male"
+                      checked={newMember.gender === 'male'}
+                      onChange={() => {}}
+                      className="h-4 w-4 text-blue-500 border-gray-300 focus:ring-blue-500"
+                    />
+                    <Label htmlFor="gender-male" className="flex items-center gap-2 cursor-pointer">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 8v8"></path>
+                        <path d="M8 12h8"></path>
+                      </svg>
+                      <span>Male</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-pink-50 transition-colors cursor-pointer" onClick={() => setNewMember({...newMember, gender: 'female'})}>
+                    <input
+                      type="radio"
+                      id="gender-female"
+                      checked={newMember.gender === 'female'}
+                      onChange={() => {}}
+                      className="h-4 w-4 text-pink-500 border-gray-300 focus:ring-pink-500"
+                    />
+                    <Label htmlFor="gender-female" className="flex items-center gap-2 cursor-pointer">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M8 12h8"></path>
+                      </svg>
+                      <span>Female</span>
+                    </Label>
+                  </div>
+                  <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-green-50 transition-colors cursor-pointer" onClick={() => setNewMember({...newMember, gender: 'other'})}>
+                    <input
+                      type="radio"
+                      id="gender-other"
+                      checked={newMember.gender === 'other'}
+                      onChange={() => {}}
+                      className="h-4 w-4 text-green-500 border-gray-300 focus:ring-green-500"
+                    />
+                    <Label htmlFor="gender-other" className="flex items-center gap-2 cursor-pointer">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M12 8v8"></path>
+                      </svg>
+                      <span>Other</span>
+                    </Label>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-4 items-center gap-4">
