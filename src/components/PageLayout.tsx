@@ -4,35 +4,35 @@ import React, { ReactNode } from 'react';
 
 interface PageLayoutProps {
   /**
-   * 页面标题
+   * Page title
    */
   title: string;
-  
+
   /**
-   * 页面描述文本（可选）
+   * Page description text (optional)
    */
   description?: string;
-  
+
   /**
-   * 内容区域的子元素
+   * Child elements for the content area
    */
   children: ReactNode;
-  
+
   /**
-   * 额外的CSS类名
+   * Additional CSS class names
    */
   className?: string;
-  
+
   /**
-   * 页面头部右侧的操作按钮或内容
+   * Action buttons or content for the right side of the page header
    */
   actions?: ReactNode;
 }
 
 /**
- * 通用页面布局组件
- * 
- * 提供统一的页面标题、描述和内容区域布局
+ * Common page layout component
+ *
+ * Provides a unified layout for page title, description, and content area
  */
 export function PageLayout({
   title,
