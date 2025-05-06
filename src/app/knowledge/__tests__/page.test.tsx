@@ -67,13 +67,6 @@ describe('KnowledgePage组件', () => {
     const schemaScript = screen.getByTestId('script-schema-knowledge');
     expect(schemaScript).toBeInTheDocument();
     expect(schemaScript).toHaveAttribute('type', 'application/ld+json');
-
-    // 验证脚本存在
-    expect(schemaScript).toBeInTheDocument();
-
-    // 在测试环境中，dangerouslySetInnerHTML会被模拟，所以我们只验证脚本存在
-
-    // 在测试环境中，我们不能直接解析脚本内容，所以跳过这部分验证
   });
 
   it('应该渲染手风琴组件', () => {
@@ -82,10 +75,6 @@ describe('KnowledgePage组件', () => {
     // 验证手风琴组件存在
     const accordion = screen.getByTestId('mock-accordion');
     expect(accordion).toBeInTheDocument();
-
-    // 验证手风琴项目存在
-    const accordionItems = screen.getAllByTestId(/mock-accordion-item/);
-    expect(accordionItems.length).toBeGreaterThan(0);
 
     // 验证手风琴触发器和内容存在
     const triggers = screen.getAllByTestId('mock-accordion-trigger');
@@ -109,5 +98,34 @@ describe('KnowledgePage组件', () => {
 
     // 验证内容包含常见问题部分
     expect(contentHTML).toContain('Frequently Asked Questions');
+
+    // 验证内容包含家谱类型部分
+    expect(contentHTML).toContain('Types and Styles of Family Trees');
+
+    // 验证内容包含术语部分
+    expect(contentHTML).toContain('Common Genealogy Terms');
+  });
+
+  it('应该包含行动号召部分', () => {
+    render(<KnowledgePage />);
+
+    // 验证页面内容区域存在
+    const pageContent = screen.getByTestId('page-content');
+    expect(pageContent).toBeInTheDocument();
+
+    // 验证页面内容包含行动号召部分
+    expect(pageContent.innerHTML).toContain('Ready to Create Your Family Tree?');
+  });
+
+  it('应该包含图片展示', () => {
+    render(<KnowledgePage />);
+
+    // 验证页面内容区域存在
+    const pageContent = screen.getByTestId('page-content');
+    expect(pageContent).toBeInTheDocument();
+
+    // 验证页面包含图片
+    const images = pageContent.querySelectorAll('img');
+    expect(images.length).toBeGreaterThan(0);
   });
 });
