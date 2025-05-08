@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import type { Metadata } from "next"; // Import Metadata type
+
 import { Member, FamilyTree, SaveFamilyTreeResult, Relationship, RelationType } from '@/types/family-tree';
 import { SuccessDialog } from '@/components/ui/success-dialog';
 import { ErrorDialog } from '@/components/ui/error-dialog';
@@ -30,37 +30,7 @@ import Link from 'next/link';
 import { Button } from "@/components/ui/button";
 import Script from 'next/script';
 
-// Add new metadata object
-export const metadata: Metadata = {
-  title: "Family Tree Generator | Create Your Ancestry Chart Online | Family Tree CC",
-  description: "Use our free and easy online family tree generator to build your family chart. Input your family members, visualize relationships, and create your ancestry tree in minutes with Family Tree CC.",
-  keywords: ["family tree generator", "create family tree", "build family tree", "online family tree tool", "ancestry chart maker", "genealogy software", "free family tree generator", "Family Tree CC"],
-  openGraph: {
-    title: "Family Tree Generator | Create Your Ancestry Chart Online | Family Tree CC",
-    description: "Use our free and easy online family tree generator to build your family chart. Input your family members, visualize relationships, and create your ancestry tree in minutes with Family Tree CC.",
-    url: "https://www.family-tree.cc/generator/",
-    siteName: "Family Tree CC",
-    images: [
-      {
-        url: "https://www.family-tree.cc/og-generator.jpg", // Replace with your actual OG image for the generator page
-        width: 1200,
-        height: 630,
-        alt: "Family Tree CC - Online Family Tree Generator Tool",
-      },
-    ],
-    locale: "en_US",
-    type: "website", // Can also be 'product' if you prefer to classify the generator as such
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Family Tree Generator | Create Your Ancestry Chart Online | Family Tree CC",
-    description: "Use our free and easy online family tree generator to build your family chart with Family Tree CC.",
-    // images: ['https://www.family-tree.cc/twitter-generator.jpg'], // Replace with your actual Twitter image for the generator page
-  },
-  alternates: {
-    canonical: "https://www.family-tree.cc/generator/",
-  },
-};
+
 
 const SoftwareApplicationSchema = {
   "@context": "https://schema.org",
