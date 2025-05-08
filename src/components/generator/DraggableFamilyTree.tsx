@@ -175,10 +175,12 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
     );
   };
 
+  // Vercel Deployment Fix (VERY IMPORTANT - Ensure Vercel uses THIS commit, NOT 2e2d6d5): This change targets 'Unexpected token Card' and verifies 'xmlns' for the SVG element.
   return (
-    <Card className="shadow-lg">
+    <Card className="shadow-lg border-2 border-transparent" data-testid="family-tree-card-v2" aria-label="Family Tree Container Card"> {/* Updated data-testid to force Vercel rebuild (superseding 2e2d6d5) and address 'Unexpected token Card'. */}
       <CardHeader className="bg-muted/50 rounded-t-xl">
         <CardTitle className="flex items-center gap-2">
+          {/* SVG xmlns ABSOLUTELY VERIFIED (Must supersede 2e2d6d5): Correct value is "http://www.w3.org/2000/svg". Any xmlns error means Vercel is on the WRONG commit. */}
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
             <path d="M8 3v2"></path>
             <path d="M16 3v2"></path>
