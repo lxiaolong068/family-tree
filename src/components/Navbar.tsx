@@ -35,8 +35,8 @@ const Navbar = () => {
     <nav className="bg-card shadow-sm py-4 border-b sticky top-0 z-50">
       <div className="container mx-auto px-4 flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6">
+        <Link href="/" className="text-2xl font-bold text-primary hover:opacity-80 transition-opacity flex items-center gap-2" aria-label="Family Tree Home">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6" aria-hidden="true">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
             <circle cx="9" cy="7" r="4"></circle>
             <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -56,6 +56,7 @@ const Navbar = () => {
                     "px-4 py-2 rounded-md text-foreground/80 hover:text-primary hover:bg-accent transition-colors",
                     pathname === item.href && "bg-accent text-primary font-medium"
                   )}
+                  aria-current={pathname === item.href ? "page" : undefined}
                 >
                   {item.label}
                 </Link>
@@ -66,7 +67,7 @@ const Navbar = () => {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 hover:bg-accent">
+                <Button variant="ghost" className="flex items-center gap-2 hover:bg-accent" aria-label="Open user menu">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user?.profileImage} alt={user?.name} />
                     <AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0)}</AvatarFallback>
@@ -120,6 +121,7 @@ const Navbar = () => {
                     pathname === item.href && "bg-accent text-primary font-medium"
                   )}
                   onClick={() => setMobileMenuOpen(false)}
+                  aria-current={pathname === item.href ? "page" : undefined}
                 >
                   {item.label}
                 </Link>
@@ -132,6 +134,7 @@ const Navbar = () => {
                     href="/profile"
                     className="block px-4 py-2 rounded-md text-foreground/80 hover:text-primary hover:bg-accent transition-colors"
                     onClick={() => setMobileMenuOpen(false)}
+                    aria-label="View your profile"
                   >
                     Profile
                   </Link>
@@ -143,6 +146,7 @@ const Navbar = () => {
                       setMobileMenuOpen(false);
                     }}
                     className="w-full text-left px-4 py-2 rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+                    aria-label="Logout from your account"
                   >
                     Logout
                   </button>

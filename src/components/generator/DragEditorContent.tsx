@@ -163,7 +163,7 @@ const DragEditorContent = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-6 flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" aria-hidden="true">
           <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
           <circle cx="9" cy="7" r="4"></circle>
           <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
@@ -175,7 +175,7 @@ const DragEditorContent = () => {
       <Card className="mb-6 shadow-md border-primary/10">
         <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-t-xl">
           <CardTitle className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary" aria-hidden="true">
               <circle cx="12" cy="12" r="10"></circle>
               <line x1="12" y1="16" x2="12" y2="12"></line>
               <line x1="12" y1="8" x2="12.01" y2="8"></line>
@@ -188,8 +188,8 @@ const DragEditorContent = () => {
         </CardHeader>
         <CardContent className="p-4">
           <div className="flex flex-wrap gap-3">
-            <Button variant="outline" onClick={loadData} className="gap-2 hover:bg-blue-50 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <Button variant="outline" onClick={loadData} className="gap-2 hover:bg-blue-50 transition-colors" aria-label="Reload family tree data">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M21 2v6h-6"></path>
                 <path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path>
                 <path d="M3 12a9 9 0 0 0 15 6.7L21 16"></path>
@@ -197,17 +197,17 @@ const DragEditorContent = () => {
               </svg>
               Reload
             </Button>
-            <Button onClick={handleSaveToDatabase} className="gap-2 bg-primary hover:bg-primary/90 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <Button onClick={handleSaveToDatabase} className="gap-2 bg-primary hover:bg-primary/90 transition-colors" aria-label="Save family tree to database">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                 <polyline points="17 21 17 13 7 13 7 21"></polyline>
                 <polyline points="7 3 7 8 15 8"></polyline>
               </svg>
               Save to Database
             </Button>
-            <Link href="/generator" passHref>
-              <Button variant="secondary" className="gap-2 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <Link href="/generator" passHref legacyBehavior>
+              <Button variant="secondary" className="gap-2 transition-colors" aria-label="Back to form editor">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <path d="M19 12H5"></path>
                   <path d="M12 19l-7-7 7-7"></path>
                 </svg>

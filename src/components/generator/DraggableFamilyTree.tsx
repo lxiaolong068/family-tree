@@ -99,6 +99,8 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
         relation: '子女',
         gender: 'male'
       });
+      // Focus management: Optionally focus on a relevant element after dialog closes
+      // For example, focus on the button that opened the dialog or the newly added member
     }
   };
 
@@ -125,7 +127,7 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
     return (
       <div key={member.id} className="flex flex-col items-center">
         <DroppableArea id={member.id}>
-          <div className="m-2">
+          <div className="m-2" tabIndex={0} role="group" aria-labelledby={`member-name-${member.id}`}>
             <DraggableMember
               member={member}
               isRoot={isRoot}
@@ -188,10 +190,11 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-sm">
-          <p className="flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
+        <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} onDragOver={onDragOver}>
+          <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-sm" role="alert">
+            <p className="flex items-center gap-2">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="10"></circle>
               <path d="M12 16v-4"></path>
               <path d="M12 8h.01"></path>
             </svg>
@@ -347,8 +350,8 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
               <Button variant="outline" onClick={() => setIsAddMemberDialogOpen(false)}>
                 Cancel
               </Button>
-              <Button onClick={handleSubmitNewMember}>
-                Add
+              <Button onClick={handleSubmitNewMember} className="w-full sm:w-auto">
+                Add Member
               </Button>
             </DialogFooter>
           </DialogContent>

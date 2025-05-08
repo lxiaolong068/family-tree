@@ -41,11 +41,11 @@ const MemberForm: React.FC<MemberFormProps> = ({
       <CardContent className="pt-6">
         <Tabs defaultValue="basic" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="basic">Basic Info</TabsTrigger>
-            <TabsTrigger value="additional">Additional Info</TabsTrigger>
+            <TabsTrigger value="basic" aria-controls="basic-tab-content">Basic Info</TabsTrigger>
+            <TabsTrigger value="additional" aria-controls="additional-tab-content">Additional Info</TabsTrigger>
           </TabsList>
 
-          <TabsContent value="basic">
+          <TabsContent value="basic" id="basic-tab-content" role="tabpanel" aria-labelledby="basic-tab-trigger">
             <div className="grid gap-6">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">
@@ -125,7 +125,7 @@ const MemberForm: React.FC<MemberFormProps> = ({
             </div>
           </TabsContent>
 
-          <TabsContent value="additional">
+          <TabsContent value="additional" id="additional-tab-content" role="tabpanel" aria-labelledby="additional-tab-trigger">
             <div className="grid gap-6">
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 <div className="space-y-2">

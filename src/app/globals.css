@@ -35,7 +35,7 @@
   --primary-foreground: 0 0% 100%;
 
   /* 次要色调：紫色 */
-  --secondary: 250 60% 60%;
+  --secondary: 250 60% 50%; /* Updated for better contrast */
   --secondary-foreground: 0 0% 100%;
 
   /* 中性色调 */
@@ -47,7 +47,7 @@
   --accent-foreground: 222.2 47.4% 11.2%;
 
   /* 危险色调：红色 */
-  --destructive: 0 84.2% 60.2%;
+  --destructive: 0 84.2% 50%; /* Updated for better contrast */
   --destructive-foreground: 210 40% 98%;
 
   /* 成功色调：绿色 */
@@ -99,7 +99,7 @@
   --popover-foreground: 210 40% 98%;
 
   /* 主色调：蓝色（暗色模式下更亮） */
-  --primary: 210 100% 60%;
+  --primary: 210 100% 50%; /* Updated for better contrast in dark mode */
   --primary-foreground: 0 0% 100%;
 
   /* 次要色调：紫色（暗色模式下更亮） */
@@ -115,7 +115,7 @@
   --accent-foreground: 210 40% 98%;
 
   /* 危险色调：红色 */
-  --destructive: 0 70% 50%;
+  --destructive: 0 84.2% 50%; /* Updated for better contrast in dark mode */
   --destructive-foreground: 210 40% 98%;
 
   /* 成功色调：绿色 */
