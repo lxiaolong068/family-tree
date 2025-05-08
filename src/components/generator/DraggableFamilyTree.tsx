@@ -175,12 +175,10 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
     );
   };
 
-  // Vercel Deployment Fix (VERY IMPORTANT - Ensure Vercel uses THIS commit, NOT 2e2d6d5): This change targets 'Unexpected token Card' and verifies 'xmlns' for the SVG element.
   return (
-    <Card className="shadow-lg border-2 border-transparent" data-testid="family-tree-card-v2" aria-label="Family Tree Container Card"> {/* Updated data-testid to force Vercel rebuild (superseding 2e2d6d5) and address 'Unexpected token Card'. */}
+    <Card className="shadow-lg border-2 border-transparent" data-testid="family-tree-card-v2" aria-label="Family Tree Container Card">
       <CardHeader className="bg-muted/50 rounded-t-xl">
         <CardTitle className="flex items-center gap-2">
-          {/* SVG xmlns ABSOLUTELY VERIFIED (Must supersede 2e2d6d5): Correct value is "http://www.w3.org/2000/svg". Any xmlns error means Vercel is on the WRONG commit. */}
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
             <path d="M8 3v2"></path>
             <path d="M16 3v2"></path>
@@ -198,21 +196,15 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
             <p className="flex items-center gap-2">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="12" cy="12" r="10"></circle>
-              <path d="M12 16v-4"></path>
-              <path d="M12 8h.01"></path>
-            </svg>
-            <span>
-              <strong>Tip:</strong> Drag a family member onto another to create a parent-child relationship.
-              Click "Add Child" to add a new child to a member.
-            </span>
-          </p>
-        </div>
-
-        <DndContext
-          onDragStart={onDragStart}
-          onDragEnd={onDragEnd}
-          onDragOver={onDragOver}
-        >
+                <path d="M12 16v-4"></path>
+                <path d="M12 8h.01"></path>
+              </svg>
+              <span>
+                <strong>Tip:</strong> Drag a family member onto another to create a parent-child relationship.
+                Click "Add Child" to add a new child to a member.
+              </span>
+            </p>
+          </div>
           {familyTree.members.length === 0 ? (
             <div className="flex flex-col items-center justify-center p-12 border-2 border-dashed border-primary/30 rounded-lg bg-primary/5">
               <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-primary/50 mb-4">
@@ -225,10 +217,7 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
                 No family members yet. Start creating your family tree by adding your first member!
               </p>
               <Button
-                onClick={() => {
-                  setNewMemberParentId(null);
-                  setIsAddMemberDialogOpen(true);
-                }}
+                onClick={() => { setNewMemberParentId(null); setIsAddMemberDialogOpen(true); }}
                 className="gap-2 shadow-md hover:shadow-lg transition-all"
               >
                 <PlusCircle className="h-4 w-4" />
@@ -242,123 +231,105 @@ const DraggableFamilyTree: React.FC<DraggableFamilyTreeProps> = ({
               </div>
             </div>
           )}
-        </DndContext>
+          <Dialog open={isAddMemberDialogOpen} onOpenChange={setIsAddMemberDialogOpen}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>{newMemberParentId ? 'Add Child' : 'Add First Member'}</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="name" className="text-right">Name</Label>
+                  <Input id="name" value={newMember.name || ''} onChange={e => setNewMember({ ...newMember, name: e.target.value })} className="col-span-3" />
+                </div>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="relation" className="text-right">
+                    Relationship
+                  </Label>
+                  <Input
+                    id="relation"
+                    value={newMember.relation || ''}
+                    onChange={(e) => setNewMember({...newMember, relation: e.target.value})}
+                    className="col-span-3"
+                  />
+                </div>
 
-        {/* 添加新成员对话框 */}
-        <Dialog open={isAddMemberDialogOpen} onOpenChange={setIsAddMemberDialogOpen}>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>
-                {newMemberParentId ? 'Add Child' : 'Add First Member'}
-              </DialogTitle>
-            </DialogHeader>
-
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="name" className="text-right">
-                  Name
-                </Label>
-                <Input
-                  id="name"
-                  value={newMember.name || ''}
-                  onChange={(e) => setNewMember({...newMember, name: e.target.value})}
-                  className="col-span-3"
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="relation" className="text-right">
-                  Relationship
-                </Label>
-                <Input
-                  id="relation"
-                  value={newMember.relation || ''}
-                  onChange={(e) => setNewMember({...newMember, relation: e.target.value})}
-                  className="col-span-3"
-                />
-              </div>
-
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="gender" className="text-right">
-                  Gender
-                </Label>
-                <div className="col-span-3 grid grid-cols-3 gap-2">
-                  <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => setNewMember({...newMember, gender: 'male'})}>
-                    <input
-                      type="radio"
-                      id="gender-male"
-                      checked={newMember.gender === 'male'}
-                      onChange={() => {}}
-                      className="h-4 w-4 text-blue-500 border-gray-300 focus:ring-blue-500"
-                    />
-                    <Label htmlFor="gender-male" className="flex items-center gap-2 cursor-pointer">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M12 8v8"></path>
-                        <path d="M8 12h8"></path>
-                      </svg>
-                      <span>Male</span>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-pink-50 transition-colors cursor-pointer" onClick={() => setNewMember({...newMember, gender: 'female'})}>
-                    <input
-                      type="radio"
-                      id="gender-female"
-                      checked={newMember.gender === 'female'}
-                      onChange={() => {}}
-                      className="h-4 w-4 text-pink-500 border-gray-300 focus:ring-pink-500"
-                    />
-                    <Label htmlFor="gender-female" className="flex items-center gap-2 cursor-pointer">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M8 12h8"></path>
-                      </svg>
-                      <span>Female</span>
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-green-50 transition-colors cursor-pointer" onClick={() => setNewMember({...newMember, gender: 'other'})}>
-                    <input
-                      type="radio"
-                      id="gender-other"
-                      checked={newMember.gender === 'other'}
-                      onChange={() => {}}
-                      className="h-4 w-4 text-green-500 border-gray-300 focus:ring-green-500"
-                    />
-                    <Label htmlFor="gender-other" className="flex items-center gap-2 cursor-pointer">
-                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500">
-                        <circle cx="12" cy="12" r="10"></circle>
-                        <path d="M12 8v8"></path>
-                      </svg>
-                      <span>Other</span>
-                    </Label>
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="gender" className="text-right">
+                    Gender
+                  </Label>
+                  <div className="col-span-3 grid grid-cols-3 gap-2">
+                    <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-blue-50 transition-colors cursor-pointer" onClick={() => setNewMember({...newMember, gender: 'male'})}>
+                      <input
+                        type="radio"
+                        id="gender-male"
+                        checked={newMember.gender === 'male'}
+                        onChange={() => {}}
+                        className="h-4 w-4 text-blue-500 border-gray-300 focus:ring-blue-500"
+                      />
+                      <Label htmlFor="gender-male" className="flex items-center gap-2 cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M12 8v8"></path>
+                          <path d="M8 12h8"></path>
+                        </svg>
+                        <span>Male</span>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-pink-50 transition-colors cursor-pointer" onClick={() => setNewMember({...newMember, gender: 'female'})}>
+                      <input
+                        type="radio"
+                        id="gender-female"
+                        checked={newMember.gender === 'female'}
+                        onChange={() => {}}
+                        className="h-4 w-4 text-pink-500 border-gray-300 focus:ring-pink-500"
+                      />
+                      <Label htmlFor="gender-female" className="flex items-center gap-2 cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-pink-500">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M8 12h8"></path>
+                        </svg>
+                        <span>Female</span>
+                      </Label>
+                    </div>
+                    <div className="flex items-center space-x-2 rounded-md border p-2 hover:bg-green-50 transition-colors cursor-pointer" onClick={() => setNewMember({...newMember, gender: 'other'})}>
+                      <input
+                        type="radio"
+                        id="gender-other"
+                        checked={newMember.gender === 'other'}
+                        onChange={() => {}}
+                        className="h-4 w-4 text-green-500 border-gray-300 focus:ring-green-500"
+                      />
+                      <Label htmlFor="gender-other" className="flex items-center gap-2 cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-green-500">
+                          <circle cx="12" cy="12" r="10"></circle>
+                          <path d="M12 8v8"></path>
+                        </svg>
+                        <span>Other</span>
+                      </Label>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="birthDate" className="text-right">
-                  Birth Date
-                </Label>
-                <Input
-                  id="birthDate"
-                  type="date"
-                  value={newMember.birthDate || ''}
-                  onChange={(e) => setNewMember({...newMember, birthDate: e.target.value})}
-                  className="col-span-3"
-                />
+                <div className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor="birthDate" className="text-right">
+                    Birth Date
+                  </Label>
+                  <Input
+                    id="birthDate"
+                    type="date"
+                    value={newMember.birthDate || ''}
+                    onChange={(e) => setNewMember({...newMember, birthDate: e.target.value})}
+                    className="col-span-3"
+                  />
+                </div>
               </div>
-            </div>
-
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsAddMemberDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleSubmitNewMember} className="w-full sm:w-auto">
-                Add Member
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+              <DialogFooter>
+                <Button variant="outline" onClick={() => setIsAddMemberDialogOpen(false)}>Cancel</Button>
+                <Button onClick={handleSubmitNewMember} className="w-full sm:w-auto">Add Member</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </DndContext>
       </CardContent>
     </Card>
   );
