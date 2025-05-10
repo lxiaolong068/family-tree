@@ -7,6 +7,28 @@ module.exports = {
     './app/**/*.{ts,tsx}',
     './src/**/*.{ts,tsx}',
   ],
+  safelist: [
+    // 添加关键UI组件的类名，确保它们在生产构建中被包含
+    'bg-background',
+    'text-foreground',
+    'border-border',
+    'bg-primary',
+    'text-primary-foreground',
+    'bg-secondary',
+    'text-secondary-foreground',
+    'bg-muted',
+    'text-muted-foreground',
+    'bg-accent',
+    'text-accent-foreground',
+    'bg-destructive',
+    'text-destructive-foreground',
+    'bg-card',
+    'text-card-foreground',
+    'bg-popover',
+    'text-popover-foreground',
+    'bg-sidebar',
+    'text-sidebar-foreground',
+  ],
   theme: {
     screens: {
       'xs': '480px',
