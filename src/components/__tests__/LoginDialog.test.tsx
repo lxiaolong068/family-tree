@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import LoginDialog from '../LoginDialog';
 import { useAuth } from '@/contexts/AuthContext';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
@@ -82,46 +82,48 @@ describe('LoginDialog组件', () => {
   it('应该处理Google登录成功', async () => {
     const user = userEvent.setup();
     
-    // 模拟用户对象
     const mockUser = {
       email: 'test@example.com',
       displayName: 'Test User',
       getIdToken: jest.fn().mockResolvedValue('mock-id-token')
     };
     
-    // 模拟signInWithPopup返回成功结果
-    (signInWithPopup as jest.Mock).mockResolvedValue({
-      user: mockUser
-    });
+    (signInWithPopup as jest.Mock).mockResolvedValue({ user: mockUser });
     
-    // 模拟login返回成功
-    mockLogin.mockResolvedValue(undefined);
+    mockLogin.mockImplementation(() => {
+      return new Promise(resolve => setTimeout(() => resolve(undefined), 50)); // Resolves after 50ms
+    });
     
     render(<LoginDialog open={true} onClose={mockOnClose} />);
     
-    // 点击Google登录按钮
-    await user.click(screen.getByText('Continue with Google'));
+    const googleLoginButton = screen.getByRole('button', { name: /Continue with Google/i });
+    await user.click(googleLoginButton);
     
-    // 验证加载状态
-    expect(screen.getByText('Signing in...')).toBeInTheDocument();
-    
-    // 等待异步操作完成
+    // Assert the loading state
     await waitFor(() => {
-      // 验证GoogleAuthProvider被创建
-      expect(GoogleAuthProvider).toHaveBeenCalled();
+      // Wait for the "Signing in..." text to appear
+      const signInTextElement = screen.getByText('Signing in...');
+      // Find the button containing this text
+      const buttonDuringLoading = signInTextElement.closest('button');
       
-      // 验证signInWithPopup被调用
-      expect(signInWithPopup).toHaveBeenCalledWith(auth, expect.any(Object));
+      // Ensure the button was found
+      if (!buttonDuringLoading) {
+        throw new Error('Button containing "Signing in..." text not found.');
+      }
       
-      // 验证getIdToken被调用
-      expect(mockUser.getIdToken).toHaveBeenCalled();
-      
-      // 验证login被调用
-      expect(mockLogin).toHaveBeenCalledWith('mock-id-token');
-      
-      // 验证onClose被调用
-      expect(mockOnClose).toHaveBeenCalled();
+      // Assert properties of the button
+      expect(buttonDuringLoading).toBeDisabled();
+      expect(buttonDuringLoading.querySelector('.animate-spin')).toBeInTheDocument();
     });
+    
+    // Assert that all async operations completed and onClose was called
+    await waitFor(() => {
+      expect(GoogleAuthProvider).toHaveBeenCalled();
+      expect(signInWithPopup).toHaveBeenCalledWith(auth, expect.any(Object));
+      expect(mockUser.getIdToken).toHaveBeenCalled();
+      expect(mockLogin).toHaveBeenCalledWith('mock-id-token');
+      expect(mockOnClose).toHaveBeenCalled();
+    }, { timeout: 2000 });
   });
 
   it('应该处理Google登录失败', async () => {
@@ -158,7 +160,27 @@ describe('LoginDialog组件', () => {
     console.error = originalConsoleError;
   });
 
-  it('应该处理login函数抛出的错误', async () => {
+  it('当通过外部交互关闭对话框时应该调用onClose', async () => {
+    // const user = userEvent.setup(); // userEvent is not strictly需要这里，因为fireEvent更直接用于Escape键
+    render(<LoginDialog open={true} onClose={mockOnClose} />);
+
+    // Dialog组件的onOpenChange会在用户按下Escape键时被调用并传入false
+    // 我们可以通过模拟按下Escape键来触发这个行为
+    // 注意：React Testing Library的fireEvent.keyDown更适合模拟这种DOM事件
+    // 而userEvent.keyboard更适合模拟用户输入
+    // 首先，确保对话框是存在的
+    const dialogElement = screen.getByRole('dialog');
+    fireEvent.keyDown(dialogElement, { key: 'Escape', code: 'Escape', keyCode: 27, charCode: 0 });
+
+    await waitFor(() => {
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
+
+    // 也可以模拟点击遮罩层，但这通常更复杂，因为遮罩层可能没有特定的role或testid
+    // 对于shadcn/ui的Dialog，按下Escape是测试onOpenChange的直接方式
+  });
+
+  it('应该处理login函数抛出错误', async () => {
     const user = userEvent.setup();
     
     // 模拟console.error

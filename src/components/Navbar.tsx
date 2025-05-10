@@ -67,9 +67,9 @@ const Navbar = () => {
           {isAuthenticated ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="flex items-center gap-2 hover:bg-accent" aria-label="Open user menu">
+                <Button data-testid="user-avatar-button" variant="ghost" className="flex items-center gap-2 hover:bg-accent" aria-label="Open user menu">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={user?.profileImage} alt={user?.name} />
+                    <AvatarImage data-testid="user-avatar-image" src={user?.profileImage} alt={user?.name ?? undefined} />
                     <AvatarFallback className="bg-primary text-primary-foreground">{user?.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <span className="text-sm font-medium hidden sm:inline-block">{user?.name}</span>
@@ -110,7 +110,7 @@ const Navbar = () => {
 
       {/* Mobile Navigation */}
       {mobileMenuOpen && (
-        <div className="md:hidden pt-4 pb-3 px-4 border-t mt-4 bg-card">
+        <div className="md:hidden pt-4 pb-3 px-4 border-t mt-4 bg-card" data-testid="mobile-nav-menu">
           <ul className="space-y-2">
             {navItems.map((item) => (
               <li key={item.href}>
