@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SaveLoginPrompt from '../SaveLoginPrompt';
 import userEvent from '@testing-library/user-event';
 
@@ -105,16 +105,15 @@ describe('SaveLoginPrompt组件', () => {
       />
     );
     
-    // 模拟对话框的onOpenChange事件
-    const dialog = screen.getByRole('dialog');
-    const dialogProps = dialog.parentElement?.__reactProps$;
+    // 获取对话框元素
+    const dialogElement = screen.getByRole('dialog');
     
-    if (dialogProps && dialogProps.onOpenChange) {
-      // 调用onOpenChange(false)模拟点击对话框外部
-      dialogProps.onOpenChange(false);
-      
-      // 验证onClose被调用
-      expect(mockOnClose).toHaveBeenCalled();
-    }
+    // 模拟按下Escape键
+    fireEvent.keyDown(dialogElement, { key: 'Escape', code: 'Escape', keyCode: 27, charCode: 0 });
+    
+    // 等待并验证onClose被调用
+    await waitFor(() => {
+      expect(mockOnClose).toHaveBeenCalledTimes(1);
+    });
   });
 });

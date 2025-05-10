@@ -257,8 +257,8 @@ graph TD
    - 为 `src/contexts/AuthContext.tsx` 添加测试，覆盖率达到91.11% 🟩【已完成】
    - 为 `src/services/storage-service.ts` 添加测试，覆盖率达到86.79% 🟩【已完成】
    - 为 `src/components/__tests__/Footer.test.tsx` 添加测试，覆盖率达到100% 🟩【已完成】
-   - 为 `src/components/__tests__/Navbar.test.tsx` 添加测试 🟧【进行中】
-   - 为 `src/components/__tests__/LoginDialog.test.tsx` 添加测试 🟧【进行中】
+   - 为 `src/components/__tests__/Navbar.test.tsx` 添加测试，修复问题并提升覆盖率至 Statements 90%, Branch 87.5%, Funcs 81.81%, Lines 89.65% 🟩【已完成】
+   - 为 `src/components/__tests__/LoginDialog.test.tsx` 添加测试，修复问题并提升覆盖率至100% 🟩【已完成】
    - 为 `src/components/__tests__/SaveLoginPrompt.test.tsx` 添加测试 🟧【进行中】
    - 为 `src/components/generator/__tests__/BatchRelationshipSelector.test.tsx` 添加测试 🟧【进行中】
    - 为 `src/components/generator/__tests__/ExportOptions.test.tsx` 添加测试 🟧【进行中】
@@ -369,8 +369,9 @@ graph TD
   - 为 AuthContext 添加测试，覆盖率达到91.11% 🟩【已完成】
   - 为 storage-service 添加测试，覆盖率达到86.79% 🟩【已完成】
   - 为 Footer 组件添加测试，覆盖率达到100% 🟩【已完成】
-  - 为 Navbar、LoginDialog、SaveLoginPrompt 等组件添加测试 🟧【进行中】
-  - 为 BatchRelationshipSelector、ExportOptions 等组件添加测试 🟧【进行中】
+  - 为 Navbar 组件 (`src/components/__tests__/Navbar.test.tsx`) 添加测试，修复问题并提升覆盖率至 Statements 90%, Branch 87.5%, Funcs 81.81%, Lines 89.65% 🟩【已完成】
+  - 为 LoginDialog 组件 (`src/components/__tests__/LoginDialog.test.tsx`) 添加测试，修复问题并提升覆盖率至100% 🟩【已完成】
+  - 为 SaveLoginPrompt、BatchRelationshipSelector、ExportOptions 等组件添加测试 🟧【进行中】
   - 总体测试覆盖率从61.71%提高到66.19% 🟩【已完成】
 
 - 修复测试问题和提高测试稳定性（2024年9月10日）：
@@ -493,8 +494,8 @@ graph TD
   - 添加测试组件之间的交互的集成测试 🟥【待开发】
   - 添加端到端测试，使用 Playwright 测试完整的用户流程 🟥【待开发】
   - 进一步提高 Generator 组件测试覆盖率，特别是 BatchRelationshipSelector.tsx 和 ExportOptions.tsx 🟧【进行中】
-  - 为 Navbar.tsx 和 Footer.tsx 等基础组件添加测试 🟧【进行中】
-  - 为 LoginDialog.tsx 和 SaveLoginPrompt.tsx 等认证相关组件添加测试 🟧【进行中】
+  - 为 Navbar.tsx 和 Footer.tsx 等基础组件添加测试 (Navbar.tsx 已完成) 🟩【已完成】
+  - 为 LoginDialog.tsx 和 SaveLoginPrompt.tsx 等认证相关组件添加测试 (LoginDialog.tsx 已完成) 🟩【已完成】
 
 - 添加更多成员属性和功能 🟥【待开发】
   - 添加成员照片上传和显示功能 🟥【待开发】
