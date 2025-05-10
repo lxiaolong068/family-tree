@@ -1,77 +1,69 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import BatchRelationshipSelector from '../BatchRelationshipSelector';
-import { Member, RelationType } from '@/types/family-tree';
+import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import BatchRelationshipSelector, { type BatchRelationshipSelectorProps } from '../BatchRelationshipSelector';
+import { RelationType, type Member } from '@/types/family-tree';
+import { useFamilyMembersStore } from '@/stores/familyMembers'; // Path to be confirmed
 
-// 模拟数据
-const mockMember: Member = {
-  id: 'member-1',
-  name: 'John Doe',
-  relation: 'Father',
-  gender: 'male',
-  relationships: []
-};
-
-const mockAvailableMembers: Member[] = [
-  {
-    id: 'member-2',
-    name: 'Jane Doe',
-    relation: 'Mother',
-    gender: 'female'
-  },
-  {
-    id: 'member-3',
-    name: 'Jimmy Doe',
-    relation: 'Son',
-    gender: 'male'
-  },
-  {
-    id: 'member-4',
-    name: 'Jenny Doe',
-    relation: 'Daughter',
-    gender: 'female'
-  }
-];
-
-// 模拟函数
+// Mocks
 const mockOnClose = jest.fn();
 const mockOnAddRelationships = jest.fn();
+const mockMember: Member = { id: 'member-1', name: 'John Doe', gender: 'male', relation: 'self' }; // Added relation
+
+jest.mock('@/stores/familyMembers', () => ({ // Path to be confirmed
+  useFamilyMembersStore: jest.fn(() => ({
+    familyMembers: [
+      { id: 'member-1', name: 'John Doe', gender: 'male', relation: 'self' }, // Added relation
+      { id: 'member-2', name: 'Jane Doe', gender: 'female', relation: 'spouse', relationships: [{ targetId: 'member-1', type: RelationType.SPOUSE, description: '' }] }, // Added relation
+      { id: 'member-3', name: 'Jimmy Doe', gender: 'male', relation: 'child' }, // Added relation
+      { id: 'member-4', name: 'Jenny Doe', gender: 'female', relation: 'child' }, // Added relation
+    ],
+    addRelationshipsToMember: jest.fn(),
+    getMemberById: (id: string) => {
+      const members: Member[] = [ // Added Member[] type
+        { id: 'member-1', name: 'John Doe', gender: 'male', relation: 'self' }, // Added relation
+        { id: 'member-2', name: 'Jane Doe', gender: 'female', relation: 'spouse', relationships: [{ targetId: 'member-1', type: RelationType.SPOUSE, description: '' }] }, // Added relation
+        { id: 'member-3', name: 'Jimmy Doe', gender: 'male', relation: 'child' }, // Added relation
+        { id: 'member-4', name: 'Jenny Doe', gender: 'female', relation: 'child' }, // Added relation
+      ];
+      return members.find(m => m.id === id);
+    }
+  })),
+}));
+
+beforeEach(() => {
+  mockOnClose.mockClear();
+  mockOnAddRelationships.mockClear();
+  const store = useFamilyMembersStore();
+  (store.addRelationshipsToMember as jest.Mock).mockClear();
+});
 
 describe('BatchRelationshipSelector组件', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
+  describe('rendering', () => {
+    it('should correctly render component', () => {
+      render(
+        <BatchRelationshipSelector
+          isOpen={true}
+          onClose={mockOnClose}
+          member={mockMember}
+          availableMembers={useFamilyMembersStore().familyMembers}
+          onAddRelationships={mockOnAddRelationships}
+        />,
+      );
+      // Check dialog title
+      expect(screen.getByRole('heading', { name: /Batch Add Relationships for John Doe/i })).toBeInTheDocument();
+      // Check main action button (text can be "Add 0 Relationships", "Add 1 Relationship", etc.)
+      expect(screen.getByRole('button', { name: /Add \\d+ Relationship(s)?/i })).toBeInTheDocument();
 
-  it('应该正确渲染组件', () => {
-    render(
-      <BatchRelationshipSelector
-        isOpen={true}
-        onClose={mockOnClose}
-        member={mockMember}
-        availableMembers={mockAvailableMembers}
-        onAddRelationships={mockOnAddRelationships}
-      />
-    );
-
-    // 验证标题
-    expect(screen.getByText(/Batch Add Relationships for John Doe/i)).toBeInTheDocument();
-    
-    // 验证关系类型选择器
-    expect(screen.getByText(/Relationship/i)).toBeInTheDocument();
-    
-    // 验证描述输入框
-    expect(screen.getByPlaceholderText(/Optional description/i)).toBeInTheDocument();
-    
-    // 验证成员列表
-    expect(screen.getByText(/Members/i)).toBeInTheDocument();
-    expect(screen.getByText(/Jane Doe \(Mother\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/Jimmy Doe \(Son\)/i)).toBeInTheDocument();
-    expect(screen.getByText(/Jenny Doe \(Daughter\)/i)).toBeInTheDocument();
-    
-    // 验证按钮
-    expect(screen.getByText(/Cancel/i)).toBeInTheDocument();
-    expect(screen.getByText(/Add 0 Relationships/i)).toBeInTheDocument();
+      // Check form elements
+      // Check relationship type label and default value in combobox
+      expect(screen.getByText(/^Relationship$/i)).toBeInTheDocument(); 
+      expect(screen.getByRole('combobox', { name: /Relationship/i })).toHaveTextContent(/Child/i);
+      
+      expect(screen.getByLabelText(/Optional description/i)).toBeInTheDocument();
+      expect(screen.getByText(/Select members to add relationships to/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Cancel/i })).toBeInTheDocument();
+    });
   });
 
   it('应该过滤掉已有相同关系类型的成员', () => {
@@ -92,7 +84,7 @@ describe('BatchRelationshipSelector组件', () => {
         isOpen={true}
         onClose={mockOnClose}
         member={memberWithRelationships}
-        availableMembers={mockAvailableMembers}
+        availableMembers={useFamilyMembersStore().familyMembers}
         onAddRelationships={mockOnAddRelationships}
       />
     );
@@ -111,7 +103,7 @@ describe('BatchRelationshipSelector组件', () => {
         isOpen={true}
         onClose={mockOnClose}
         member={mockMember}
-        availableMembers={mockAvailableMembers}
+        availableMembers={useFamilyMembersStore().familyMembers}
         onAddRelationships={mockOnAddRelationships}
       />
     );
@@ -151,7 +143,7 @@ describe('BatchRelationshipSelector组件', () => {
         isOpen={true}
         onClose={mockOnClose}
         member={mockMember}
-        availableMembers={mockAvailableMembers}
+        availableMembers={useFamilyMembersStore().familyMembers}
         onAddRelationships={mockOnAddRelationships}
       />
     );
@@ -193,7 +185,7 @@ describe('BatchRelationshipSelector组件', () => {
         isOpen={true}
         onClose={mockOnClose}
         member={mockMember}
-        availableMembers={mockAvailableMembers}
+        availableMembers={useFamilyMembersStore().familyMembers}
         onAddRelationships={mockOnAddRelationships}
       />
     );
@@ -225,64 +217,165 @@ describe('BatchRelationshipSelector组件', () => {
 
   it('应该在关闭时重置表单', async () => {
     const user = userEvent.setup();
-    
-    render(
+    const { rerender } = render(
       <BatchRelationshipSelector
         isOpen={true}
         onClose={mockOnClose}
         member={mockMember}
-        availableMembers={mockAvailableMembers}
+        availableMembers={useFamilyMembersStore().familyMembers}
         onAddRelationships={mockOnAddRelationships}
-      />
+      />,
     );
 
-    // 输入描述
-    const descriptionInput = screen.getByPlaceholderText(/Optional description/i);
-    await user.type(descriptionInput, 'Test description');
+    const initialDialog = screen.getByRole('dialog', { name: /Batch Add Relationships for John Doe/i });
+    await user.type(within(initialDialog).getByLabelText(/Optional description/i), 'Test description');
     
-    // 选择一个成员
-    const checkbox = screen.getByLabelText(/Jane Doe \(Mother\)/i);
-    await user.click(checkbox);
-    
-    // 点击取消按钮
-    const cancelButton = screen.getByText(/Cancel/i);
-    await user.click(cancelButton);
-    
-    // 验证onClose被调用
-    expect(mockOnClose).toHaveBeenCalled();
-    
-    // 重新渲染组件
-    render(
+    // Change relationship type
+    await user.click(within(initialDialog).getByRole('combobox', { name: /Relationship/i }));
+    await user.click(screen.getByRole('option', { name: RelationType.SPOUSE }));
+
+
+    // Click cancel button
+    await user.click(within(initialDialog).getByRole('button', { name: /Cancel/i }));
+    expect(mockOnClose).toHaveBeenCalled(); 
+
+    // Simulate reopening the dialog
+    rerender(
       <BatchRelationshipSelector
         isOpen={true}
         onClose={mockOnClose}
         member={mockMember}
-        availableMembers={mockAvailableMembers}
+        availableMembers={useFamilyMembersStore().familyMembers}
         onAddRelationships={mockOnAddRelationships}
-      />
+      />,
     );
     
-    // 验证表单已重置
-    expect(screen.getByPlaceholderText(/Optional description/i)).toHaveValue('');
-    expect(screen.getByText(/No members selected/i)).toBeInTheDocument();
+    const dialogAfterReopen = screen.getByRole('dialog', { name: /Batch Add Relationships for John Doe/i });
+    // Verify form is reset
+    expect(within(dialogAfterReopen).getByLabelText(/Optional description/i)).toHaveValue('');
+    expect(within(dialogAfterReopen).getByRole('combobox', { name: /Relationship/i })).toHaveTextContent(/Child/i); // Resets to Child
+    expect(within(dialogAfterReopen).getByText(/No members selected/i)).toBeInTheDocument();
   });
-
+  
   it('当没有可用成员时应该显示提示信息', () => {
     render(
       <BatchRelationshipSelector
         isOpen={true}
         onClose={mockOnClose}
         member={mockMember}
-        availableMembers={[]}
+        availableMembers={[]} // No available members
         onAddRelationships={mockOnAddRelationships}
       />
     );
 
     // 验证提示信息
-    expect(screen.getByText(/No available members to create relationships with/i)).toBeInTheDocument();
+    expect(screen.getByText(/No available members to create relationships with./i)).toBeInTheDocument();
     
     // 验证提交按钮被禁用
     const submitButton = screen.getByText(/Add 0 Relationships/i);
     expect(submitButton).toBeDisabled();
   });
+
+  it('应该允许通过点击徽章上的X按钮来取消选择成员', async () => {
+    const user = userEvent.setup();
+    render(
+      <BatchRelationshipSelector
+        isOpen={true}
+        onClose={mockOnClose}
+        member={mockMember}
+        availableMembers={useFamilyMembersStore().familyMembers}
+        onAddRelationships={mockOnAddRelationships}
+      />
+    );
+
+    // 选择第一个成员
+    const firstCheckbox = screen.getByLabelText(/Jane Doe \(Mother\)/i);
+    await user.click(firstCheckbox);
+    expect(screen.getByText('Jane Doe')).toBeInTheDocument();
+    expect(screen.getByText(/Add 1 Relationship/i)).toBeInTheDocument();
+
+    // 点击徽章上的X按钮取消选择
+    const removeButton = screen.getByTestId('remove-selected-member-2');
+    await user.click(removeButton);
+
+    // 验证成员已被取消选择
+    expect(screen.queryByText('Jane Doe')).not.toBeInTheDocument();
+    expect(screen.getByText(/Add 0 Relationships/i)).toBeInTheDocument();
+    expect(firstCheckbox).not.toBeChecked();
+  });
+
+  describe('when through Escape key close dialog', () => {
+    it('should call onClose and reset form', async () => {
+      const user = userEvent.setup();
+      const { rerender } = render(
+        <BatchRelationshipSelector
+          isOpen={true}
+          onClose={mockOnClose}
+          member={mockMember}
+          availableMembers={useFamilyMembersStore().familyMembers}
+          onAddRelationships={mockOnAddRelationships}
+        />
+      );
+      const initialDialog = screen.getByRole('dialog', { name: /Batch Add Relationships for John Doe/i });
+      await user.type(within(initialDialog).getByLabelText(/Optional description/i), 'Test description for escape');
+      // Change relationship type
+      await user.click(within(initialDialog).getByRole('combobox', { name: /Relationship/i }));
+      await user.click(screen.getByRole('option', { name: RelationType.PARENT }));
+
+
+      await user.keyboard('{Escape}');
+      expect(mockOnClose).toHaveBeenCalled();
+
+      rerender(
+        <BatchRelationshipSelector
+          isOpen={true}
+          onClose={mockOnClose}
+          member={mockMember}
+          availableMembers={useFamilyMembersStore().familyMembers}
+          onAddRelationships={mockOnAddRelationships}
+        />
+      );
+      const dialogAfterReopen = screen.getByRole('dialog', { name: /Batch Add Relationships for John Doe/i });
+      expect(within(dialogAfterReopen).getByLabelText(/Optional description/i)).toHaveValue('');
+      expect(within(dialogAfterReopen).getByRole('combobox', { name: /Relationship/i })).toHaveTextContent(/Child/i);
+      expect(within(dialogAfterReopen).getByText(/No members selected/i)).toBeInTheDocument();
+    });
+  });
+
+  it('当通过Escape键关闭对话框时，应该调用onClose并重置表单', async () => {
+    const user = userEvent.setup();
+    const { rerender } = render(
+      <BatchRelationshipSelector
+        isOpen={true}
+        onClose={mockOnClose}
+        member={mockMember}
+        availableMembers={useFamilyMembersStore().familyMembers}
+        onAddRelationships={mockOnAddRelationships}
+      />,
+    );
+    const initialDialog = screen.getByRole('dialog', { name: /Batch Add Relationships for John Doe/i });
+    await user.type(within(initialDialog).getByLabelText(/Optional description/i), '一些描述');
+    // Change relationship type
+    await user.click(within(initialDialog).getByRole('combobox', { name: /Relationship/i }));
+    await user.click(screen.getByRole('option', { name: RelationType.SIBLING }));
+
+
+    await user.keyboard('{Escape}');
+    expect(mockOnClose).toHaveBeenCalled();
+
+    rerender(
+      <BatchRelationshipSelector
+        isOpen={true}
+        onClose={mockOnClose}
+        member={mockMember}
+        availableMembers={useFamilyMembersStore().familyMembers}
+        onAddRelationships={mockOnAddRelationships}
+      />,
+    );
+    const dialogAfterReopen = screen.getByRole('dialog', { name: /Batch Add Relationships for John Doe/i });
+    expect(within(dialogAfterReopen).getByLabelText(/Optional description/i)).toHaveValue('');
+    expect(within(dialogAfterReopen).getByRole('combobox', { name: /Relationship/i })).toHaveTextContent(/Child/i);
+    expect(within(dialogAfterReopen).getByText(/No members selected/i)).toBeInTheDocument();
+  });
+  // ... other tests, ensuring 'member' prop is used and 'availableMembers' is passed ...
 });

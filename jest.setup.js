@@ -61,6 +61,35 @@ global.localStorage = new LocalStorageMock();
 // 全局模拟fetch
 global.fetch = jest.fn();
 
-// 模拟TextDecoder和TextEncoder，解决@neondatabase/serverless的依赖问题
-global.TextDecoder = require('util').TextDecoder;
-global.TextEncoder = require('util').TextEncoder;
+// Mock TextEncoder and TextDecoder
+const { TextEncoder, TextDecoder } = require('util'); // 确保从 util 导入
+
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
+// Mock ResizeObserver
+global.ResizeObserver = jest.fn().mockImplementation(() => ({
+  observe: jest.fn(),
+  unobserve: jest.fn(),
+  disconnect: jest.fn(),
+}));
+
+// Mock hasPointerCapture
+if (typeof Element.prototype.hasPointerCapture === 'undefined') {
+  Element.prototype.hasPointerCapture = jest.fn().mockReturnValue(false);
+}
+
+// Mock releasePointerCapture if it's also missing, often paired with hasPointerCapture
+if (typeof Element.prototype.releasePointerCapture === 'undefined') {
+  Element.prototype.releasePointerCapture = jest.fn();
+}
+
+// Mock setPointerCapture if it's also missing
+if (typeof Element.prototype.setPointerCapture === 'undefined') {
+  Element.prototype.setPointerCapture = jest.fn();
+}
+
+// Mock scrollIntoView
+if (typeof Element.prototype.scrollIntoView === 'undefined') {
+  Element.prototype.scrollIntoView = jest.fn();
+}

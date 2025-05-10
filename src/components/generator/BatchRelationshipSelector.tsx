@@ -12,7 +12,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { UserPlus, X, Check, Users } from 'lucide-react';
 import { Badge } from "@/components/ui/badge";
 
-interface BatchRelationshipSelectorProps {
+export interface BatchRelationshipSelectorProps {
   isOpen: boolean;
   onClose: () => void;
   member: Member;
@@ -165,6 +165,7 @@ const BatchRelationshipSelector: React.FC<BatchRelationshipSelectorProps> = ({
                               type="button" 
                               onClick={() => handleMemberToggle(id)}
                               className="ml-1 rounded-full hover:bg-muted p-0.5"
+                              data-testid={`remove-selected-${id}`}
                             >
                               <X className="h-3 w-3" />
                             </button>
